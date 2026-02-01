@@ -1,6 +1,9 @@
-import { getSupabaseClient } from '../client';
+import { getSupabaseClient, getSupabaseAdminClient } from '../client';
 import type { TaskRow, TaskInsert, TaskUpdate } from '../schema/tasks';
 import type { TaskStatus } from '@porternetwork/shared-types';
+
+// Use admin client for write operations (bypasses RLS)
+const getWriteClient = () => getSupabaseAdminClient();
 
 export interface ListTasksOptions {
   status?: TaskStatus;
@@ -118,7 +121,7 @@ export async function getTaskByChainId(
  * Create a new task
  */
 export async function createTask(task: TaskInsert): Promise<TaskRow> {
-  const supabase = getSupabaseClient();
+  const supabase = getWriteClient();
 
   const { data, error } = await supabase
     .from('tasks')
@@ -140,7 +143,7 @@ export async function updateTask(
   id: string,
   updates: TaskUpdate
 ): Promise<TaskRow> {
-  const supabase = getSupabaseClient();
+  const supabase = getWriteClient();
 
   const { data, error } = await supabase
     .from('tasks')

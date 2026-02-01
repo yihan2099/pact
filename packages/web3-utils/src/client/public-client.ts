@@ -4,16 +4,31 @@ import {
   type PublicClient,
   type Chain,
   type Transport,
+  defineChain,
 } from 'viem';
 import { baseSepolia, base } from 'viem/chains';
 
 let publicClient: PublicClient<Transport, Chain> | null = null;
 
 /**
+ * Local Anvil chain configuration
+ */
+const localAnvil = defineChain({
+  id: 31337,
+  name: 'Anvil Local',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['http://127.0.0.1:8545'] },
+  },
+});
+
+/**
  * Get the chain configuration based on chain ID
  */
 export function getChain(chainId: number): Chain {
   switch (chainId) {
+    case 31337:
+      return localAnvil;
     case 84532:
       return baseSepolia;
     case 8453:
@@ -50,6 +65,8 @@ export function getPublicClient(
  */
 export function getDefaultRpcUrl(chainId: number): string {
   switch (chainId) {
+    case 31337:
+      return process.env.RPC_URL || 'http://127.0.0.1:8545';
     case 84532:
       return 'https://sepolia.base.org';
     case 8453:

@@ -15,11 +15,12 @@ export function getSupabaseClient(): SimpleSupabaseClient {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY;
+  // Support both new (SUPABASE_PUBLISHABLE_KEY) and legacy (SUPABASE_ANON_KEY) naming
+  const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      'Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_ANON_KEY.'
+      'Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY (or SUPABASE_ANON_KEY).'
     );
   }
 
@@ -38,11 +39,12 @@ export function getSupabaseClient(): SimpleSupabaseClient {
  */
 export function getSupabaseAdminClient(): SimpleSupabaseClient {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Support both new (SUPABASE_SECRET_KEY) and legacy (SUPABASE_SERVICE_ROLE_KEY) naming
+  const supabaseServiceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
     throw new Error(
-      'Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.'
+      'Missing Supabase environment variables. Please set SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY).'
     );
   }
 
