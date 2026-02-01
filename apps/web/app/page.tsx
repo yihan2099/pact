@@ -40,9 +40,18 @@ export default function Home() {
   const { scale, gridMul, digitSize } = useResponsiveTerminalParams();
 
   return (
-    <div className="relative min-h-screen">
-      {/* Fixed terminal background */}
-      <div className="fixed inset-0" aria-hidden="true">
+    <div className="relative min-h-screen min-h-[100dvh]">
+      {/* Fixed terminal background - extended beyond viewport for iOS overscroll */}
+      <div
+        className="fixed bg-black"
+        style={{
+          top: "-100px",
+          right: "-100px",
+          bottom: "-100px",
+          left: "-100px",
+        }}
+        aria-hidden="true"
+      >
         <FaultyTerminal
           scale={scale}
           gridMul={gridMul}
