@@ -3,6 +3,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import type { AgentTier } from '@porternetwork/shared-types';
 import { allTools } from './tools';
@@ -13,6 +15,7 @@ import { cancelTaskTool } from './tools/task/cancel-task';
 import { claimTaskTool } from './tools/agent/claim-task';
 import { submitWorkTool } from './tools/agent/submit-work';
 import { getMyClaimsTool } from './tools/agent/get-my-claims';
+import { registerAgentTool } from './tools/agent/register-agent';
 import { listPendingTool } from './tools/verifier/list-pending';
 import { submitVerdictTool } from './tools/verifier/submit-verdict';
 import {
@@ -22,6 +25,7 @@ import {
 } from './tools/auth';
 import { getSession } from './auth/session-manager';
 import { checkAccess } from './auth/access-control';
+import { allPrompts, getPromptContent } from './prompts';
 
 export interface ServerContext {
   callerAddress: `0x${string}`;
@@ -44,6 +48,7 @@ export function createMcpServer() {
     {
       capabilities: {
         tools: {},
+        prompts: {},
       },
     }
   );
@@ -51,6 +56,34 @@ export function createMcpServer() {
   // Handle tool listing
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return { tools: allTools };
+  });
+
+  // Handle prompt listing
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    return { prompts: allPrompts };
+  });
+
+  // Handle prompt retrieval
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const { name } = request.params;
+    const content = getPromptContent(name);
+
+    if (!content) {
+      throw new Error(`Unknown prompt: ${name}`);
+    }
+
+    return {
+      description: allPrompts.find((p) => p.name === name)?.description || '',
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: content,
+          },
+        },
+      ],
+    };
   });
 
   // Handle tool calls
@@ -138,6 +171,9 @@ export function createMcpServer() {
           break;
         case 'get_my_claims':
           result = await getMyClaimsTool.handler(args, context);
+          break;
+        case 'register_agent':
+          result = await registerAgentTool.handler(args, context);
           break;
         case 'list_pending_verifications':
           result = await listPendingTool.handler(args, context);
