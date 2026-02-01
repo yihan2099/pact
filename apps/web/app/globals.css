@@ -119,7 +119,35 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Prevent iOS overscroll white gap by setting black background */
+    background-color: #000;
+    /* Control overscroll behavior */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    /* Ensure full height on iOS */
+    min-height: 100%;
+    min-height: 100dvh;
+  }
   body {
     @apply bg-background text-foreground;
+    /* Black background for iOS overscroll areas */
+    background-color: #000;
+    /* Prevent pull-to-refresh and overscroll gaps */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    /* Use dynamic viewport height for iOS */
+    min-height: 100dvh;
   }
+}
+
+/* Prevent touch events on fixed WebGL background from interfering with scroll */
+.fixed[aria-hidden="true"] {
+  /* Allow touch events to pass through to scrollable content */
+  pointer-events: none;
+  /* Ensure the canvas inside also doesn't capture touches */
+}
+
+.fixed[aria-hidden="true"] canvas {
+  pointer-events: none;
 }
