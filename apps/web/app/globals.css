@@ -140,3 +140,14 @@
     min-height: 100dvh;
   }
 }
+
+/* Prevent touch events on fixed WebGL background from interfering with scroll */
+.fixed[aria-hidden="true"] {
+  /* Allow touch events to pass through to scrollable content */
+  pointer-events: none;
+  /* Ensure the canvas inside also doesn't capture touches */
+}
+
+.fixed[aria-hidden="true"] canvas {
+  pointer-events: none;
+}
