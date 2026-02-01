@@ -182,12 +182,35 @@ float botChar4(vec2 p) {
     return on ? 1.0 : 0.0;
 }
 
+// Bot variant 5: Crab/Lobster (7x5) - OpenClaw mascot
+float botCharCrab(vec2 p) {
+    float px = p.x * 7.0;
+    float py = (1.0 - p.y) * 5.0;
+    int ix = int(floor(px));
+    int iy = int(floor(py));
+
+    // X.....X  (claws raised)
+    // XX...XX  (pincers)
+    // .XXXXX.  (shell)
+    // ..X.X..  (eyes)
+    // .X.X.X.  (legs)
+    bool on = false;
+    if (iy == 0) on = (ix == 0 || ix == 6);
+    else if (iy == 1) on = (ix == 0 || ix == 1 || ix == 5 || ix == 6);
+    else if (iy == 2) on = (ix >= 1 && ix <= 5);
+    else if (iy == 3) on = (ix == 2 || ix == 4);
+    else if (iy == 4) on = (ix == 1 || ix == 3 || ix == 5);
+
+    return on ? 1.0 : 0.0;
+}
+
 // Select bot variant based on hash
 float botChar(vec2 p, float variant) {
-    if (variant < 0.25) return botChar1(p);
-    else if (variant < 0.5) return botChar2(p);
-    else if (variant < 0.75) return botChar3(p);
-    else return botChar4(p);
+    if (variant < 0.18) return botChar1(p);
+    else if (variant < 0.36) return botChar2(p);
+    else if (variant < 0.54) return botChar3(p);
+    else if (variant < 0.70) return botChar4(p);
+    else return botCharCrab(p);  // 30% chance for crab
 }
 
 // XHODAI logo text (spans 6 cells horizontally)
@@ -350,6 +373,10 @@ float digit(vec2 p){
         float botVariant = fract(sin(dot(cellId, vec2(45.23, 89.13))) * 12345.6);
         float botVal = botChar(p, botVariant);
         brightness = botVal * 1.0;
+        // Mark crab variant for red coloring (variant >= 0.70)
+        if (botVariant >= 0.70 && botVal > 0.0) {
+            brightness = botVal * 2.0; // Flag for crab: brightness > 1.0
+        }
     } else if (isDollarFlow && intensity > 0.1) {
         // Render flowing dollar (more visible, animated)
         float dollarVal = dollarSmall(p);
@@ -387,10 +414,10 @@ float displace(vec2 look)
 }
 
 vec3 getColor(vec2 p){
-    
+
     float bar = step(mod(p.y + time * 20.0, 1.0), 0.2) * 0.4 + 1.0;
     bar *= uScanlineIntensity;
-    
+
     float displacement = displace(p);
     p.x += displacement;
 
@@ -400,13 +427,24 @@ vec3 getColor(vec2 p){
     }
 
     float middle = digit(p);
-    
+
     const float off = 0.002;
     float sum = digit(p + vec2(-off, -off)) + digit(p + vec2(0.0, -off)) + digit(p + vec2(off, -off)) +
                 digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(off, 0.0)) +
                 digit(p + vec2(-off, off)) + digit(p + vec2(0.0, off)) + digit(p + vec2(off, off));
-    
-    vec3 baseColor = vec3(0.9) * middle + sum * 0.1 * vec3(1.0) * bar;
+
+    // Check if this is a crab (brightness > 1.0 is our flag)
+    bool isCrab = middle > 1.5;
+
+    vec3 baseColor;
+    if (isCrab) {
+        // Lobster red color for crab icons: #E63B2E -> vec3(0.9, 0.23, 0.18)
+        vec3 lobsterRed = vec3(0.9, 0.23, 0.18);
+        float actualBrightness = middle * 0.5; // Convert back from flag
+        baseColor = lobsterRed * actualBrightness + sum * 0.1 * lobsterRed * bar;
+    } else {
+        baseColor = vec3(0.9) * middle + sum * 0.1 * vec3(1.0) * bar;
+    }
     return baseColor;
 }
 
