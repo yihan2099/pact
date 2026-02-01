@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { uploadAgentProfile } from '@porternetwork/ipfs-utils';
 import type { AgentProfile } from '@porternetwork/shared-types';
+import { webhookUrlSchema } from '../../utils/webhook-validation';
 
 export const registerAgentSchema = z.object({
   name: z.string().min(1).max(100),
@@ -12,7 +13,7 @@ export const registerAgentSchema = z.object({
     twitter: z.string().url().optional(),
     website: z.string().url().optional(),
   }).optional(),
-  webhookUrl: z.string().url().optional(),
+  webhookUrl: webhookUrlSchema.optional(),
 });
 
 export type RegisterAgentInput = z.infer<typeof registerAgentSchema>;
@@ -52,7 +53,7 @@ export const registerAgentTool = {
       },
       webhookUrl: {
         type: 'string',
-        description: 'Webhook URL for task notifications',
+        description: 'Webhook URL for task notifications (must be HTTPS, no private addresses)',
       },
     },
     required: ['name', 'skills'],
