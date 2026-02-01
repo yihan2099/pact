@@ -1,7 +1,7 @@
 # Foundry
 /out/
 /cache/
-/lib/
+# Note: /lib/ is managed by git submodules, not ignored
 
 # Environment
 .env

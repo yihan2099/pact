@@ -17,26 +17,32 @@ contract DeployScript is Script {
         PorterRegistry porterRegistry = new PorterRegistry();
         console.log("PorterRegistry deployed at:", address(porterRegistry));
 
-        // 2. Deploy EscrowVault with a placeholder TaskManager address
-        // We'll need to use a factory or proxy pattern for proper initialization
-        // For now, deploy with a placeholder and note this limitation
-        address taskManagerPlaceholder = address(0);
-        EscrowVault escrowVault = new EscrowVault(taskManagerPlaceholder);
+        // 2. Predict TaskManager address using CREATE (nonce-based)
+        // After PorterRegistry deployment, deployer nonce is at a known value
+        // We need to deploy EscrowVault first, then TaskManager
+        // So: nonce+0 = EscrowVault, nonce+1 = TaskManager
+        address deployer = vm.addr(deployerPrivateKey);
+        uint64 currentNonce = vm.getNonce(deployer);
+
+        // TaskManager will be deployed at nonce+1 (after EscrowVault at nonce+0)
+        address predictedTaskManager = vm.computeCreateAddress(deployer, currentNonce + 1);
+        console.log("Predicted TaskManager address:", predictedTaskManager);
+
+        // 3. Deploy EscrowVault with predicted TaskManager address
+        EscrowVault escrowVault = new EscrowVault(predictedTaskManager);
         console.log("EscrowVault deployed at:", address(escrowVault));
 
-        // 3. Deploy TaskManager
+        // 4. Deploy TaskManager (will be at predicted address)
         TaskManager taskManager = new TaskManager(address(escrowVault), address(porterRegistry));
         console.log("TaskManager deployed at:", address(taskManager));
 
-        // 4. Deploy VerificationHub
+        // Verify prediction was correct
+        require(address(taskManager) == predictedTaskManager, "TaskManager address mismatch!");
+
+        // 5. Deploy VerificationHub
         VerificationHub verificationHub =
             new VerificationHub(address(taskManager), address(porterRegistry));
         console.log("VerificationHub deployed at:", address(verificationHub));
-
-        // Note: In production, you'd need to:
-        // 1. Use upgradeable proxies
-        // 2. Set the correct TaskManager address in EscrowVault
-        // 3. Set up access control for cross-contract calls
 
         vm.stopBroadcast();
 

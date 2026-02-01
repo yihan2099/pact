@@ -43,3 +43,9 @@ next-env.d.ts
 
 # turbo
 .turbo
+
+# foundry
+apps/contracts/out/
+apps/contracts/cache/
+apps/contracts/broadcast/
+apps/contracts/foundry.lock
