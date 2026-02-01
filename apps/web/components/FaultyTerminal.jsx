@@ -604,7 +604,14 @@ export default function FaultyTerminal({
     // Initialize random offset on mount
     timeOffsetRef.current = Math.random() * 100;
 
-    const renderer = new Renderer({ dpr });
+    // preserveDrawingBuffer: true prevents black flash when iOS Safari throttles RAF during scroll
+    // powerPreference: 'high-performance' helps maintain frame rate during scroll
+    const renderer = new Renderer({
+      dpr,
+      preserveDrawingBuffer: true,
+      powerPreference: 'high-performance',
+      antialias: false,
+    });
     rendererRef.current = renderer;
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
