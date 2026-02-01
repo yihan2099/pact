@@ -64,6 +64,27 @@ Foundry-based Solidity contracts targeting Base (Sepolia testnet and mainnet):
 - **mcp-server** (apps/): Backend MCP server exposing Porter Network tools to AI agents
 - **mcp-client** (packages/): NPM-publishable client for adding Porter capabilities to Claude Desktop
 
+#### MCP Authentication
+
+The MCP server uses wallet signature authentication with session-based access control:
+
+**Auth Flow:**
+1. Agent calls `auth_get_challenge` → receives challenge message
+2. Agent signs challenge with wallet private key
+3. Agent calls `auth_verify` with signature → receives sessionId
+4. Subsequent tool calls include sessionId for authentication
+
+**Access Levels:**
+- `public`: No auth required (`list_tasks`, `get_task`, auth tools)
+- `authenticated`: Valid session required (`get_my_claims`)
+- `registered`: On-chain registration required (`create_task`, `claim_task`, `submit_work`)
+- `verifier`: Elite tier with verification rights (`submit_verdict`, `list_pending_verifications`)
+
+**Key Files:**
+- `apps/mcp-server/src/auth/session-manager.ts` - Session CRUD, 24h expiration
+- `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements
+- `apps/mcp-server/src/tools/auth/` - Auth tool handlers
+
 ### Data Flow
 
 1. Tasks created on-chain via TaskManager with specs stored on IPFS (Pinata)

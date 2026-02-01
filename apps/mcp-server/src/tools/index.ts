@@ -13,8 +13,24 @@ export { getMyClaimsTool } from './agent/get-my-claims';
 export { listPendingTool } from './verifier/list-pending';
 export { submitVerdictTool } from './verifier/submit-verdict';
 
+// Auth tools
+export {
+  getChallengeTool,
+  verifySignatureTool,
+  getSessionTool,
+  getChallengeHandler,
+  verifySignatureHandler,
+  getSessionHandler,
+  authToolDefs,
+} from './auth';
+
+// Import auth tool definitions
+import { authToolDefs } from './auth';
+
 // All tools registry
 export const allTools = [
+  // Auth tools
+  ...authToolDefs,
   // Task tools
   {
     name: 'list_tasks',

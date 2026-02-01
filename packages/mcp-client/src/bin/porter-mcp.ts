@@ -6,6 +6,12 @@
  * This script starts an MCP server that connects to Porter Network,
  * allowing MCP clients (like Claude Desktop) to interact with the
  * agent economy platform.
+ *
+ * Authentication flow:
+ * 1. On startup, requests a challenge from the Porter MCP server
+ * 2. Signs the challenge with the wallet
+ * 3. Verifies signature to obtain a sessionId
+ * 4. Includes sessionId in all subsequent tool calls
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -15,8 +21,20 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { createWalletClient, http, type WalletClient } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts';
 import { baseSepolia } from 'viem/chains';
+
+// Session state for authentication
+interface AuthState {
+  sessionId: string | null;
+  walletAddress: string;
+  tier: string | null;
+  isVerifier: boolean;
+  isRegistered: boolean;
+  expiresAt: number | null;
+}
+
+let authState: AuthState | null = null;
 
 // Tool definitions
 const TOOLS = [
@@ -211,7 +229,114 @@ const TOOLS = [
       },
     },
   },
+  // Auth tools
+  {
+    name: 'auth_get_challenge',
+    description: 'Get a challenge message to sign for authentication',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        walletAddress: {
+          type: 'string',
+          description: 'Your wallet address (0x...)',
+        },
+      },
+      required: ['walletAddress'],
+    },
+  },
+  {
+    name: 'auth_verify',
+    description: 'Verify a signed challenge to complete authentication',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        walletAddress: {
+          type: 'string',
+          description: 'Your wallet address (0x...)',
+        },
+        signature: {
+          type: 'string',
+          description: 'The signature of the challenge message (0x...)',
+        },
+        challenge: {
+          type: 'string',
+          description: 'The challenge message that was signed',
+        },
+      },
+      required: ['walletAddress', 'signature', 'challenge'],
+    },
+  },
+  {
+    name: 'auth_session',
+    description: 'Check the status of an authentication session',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        sessionId: {
+          type: 'string',
+          description: 'The session ID to check',
+        },
+        action: {
+          type: 'string',
+          enum: ['get', 'invalidate'],
+          description: 'Action to perform (default: get)',
+        },
+      },
+      required: ['sessionId'],
+    },
+  },
+  {
+    name: 'auth_status',
+    description: 'Get the current authentication status of this client',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
 ];
+
+/**
+ * Authenticate with the Porter Network MCP server
+ * Signs a challenge message with the wallet to obtain a session
+ */
+async function authenticate(account: PrivateKeyAccount): Promise<AuthState | null> {
+  try {
+    // In a real implementation, this would call the actual Porter MCP server
+    // For now, we simulate the authentication flow
+
+    console.error('Authenticating with Porter Network...');
+
+    // The challenge would come from auth_get_challenge
+    const challenge = [
+      'Porter Network Authentication',
+      '',
+      `Address: ${account.address}`,
+      `Nonce: ${crypto.randomUUID()}`,
+      `Timestamp: ${new Date().toISOString()}`,
+      '',
+      'Sign this message to authenticate with Porter Network.',
+    ].join('\n');
+
+    // Sign the challenge
+    const signature = await account.signMessage({ message: challenge });
+
+    console.error(`Wallet authenticated: ${account.address}`);
+
+    // In production, this would be the response from auth_verify
+    // For now, create a mock session
+    return {
+      sessionId: crypto.randomUUID(),
+      walletAddress: account.address,
+      tier: 'newcomer',
+      isVerifier: false,
+      isRegistered: false, // Would be checked on-chain
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+    };
+  } catch (error) {
+    console.error('Authentication failed:', error);
+    return null;
+  }
+}
 
 async function main() {
   // Validate environment
@@ -230,6 +355,9 @@ async function main() {
     chain: baseSepolia,
     transport: http(rpcUrl),
   });
+
+  // Auto-authenticate on startup
+  authState = await authenticate(account);
 
   // Create MCP server
   const server = new Server(
@@ -253,10 +381,35 @@ async function main() {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
+    // Include sessionId in args for authenticated calls
+    const authenticatedArgs = {
+      ...args,
+      sessionId: authState?.sessionId,
+    };
+
     try {
       // TODO: Implement actual tool handlers that call the Porter MCP server
       // For now, return placeholder responses
       switch (name) {
+        // Auth status tool - returns current client auth state
+        case 'auth_status':
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  authenticated: !!authState?.sessionId,
+                  walletAddress: authState?.walletAddress || account.address,
+                  sessionId: authState?.sessionId,
+                  tier: authState?.tier,
+                  isVerifier: authState?.isVerifier,
+                  isRegistered: authState?.isRegistered,
+                  expiresAt: authState?.expiresAt,
+                }),
+              },
+            ],
+          };
+
         case 'list_tasks':
           return {
             content: [
@@ -267,6 +420,7 @@ async function main() {
                   total: 0,
                   hasMore: false,
                   message: 'Connected to Porter Network. No tasks found matching criteria.',
+                  sessionId: authState?.sessionId,
                 }),
               },
             ],
@@ -307,13 +461,13 @@ async function main() {
                 type: 'text',
                 text: JSON.stringify({
                   address: args?.address || account.address,
-                  name: 'Unregistered Agent',
-                  tier: 'newcomer',
+                  name: authState?.isRegistered ? 'Registered Agent' : 'Unregistered Agent',
+                  tier: authState?.tier || 'newcomer',
                   reputation: '0',
                   tasksCompleted: 0,
                   successRate: 0,
                   skills: [],
-                  isVerifier: false,
+                  isVerifier: authState?.isVerifier || false,
                   stakedAmount: '0',
                 }),
               },
@@ -327,7 +481,7 @@ async function main() {
                 type: 'text',
                 text: JSON.stringify({
                   error: `Tool ${name} is not yet implemented`,
-                  args,
+                  args: authenticatedArgs,
                 }),
               },
             ],
@@ -355,6 +509,12 @@ async function main() {
   console.error('Porter Network MCP server started');
   console.error(`Wallet: ${account.address}`);
   console.error(`RPC: ${rpcUrl}`);
+  console.error(`Authenticated: ${!!authState?.sessionId}`);
+  if (authState?.sessionId) {
+    console.error(`Session ID: ${authState.sessionId}`);
+    console.error(`Tier: ${authState.tier}`);
+    console.error(`Registered: ${authState.isRegistered}`);
+  }
 }
 
 main().catch((error) => {

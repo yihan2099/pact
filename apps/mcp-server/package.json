@@ -8,7 +8,9 @@
     "dev:mcp": "bun run --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target node",
     "start": "bun run dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

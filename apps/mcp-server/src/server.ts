@@ -4,6 +4,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import type { AgentTier } from '@porternetwork/shared-types';
 import { allTools } from './tools';
 import { listTasksTool } from './tools/task/list-tasks';
 import { getTaskTool } from './tools/task/get-task';
@@ -14,10 +15,21 @@ import { submitWorkTool } from './tools/agent/submit-work';
 import { getMyClaimsTool } from './tools/agent/get-my-claims';
 import { listPendingTool } from './tools/verifier/list-pending';
 import { submitVerdictTool } from './tools/verifier/submit-verdict';
+import {
+  getChallengeHandler,
+  verifySignatureHandler,
+  getSessionHandler,
+} from './tools/auth';
+import { getSession } from './auth/session-manager';
+import { checkAccess } from './auth/access-control';
 
 export interface ServerContext {
   callerAddress: `0x${string}`;
   isVerifier: boolean;
+  isAuthenticated: boolean;
+  tier: AgentTier | null;
+  isRegistered: boolean;
+  sessionId: string | null;
 }
 
 /**
@@ -45,16 +57,67 @@ export function createMcpServer() {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
-    // TODO: Extract context from authenticated session
-    const context: ServerContext = {
+    // Extract sessionId from args if provided
+    const typedArgs = args as Record<string, unknown> | undefined;
+    const sessionId = typedArgs?.sessionId as string | undefined;
+
+    // Build context from session
+    let context: ServerContext = {
       callerAddress: '0x0000000000000000000000000000000000000000',
       isVerifier: false,
+      isAuthenticated: false,
+      tier: null,
+      isRegistered: false,
+      sessionId: null,
     };
+
+    if (sessionId) {
+      const session = getSession(sessionId);
+      if (session) {
+        context = {
+          callerAddress: session.walletAddress,
+          isVerifier: session.isVerifier,
+          isAuthenticated: true,
+          tier: session.tier,
+          isRegistered: session.isRegistered,
+          sessionId,
+        };
+      }
+    }
+
+    // Check access control
+    const accessCheck = checkAccess(name, context);
+    if (!accessCheck.allowed) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: 'Access denied',
+              reason: accessCheck.reason,
+            }),
+          },
+        ],
+        isError: true,
+      };
+    }
 
     try {
       let result: unknown;
 
       switch (name) {
+        // Auth tools
+        case 'auth_get_challenge':
+          result = await getChallengeHandler(args);
+          break;
+        case 'auth_verify':
+          result = await verifySignatureHandler(args);
+          break;
+        case 'auth_session':
+          result = await getSessionHandler(args);
+          break;
+
+        // Task tools
         case 'list_tasks':
           result = await listTasksTool.handler(args);
           break;
