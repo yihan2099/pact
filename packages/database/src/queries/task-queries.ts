@@ -19,7 +19,9 @@ export interface ListTasksOptions {
 }
 
 /**
- * List tasks with filtering and pagination
+ * List tasks with filtering and pagination.
+ * Uses PostgreSQL RPC function for proper numeric bounty comparison when
+ * bounty filters are provided, otherwise uses standard Supabase query.
  */
 export async function listTasks(options: ListTasksOptions = {}): Promise<{
   tasks: TaskRow[];
@@ -39,6 +41,49 @@ export async function listTasks(options: ListTasksOptions = {}): Promise<{
     sortOrder = 'desc',
   } = options;
 
+  // When bounty filters are provided, use RPC function for proper numeric comparison
+  // This is necessary because bounty_amount is stored as TEXT (wei strings),
+  // and lexicographic comparison doesn't work correctly for numeric values
+  // (e.g., "500000..." > "1000000..." lexicographically, but < numerically)
+  if (minBounty || maxBounty) {
+    const { data, error } = await supabase.rpc('list_tasks_with_bounty_filter', {
+      p_min_bounty: minBounty || null,
+      p_max_bounty: maxBounty || null,
+      p_status: status || null,
+      p_creator_address: creatorAddress?.toLowerCase() || null,
+      p_claimed_by: claimedBy?.toLowerCase() || null,
+      p_tags: tags && tags.length > 0 ? tags : null,
+      p_limit: limit,
+      p_offset: offset,
+      p_sort_by: sortBy,
+      p_sort_order: sortOrder,
+    });
+
+    if (error) {
+      throw new Error(`Failed to list tasks: ${error.message}`);
+    }
+
+    const tasks = (data ?? []) as TaskRow[];
+
+    // Get accurate count using the companion count function
+    const { data: countData, error: countError } = await supabase.rpc('count_tasks_with_bounty_filter', {
+      p_min_bounty: minBounty || null,
+      p_max_bounty: maxBounty || null,
+      p_status: status || null,
+      p_creator_address: creatorAddress?.toLowerCase() || null,
+      p_claimed_by: claimedBy?.toLowerCase() || null,
+      p_tags: tags && tags.length > 0 ? tags : null,
+    });
+
+    if (countError) {
+      // Non-fatal: return tasks without accurate total
+      return { tasks, total: tasks.length };
+    }
+
+    return { tasks, total: (countData as number) ?? tasks.length };
+  }
+
+  // Standard query without bounty filtering
   let query = supabase.from('tasks').select('*', { count: 'exact' });
 
   if (status) {
@@ -55,14 +100,6 @@ export async function listTasks(options: ListTasksOptions = {}): Promise<{
 
   if (tags && tags.length > 0) {
     query = query.overlaps('tags', tags);
-  }
-
-  if (minBounty) {
-    query = query.gte('bounty_amount', minBounty);
-  }
-
-  if (maxBounty) {
-    query = query.lte('bounty_amount', maxBounty);
   }
 
   query = query

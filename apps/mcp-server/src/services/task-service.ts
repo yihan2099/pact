@@ -1,5 +1,6 @@
 import { listTasks, getTaskById, createTask, updateTask } from '@porternetwork/database';
 import { fetchTaskSpecification, uploadTaskSpecification } from '@porternetwork/ipfs-utils';
+import { ethToWei } from '@porternetwork/web3-utils';
 import type { ListTasksInput, CreateTaskInput, GetTaskInput } from '@porternetwork/shared-types';
 import type { TaskListItem, GetTaskResponse, CreateTaskResponse } from '@porternetwork/shared-types';
 
@@ -19,11 +20,32 @@ export async function listTasksHandler(
     sortBy = 'deadline';
   }
 
+  // Convert ETH inputs to wei for database comparison
+  // Database stores bounty amounts as wei strings (e.g., "1000000000000000000" for 1 ETH)
+  let minBountyWei: string | undefined;
+  let maxBountyWei: string | undefined;
+
+  if (input.minBounty) {
+    try {
+      minBountyWei = ethToWei(input.minBounty).toString();
+    } catch {
+      throw new Error(`Invalid minBounty value: "${input.minBounty}". Expected a valid ETH amount (e.g., "0.5", "1.0")`);
+    }
+  }
+
+  if (input.maxBounty) {
+    try {
+      maxBountyWei = ethToWei(input.maxBounty).toString();
+    } catch {
+      throw new Error(`Invalid maxBounty value: "${input.maxBounty}". Expected a valid ETH amount (e.g., "0.5", "1.0")`);
+    }
+  }
+
   const { tasks, total } = await listTasks({
     status: input.status as any,
     tags: input.tags,
-    minBounty: input.minBounty,
-    maxBounty: input.maxBounty,
+    minBounty: minBountyWei,
+    maxBounty: maxBountyWei,
     limit: input.limit || 20,
     offset: input.offset || 0,
     sortBy,
