@@ -26,6 +26,7 @@ contract VerificationHub is IVerificationHub {
     error InvalidScore();
     error NotAllowedToDispute();
     error OnlyTaskManager();
+    error TaskAlreadyPending();
 
     modifier onlyTaskManager() {
         if (msg.sender != address(taskManager)) revert OnlyTaskManager();
@@ -132,6 +133,14 @@ contract VerificationHub is IVerificationHub {
      * @param taskId The task ID
      */
     function addPending(uint256 taskId) external onlyTaskManager {
+        // Check if task is already in pending list
+        if (_pendingTaskIds.length > 0) {
+            uint256 index = _pendingIndex[taskId];
+            if (index < _pendingTaskIds.length && _pendingTaskIds[index] == taskId) {
+                revert TaskAlreadyPending();
+            }
+        }
+
         _pendingIndex[taskId] = _pendingTaskIds.length;
         _pendingTaskIds.push(taskId);
 

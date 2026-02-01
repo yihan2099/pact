@@ -42,6 +42,8 @@ contract TaskManager is ITaskManager {
     error OnlyVerificationHub();
     error ClaimNotExpired();
     error OnlyCreatorCanReclaim();
+    error DeadlinePassed();
+    error VerificationHubNotSet();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert OnlyOwner();
@@ -151,6 +153,8 @@ contract TaskManager is ITaskManager {
         if (task.id == 0) revert TaskNotFound();
         if (task.status != TaskStatus.Claimed) revert TaskNotClaimed();
         if (task.claimedBy != msg.sender) revert NotClaimingAgent();
+        if (task.deadline != 0 && block.timestamp > task.deadline) revert DeadlinePassed();
+        if (verificationHub == address(0)) revert VerificationHubNotSet();
 
         task.status = TaskStatus.Submitted;
         task.submissionCid = submissionCid;

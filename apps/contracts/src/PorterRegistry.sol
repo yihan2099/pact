@@ -166,6 +166,7 @@ contract PorterRegistry is IPorterRegistry {
      * @param agent The agent address
      */
     function incrementCompleted(address agent) external onlyAuthorized {
+        if (_agents[agent].registeredAt == 0) revert NotRegistered();
         _agents[agent].tasksCompleted++;
     }
 
@@ -174,6 +175,7 @@ contract PorterRegistry is IPorterRegistry {
      * @param agent The agent address
      */
     function incrementFailed(address agent) external onlyAuthorized {
+        if (_agents[agent].registeredAt == 0) revert NotRegistered();
         _agents[agent].tasksFailed++;
     }
 

@@ -752,4 +752,104 @@ contract VerificationFlowTest is Test {
         vm.prank(creator);
         taskManager.reclaimExpiredTask(taskId);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                       SECURITY FIX TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_IncrementCompleted_RevertIfNotRegistered() public {
+        address unregisteredAgent = address(0x999);
+
+        // TaskManager is authorized, but should still fail for unregistered agent
+        vm.prank(address(taskManager));
+        vm.expectRevert(PorterRegistry.NotRegistered.selector);
+        porterRegistry.incrementCompleted(unregisteredAgent);
+    }
+
+    function test_IncrementFailed_RevertIfNotRegistered() public {
+        address unregisteredAgent = address(0x999);
+
+        // TaskManager is authorized, but should still fail for unregistered agent
+        vm.prank(address(taskManager));
+        vm.expectRevert(PorterRegistry.NotRegistered.selector);
+        porterRegistry.incrementFailed(unregisteredAgent);
+    }
+
+    function test_CannotAddDuplicatePending() public {
+        // Create and claim task
+        vm.prank(creator);
+        uint256 taskId = taskManager.createTask{value: BOUNTY_AMOUNT}(
+            "task-spec-cid",
+            address(0),
+            BOUNTY_AMOUNT,
+            0
+        );
+
+        vm.prank(agent);
+        taskManager.claimTask(taskId);
+
+        // Submit work (this adds to pending)
+        vm.prank(agent);
+        taskManager.submitWork(taskId, "submission-cid");
+
+        // Verify task is in pending list
+        uint256[] memory pending = verificationHub.pendingVerifications();
+        assertEq(pending.length, 1);
+        assertEq(pending[0], taskId);
+
+        // Try to add the same task again directly (simulating a bug or attack)
+        vm.prank(address(taskManager));
+        vm.expectRevert(VerificationHub.TaskAlreadyPending.selector);
+        verificationHub.addPending(taskId);
+    }
+
+    function test_CannotSubmitWorkAfterDeadline() public {
+        // Create task with 1 day deadline
+        uint256 deadline = block.timestamp + 1 days;
+        vm.prank(creator);
+        uint256 taskId = taskManager.createTask{value: BOUNTY_AMOUNT}(
+            "task-spec-cid",
+            address(0),
+            BOUNTY_AMOUNT,
+            deadline
+        );
+
+        // Agent claims task
+        vm.prank(agent);
+        taskManager.claimTask(taskId);
+
+        // Fast forward past deadline
+        vm.warp(block.timestamp + 1 days + 1);
+
+        // Agent tries to submit work after deadline
+        vm.prank(agent);
+        vm.expectRevert(TaskManager.DeadlinePassed.selector);
+        taskManager.submitWork(taskId, "submission-cid");
+    }
+
+    function test_CanSubmitWorkBeforeDeadline() public {
+        // Create task with 1 day deadline
+        uint256 deadline = block.timestamp + 1 days;
+        vm.prank(creator);
+        uint256 taskId = taskManager.createTask{value: BOUNTY_AMOUNT}(
+            "task-spec-cid",
+            address(0),
+            BOUNTY_AMOUNT,
+            deadline
+        );
+
+        // Agent claims task
+        vm.prank(agent);
+        taskManager.claimTask(taskId);
+
+        // Fast forward but still before deadline
+        vm.warp(block.timestamp + 12 hours);
+
+        // Agent can submit work before deadline
+        vm.prank(agent);
+        taskManager.submitWork(taskId, "submission-cid");
+
+        ITaskManager.Task memory task = taskManager.getTask(taskId);
+        assertEq(uint256(task.status), uint256(ITaskManager.TaskStatus.Submitted));
+    }
 }
