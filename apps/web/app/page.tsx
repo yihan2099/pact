@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
@@ -11,27 +11,44 @@ const FaultyTerminal = dynamic(() => import("@/components/FaultyTerminal"), {
   ssr: false,
 });
 
+// Stable grid multiplier arrays to prevent unnecessary re-renders
+const GRID_MUL_MOBILE: [number, number] = [1, 1];
+const GRID_MUL_DESKTOP: [number, number] = [2, 1];
+
 function useResponsiveTerminalParams() {
-  const [params, setParams] = useState({
-    scale: 1.5,
-    gridMul: [2, 1] as [number, number],
-    digitSize: 1.2,
-  });
+  const [isMobile, setIsMobile] = useState(false);
+  const lastWidthRef = useRef<number | null>(null);
 
   useEffect(() => {
     const updateParams = () => {
-      const isMobile = window.innerWidth < 768;
-      setParams({
-        scale: isMobile ? 1.0 : 1.5,
-        gridMul: isMobile ? [1, 1] : [2, 1],
-        digitSize: isMobile ? 1.5 : 1.2,
-      });
+      const width = window.innerWidth;
+      const newIsMobile = width < 768;
+
+      // Only update if the mobile/desktop breakpoint actually crossed
+      // This prevents re-renders from iOS address bar resize events
+      if (lastWidthRef.current !== null) {
+        const wasAlsoMobile = lastWidthRef.current < 768;
+        if (wasAlsoMobile === newIsMobile) {
+          lastWidthRef.current = width;
+          return; // Same breakpoint, no need to update
+        }
+      }
+
+      lastWidthRef.current = width;
+      setIsMobile(newIsMobile);
     };
 
     updateParams();
     window.addEventListener("resize", updateParams);
     return () => window.removeEventListener("resize", updateParams);
   }, []);
+
+  // Use stable array references that never change
+  const params = useMemo(() => ({
+    scale: isMobile ? 1.0 : 1.5,
+    gridMul: isMobile ? GRID_MUL_MOBILE : GRID_MUL_DESKTOP,
+    digitSize: isMobile ? 1.5 : 1.2,
+  }), [isMobile]);
 
   return params;
 }
@@ -41,8 +58,17 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen min-h-[100dvh]">
-      {/* Fixed terminal background */}
-      <div className="fixed inset-0 bg-black" aria-hidden="true">
+      {/* Fixed terminal background - GPU accelerated to prevent scroll glitches */}
+      <div
+        className="fixed inset-0 bg-black"
+        aria-hidden="true"
+        style={{
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+        }}
+      >
         <FaultyTerminal
           scale={scale}
           gridMul={gridMul}

@@ -577,6 +577,7 @@ export default function FaultyTerminal({
   const containerRef = useRef(null);
   const programRef = useRef(null);
   const rendererRef = useRef(null);
+  const meshRef = useRef(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
   const smoothMouseRef = useRef({ x: 0.5, y: 0.5 });
   const frozenTimeRef = useRef(0);
@@ -584,8 +585,14 @@ export default function FaultyTerminal({
   const loadAnimationStartRef = useRef(0);
   const timeOffsetRef = useRef(0);
 
-  const tintVec = useMemo(() => hexToRgb(tint), [tint]);
+  // Store current props in refs so render loop always has latest values
+  // without causing effect re-runs
+  const propsRef = useRef({
+    pause, timeScale, mouseReact, pageLoadAnimation
+  });
+  propsRef.current = { pause, timeScale, mouseReact, pageLoadAnimation };
 
+  const tintVec = useMemo(() => hexToRgb(tint), [tint]);
   const ditherValue = useMemo(() => (typeof dither === 'boolean' ? (dither ? 1 : 0) : dither), [dither]);
 
   const handleMouseMove = useCallback(e => {
@@ -597,6 +604,8 @@ export default function FaultyTerminal({
     mouseRef.current = { x, y };
   }, []);
 
+  // INITIALIZATION EFFECT - Only runs once on mount, cleanup on unmount
+  // This prevents WebGL context loss during prop changes
   useEffect(() => {
     const ctn = containerRef.current;
     if (!ctn) return;
@@ -604,7 +613,14 @@ export default function FaultyTerminal({
     // Initialize random offset on mount
     timeOffsetRef.current = Math.random() * 100;
 
-    const renderer = new Renderer({ dpr });
+    // preserveDrawingBuffer: true prevents black flash when iOS Safari throttles RAF during scroll
+    // powerPreference: 'high-performance' helps maintain frame rate during scroll
+    const renderer = new Renderer({
+      dpr,
+      preserveDrawingBuffer: true,
+      powerPreference: 'high-performance',
+      antialias: false,
+    });
     rendererRef.current = renderer;
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
@@ -620,7 +636,6 @@ export default function FaultyTerminal({
           value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
         },
         uScale: { value: scale },
-
         uGridMul: { value: new Float32Array(gridMul) },
         uDigitSize: { value: digitSize },
         uScanlineIntensity: { value: scanlineIntensity },
@@ -645,7 +660,10 @@ export default function FaultyTerminal({
     programRef.current = program;
 
     const mesh = new Mesh(gl, { geometry, program });
+    meshRef.current = mesh;
 
+    // Debounced resize to prevent excessive updates during iOS address bar changes
+    let resizeTimeout;
     function resize() {
       if (!ctn || !renderer) return;
       renderer.setSize(ctn.offsetWidth, ctn.offsetHeight);
@@ -656,33 +674,38 @@ export default function FaultyTerminal({
       );
     }
 
-    const resizeObserver = new ResizeObserver(() => resize());
+    const resizeObserver = new ResizeObserver(() => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resize, 100);
+    });
     resizeObserver.observe(ctn);
     resize();
 
+    // Render loop - reads from propsRef for latest values
     const update = t => {
       rafRef.current = requestAnimationFrame(update);
+      const props = propsRef.current;
 
-      if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
+      if (props.pageLoadAnimation && loadAnimationStartRef.current === 0) {
         loadAnimationStartRef.current = t;
       }
 
-      if (!pause) {
-        const elapsed = (t * 0.001 + timeOffsetRef.current) * timeScale;
+      if (!props.pause) {
+        const elapsed = (t * 0.001 + timeOffsetRef.current) * props.timeScale;
         program.uniforms.iTime.value = elapsed;
         frozenTimeRef.current = elapsed;
       } else {
         program.uniforms.iTime.value = frozenTimeRef.current;
       }
 
-      if (pageLoadAnimation && loadAnimationStartRef.current > 0) {
+      if (props.pageLoadAnimation && loadAnimationStartRef.current > 0) {
         const animationDuration = 2000;
         const animationElapsed = t - loadAnimationStartRef.current;
         const progress = Math.min(animationElapsed / animationDuration, 1);
         program.uniforms.uPageLoadProgress.value = progress;
       }
 
-      if (mouseReact) {
+      if (props.mouseReact) {
         const dampingFactor = 0.08;
         const smoothMouse = smoothMouseRef.current;
         const mouse = mouseRef.current;
@@ -699,21 +722,45 @@ export default function FaultyTerminal({
     rafRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
-    if (mouseReact) ctn.addEventListener('mousemove', handleMouseMove);
+    // Mouse move listener
+    ctn.addEventListener('mousemove', handleMouseMove);
 
+    // Cleanup ONLY on unmount - never on prop changes
     return () => {
+      clearTimeout(resizeTimeout);
       cancelAnimationFrame(rafRef.current);
       resizeObserver.disconnect();
-      if (mouseReact) ctn.removeEventListener('mousemove', handleMouseMove);
+      ctn.removeEventListener('mousemove', handleMouseMove);
       if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
-      loadAnimationStartRef.current = 0;
-      timeOffsetRef.current = Math.random() * 100;
+      programRef.current = null;
+      rendererRef.current = null;
+      meshRef.current = null;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dpr]); // Only re-initialize if DPR changes (rare - device change)
+
+  // UNIFORM UPDATE EFFECT - Updates shader uniforms when props change
+  // WITHOUT destroying and recreating the WebGL context
+  useEffect(() => {
+    const program = programRef.current;
+    if (!program) return;
+
+    program.uniforms.uScale.value = scale;
+    program.uniforms.uGridMul.value = new Float32Array(gridMul);
+    program.uniforms.uDigitSize.value = digitSize;
+    program.uniforms.uScanlineIntensity.value = scanlineIntensity;
+    program.uniforms.uGlitchAmount.value = glitchAmount;
+    program.uniforms.uFlickerAmount.value = flickerAmount;
+    program.uniforms.uNoiseAmp.value = noiseAmp;
+    program.uniforms.uChromaticAberration.value = chromaticAberration;
+    program.uniforms.uDither.value = ditherValue;
+    program.uniforms.uCurvature.value = curvature;
+    program.uniforms.uTint.value = new Color(tintVec[0], tintVec[1], tintVec[2]);
+    program.uniforms.uMouseStrength.value = mouseStrength;
+    program.uniforms.uUseMouse.value = mouseReact ? 1 : 0;
+    program.uniforms.uBrightness.value = brightness;
   }, [
-    dpr,
-    pause,
-    timeScale,
     scale,
     gridMul,
     digitSize,
@@ -727,9 +774,7 @@ export default function FaultyTerminal({
     tintVec,
     mouseReact,
     mouseStrength,
-    pageLoadAnimation,
-    brightness,
-    handleMouseMove
+    brightness
   ]);
 
   return <div ref={containerRef} className={`faulty-terminal-container ${className}`} style={style} {...rest} />;
