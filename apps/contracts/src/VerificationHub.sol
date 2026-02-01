@@ -77,9 +77,9 @@ contract VerificationHub is IVerificationHub {
 
         emit VerdictSubmitted(taskId, msg.sender, outcome, score, feedbackCid);
 
-        // If approved, complete the task
+        // If approved, complete the task and release bounty
         if (outcome == VerdictOutcome.Approved) {
-            // TODO: Call taskManager.completeTask(taskId)
+            taskManager.completeTask(taskId);
         }
     }
 
@@ -133,8 +133,14 @@ contract VerificationHub is IVerificationHub {
      * @dev Remove a task from the pending list
      */
     function _removePending(uint256 taskId) private {
+        // If array is empty or task not in pending list, nothing to remove
+        if (_pendingTaskIds.length == 0) return;
+
         uint256 index = _pendingIndex[taskId];
         uint256 lastIndex = _pendingTaskIds.length - 1;
+
+        // Verify the task is actually at this index (handles case where task was never added)
+        if (index > lastIndex || _pendingTaskIds[index] != taskId) return;
 
         if (index != lastIndex) {
             uint256 lastTaskId = _pendingTaskIds[lastIndex];

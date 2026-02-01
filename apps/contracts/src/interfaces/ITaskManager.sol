@@ -63,6 +63,8 @@ interface ITaskManager {
 
     function cancelTask(uint256 taskId) external;
 
+    function completeTask(uint256 taskId) external;
+
     function getTask(uint256 taskId) external view returns (Task memory);
 
     function taskCount() external view returns (uint256);

@@ -16,7 +16,11 @@ contract TaskManager is ITaskManager {
 
     // External contracts
     IEscrowVault public immutable escrowVault;
-    IPorterRegistry public immutable porterRegistry;
+    IPorterRegistry public porterRegistry;
+
+    // Access control
+    address public owner;
+    address public verificationHub;
 
     // Configuration
     uint256 public constant MIN_CLAIM_DURATION = 1 hours;
@@ -33,10 +37,39 @@ contract TaskManager is ITaskManager {
     error InsufficientBounty();
     error InvalidDeadline();
     error TaskAlreadyClaimed();
+    error OnlyOwner();
+    error OnlyVerificationHub();
+
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert OnlyOwner();
+        _;
+    }
+
+    modifier onlyVerificationHub() {
+        if (msg.sender != verificationHub) revert OnlyVerificationHub();
+        _;
+    }
 
     constructor(address _escrowVault, address _porterRegistry) {
         escrowVault = IEscrowVault(_escrowVault);
         porterRegistry = IPorterRegistry(_porterRegistry);
+        owner = msg.sender;
+    }
+
+    /**
+     * @notice Set the VerificationHub address (callable by owner)
+     * @param _hub The VerificationHub address
+     */
+    function setVerificationHub(address _hub) external onlyOwner {
+        verificationHub = _hub;
+    }
+
+    /**
+     * @notice Set the PorterRegistry address (callable by owner)
+     * @param _registry The PorterRegistry address
+     */
+    function setPorterRegistry(address _registry) external onlyOwner {
+        porterRegistry = IPorterRegistry(_registry);
     }
 
     /**
@@ -144,8 +177,7 @@ contract TaskManager is ITaskManager {
      * @notice Complete a task (called by VerificationHub after approval)
      * @param taskId The task ID
      */
-    function completeTask(uint256 taskId) external {
-        // TODO: Add access control - only VerificationHub can call this
+    function completeTask(uint256 taskId) external onlyVerificationHub {
         Task storage task = _tasks[taskId];
         if (task.id == 0) revert TaskNotFound();
 
@@ -153,6 +185,9 @@ contract TaskManager is ITaskManager {
 
         // Release bounty to agent
         escrowVault.release(taskId, task.claimedBy);
+
+        // Update agent reputation
+        porterRegistry.incrementCompleted(task.claimedBy);
 
         emit TaskCompleted(taskId, task.claimedBy, task.bountyAmount);
     }

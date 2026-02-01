@@ -49,4 +49,10 @@ interface IPorterRegistry {
     function isRegistered(address agent) external view returns (bool);
 
     function getStake(address agent) external view returns (uint256);
+
+    function incrementCompleted(address agent) external;
+
+    function incrementFailed(address agent) external;
+
+    function updateReputation(address agent, int256 delta) external;
 }

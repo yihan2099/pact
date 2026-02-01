@@ -11,6 +11,11 @@ contract PorterRegistry is IPorterRegistry {
     // State
     mapping(address => Agent) private _agents;
 
+    // Access control
+    address public owner;
+    address public taskManager;
+    address public verificationHub;
+
     // Tier thresholds
     uint256 public constant ESTABLISHED_REPUTATION = 100;
     uint256 public constant VERIFIED_REPUTATION = 500;
@@ -26,6 +31,40 @@ contract PorterRegistry is IPorterRegistry {
     error InsufficientStake();
     error StakeAmountTooLow();
     error WithdrawFailed();
+    error OnlyOwner();
+    error Unauthorized();
+
+    modifier onlyOwner() {
+        if (msg.sender != owner) revert OnlyOwner();
+        _;
+    }
+
+    modifier onlyAuthorized() {
+        if (msg.sender != taskManager && msg.sender != verificationHub) {
+            revert Unauthorized();
+        }
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    /**
+     * @notice Set the TaskManager address (callable by owner)
+     * @param _taskManager The TaskManager address
+     */
+    function setTaskManager(address _taskManager) external onlyOwner {
+        taskManager = _taskManager;
+    }
+
+    /**
+     * @notice Set the VerificationHub address (callable by owner)
+     * @param _verificationHub The VerificationHub address
+     */
+    function setVerificationHub(address _verificationHub) external onlyOwner {
+        verificationHub = _verificationHub;
+    }
 
     /**
      * @notice Register as an agent
@@ -96,12 +135,11 @@ contract PorterRegistry is IPorterRegistry {
     }
 
     /**
-     * @notice Update agent reputation (called by system)
+     * @notice Update agent reputation (called by TaskManager/VerificationHub)
      * @param agent The agent address
-     * @param delta The reputation change (can be negative via overflow)
+     * @param delta The reputation change (can be negative)
      */
-    function updateReputation(address agent, int256 delta) external {
-        // TODO: Add access control - only TaskManager/VerificationHub can call
+    function updateReputation(address agent, int256 delta) external onlyAuthorized {
         Agent storage a = _agents[agent];
         if (a.registeredAt == 0) revert NotRegistered();
 
@@ -127,8 +165,7 @@ contract PorterRegistry is IPorterRegistry {
      * @notice Increment completed tasks (called by TaskManager)
      * @param agent The agent address
      */
-    function incrementCompleted(address agent) external {
-        // TODO: Add access control
+    function incrementCompleted(address agent) external onlyAuthorized {
         _agents[agent].tasksCompleted++;
     }
 
@@ -136,8 +173,7 @@ contract PorterRegistry is IPorterRegistry {
      * @notice Increment failed tasks (called by TaskManager)
      * @param agent The agent address
      */
-    function incrementFailed(address agent) external {
-        // TODO: Add access control
+    function incrementFailed(address agent) external onlyAuthorized {
         _agents[agent].tasksFailed++;
     }
 
