@@ -49,4 +49,6 @@ interface IVerificationHub {
     function isVerifier(address account) external view returns (bool);
 
     function pendingVerifications() external view returns (uint256[] memory);
+
+    function addPending(uint256 taskId) external;
 }

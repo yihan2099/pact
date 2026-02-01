@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {ITaskManager} from "./interfaces/ITaskManager.sol";
 import {IEscrowVault} from "./interfaces/IEscrowVault.sol";
 import {IPorterRegistry} from "./interfaces/IPorterRegistry.sol";
+import {IVerificationHub} from "./interfaces/IVerificationHub.sol";
 
 /**
  * @title TaskManager
@@ -153,6 +154,9 @@ contract TaskManager is ITaskManager {
 
         task.status = TaskStatus.Submitted;
         task.submissionCid = submissionCid;
+
+        // Add to pending verification queue
+        IVerificationHub(verificationHub).addPending(taskId);
 
         emit WorkSubmitted(taskId, msg.sender, submissionCid);
     }

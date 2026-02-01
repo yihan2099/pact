@@ -25,6 +25,12 @@ contract VerificationHub is IVerificationHub {
     error VerdictAlreadySubmitted();
     error InvalidScore();
     error NotAllowedToDispute();
+    error OnlyTaskManager();
+
+    modifier onlyTaskManager() {
+        if (msg.sender != address(taskManager)) revert OnlyTaskManager();
+        _;
+    }
 
     constructor(address _taskManager, address _porterRegistry) {
         taskManager = ITaskManager(_taskManager);
@@ -125,8 +131,7 @@ contract VerificationHub is IVerificationHub {
      * @notice Add a task to the pending list (called when work is submitted)
      * @param taskId The task ID
      */
-    function addPending(uint256 taskId) external {
-        // TODO: Add access control - only TaskManager can call
+    function addPending(uint256 taskId) external onlyTaskManager {
         _pendingIndex[taskId] = _pendingTaskIds.length;
         _pendingTaskIds.push(taskId);
 

@@ -350,6 +350,18 @@ contract VerificationFlowTest is Test {
         porterRegistry.updateReputation(agent, 100);
     }
 
+    function test_AddPending_OnlyTaskManager() public {
+        // Random address cannot call addPending
+        vm.prank(address(0x999));
+        vm.expectRevert(VerificationHub.OnlyTaskManager.selector);
+        verificationHub.addPending(1);
+
+        // Creator cannot call addPending
+        vm.prank(creator);
+        vm.expectRevert(VerificationHub.OnlyTaskManager.selector);
+        verificationHub.addPending(1);
+    }
+
     /*//////////////////////////////////////////////////////////////
                           EDGE CASE TESTS
     //////////////////////////////////////////////////////////////*/
