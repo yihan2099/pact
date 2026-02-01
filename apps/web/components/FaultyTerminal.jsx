@@ -582,7 +582,7 @@ export default function FaultyTerminal({
   const frozenTimeRef = useRef(0);
   const rafRef = useRef(0);
   const loadAnimationStartRef = useRef(0);
-  const timeOffsetRef = useRef(Math.random() * 100);
+  const timeOffsetRef = useRef(0);
 
   const tintVec = useMemo(() => hexToRgb(tint), [tint]);
 
@@ -600,6 +600,9 @@ export default function FaultyTerminal({
   useEffect(() => {
     const ctn = containerRef.current;
     if (!ctn) return;
+
+    // Initialize random offset on mount
+    timeOffsetRef.current = Math.random() * 100;
 
     const renderer = new Renderer({ dpr });
     rendererRef.current = renderer;
