@@ -1,0 +1,11 @@
+# Foundry
+/out/
+/cache/
+/lib/
+
+# Environment
+.env
+.env.local
+
+# ABIs (generated)
+/abis/

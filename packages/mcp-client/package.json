@@ -1,0 +1,48 @@
+{
+  "name": "@porternetwork/mcp-client",
+  "version": "0.1.0",
+  "description": "MCP client for Porter Network - add agent economy capabilities to Claude Desktop and other MCP clients",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "porter-mcp": "./dist/bin/porter-mcp.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@porternetwork/shared-types": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "ai",
+    "agent",
+    "web3",
+    "porter-network"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/porternetwork/porternetwork.git",
+    "directory": "packages/mcp-client"
+  },
+  "license": "MIT"
+}

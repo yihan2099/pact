@@ -1,0 +1,178 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import {ITaskManager} from "./interfaces/ITaskManager.sol";
+import {IEscrowVault} from "./interfaces/IEscrowVault.sol";
+import {IPorterRegistry} from "./interfaces/IPorterRegistry.sol";
+
+/**
+ * @title TaskManager
+ * @notice Manages task creation, claiming, and completion in the Porter Network
+ */
+contract TaskManager is ITaskManager {
+    // State
+    uint256 private _taskCounter;
+    mapping(uint256 => Task) private _tasks;
+
+    // External contracts
+    IEscrowVault public immutable escrowVault;
+    IPorterRegistry public immutable porterRegistry;
+
+    // Configuration
+    uint256 public constant MIN_CLAIM_DURATION = 1 hours;
+    uint256 public constant MAX_CLAIM_DURATION = 30 days;
+    uint256 public constant DEFAULT_CLAIM_DURATION = 7 days;
+
+    // Errors
+    error TaskNotFound();
+    error NotTaskCreator();
+    error TaskNotOpen();
+    error TaskNotClaimed();
+    error NotClaimingAgent();
+    error AgentNotRegistered();
+    error InsufficientBounty();
+    error InvalidDeadline();
+    error TaskAlreadyClaimed();
+
+    constructor(address _escrowVault, address _porterRegistry) {
+        escrowVault = IEscrowVault(_escrowVault);
+        porterRegistry = IPorterRegistry(_porterRegistry);
+    }
+
+    /**
+     * @notice Create a new task with a bounty
+     * @param specificationCid IPFS CID of the task specification
+     * @param bountyToken Token address for bounty (address(0) for ETH)
+     * @param bountyAmount Amount of bounty
+     * @param deadline Task deadline (0 for no deadline)
+     * @return taskId The ID of the created task
+     */
+    function createTask(
+        string calldata specificationCid,
+        address bountyToken,
+        uint256 bountyAmount,
+        uint256 deadline
+    ) external payable returns (uint256 taskId) {
+        if (bountyAmount == 0) revert InsufficientBounty();
+        if (deadline != 0 && deadline <= block.timestamp) revert InvalidDeadline();
+
+        // For ETH payments, verify msg.value
+        if (bountyToken == address(0)) {
+            if (msg.value != bountyAmount) revert InsufficientBounty();
+        }
+
+        taskId = ++_taskCounter;
+
+        _tasks[taskId] = Task({
+            id: taskId,
+            creator: msg.sender,
+            status: TaskStatus.Open,
+            bountyAmount: bountyAmount,
+            bountyToken: bountyToken,
+            specificationCid: specificationCid,
+            claimedBy: address(0),
+            claimedAt: 0,
+            submissionCid: "",
+            createdAtBlock: block.number,
+            deadline: deadline
+        });
+
+        // Deposit bounty to escrow
+        escrowVault.deposit{value: msg.value}(taskId, bountyToken, bountyAmount);
+
+        emit TaskCreated(taskId, msg.sender, bountyAmount, bountyToken, specificationCid, deadline);
+    }
+
+    /**
+     * @notice Claim a task to work on
+     * @param taskId The task ID to claim
+     */
+    function claimTask(uint256 taskId) external {
+        Task storage task = _tasks[taskId];
+        if (task.id == 0) revert TaskNotFound();
+        if (task.status != TaskStatus.Open) revert TaskNotOpen();
+        if (!porterRegistry.isRegistered(msg.sender)) revert AgentNotRegistered();
+
+        task.status = TaskStatus.Claimed;
+        task.claimedBy = msg.sender;
+        task.claimedAt = block.timestamp;
+
+        uint256 claimDeadline = block.timestamp + DEFAULT_CLAIM_DURATION;
+        if (task.deadline != 0 && task.deadline < claimDeadline) {
+            claimDeadline = task.deadline;
+        }
+
+        emit TaskClaimed(taskId, msg.sender, claimDeadline);
+    }
+
+    /**
+     * @notice Submit work for a claimed task
+     * @param taskId The task ID
+     * @param submissionCid IPFS CID of the work submission
+     */
+    function submitWork(uint256 taskId, string calldata submissionCid) external {
+        Task storage task = _tasks[taskId];
+        if (task.id == 0) revert TaskNotFound();
+        if (task.status != TaskStatus.Claimed) revert TaskNotClaimed();
+        if (task.claimedBy != msg.sender) revert NotClaimingAgent();
+
+        task.status = TaskStatus.Submitted;
+        task.submissionCid = submissionCid;
+
+        emit WorkSubmitted(taskId, msg.sender, submissionCid);
+    }
+
+    /**
+     * @notice Cancel a task (only creator, only if not claimed)
+     * @param taskId The task ID to cancel
+     */
+    function cancelTask(uint256 taskId) external {
+        Task storage task = _tasks[taskId];
+        if (task.id == 0) revert TaskNotFound();
+        if (task.creator != msg.sender) revert NotTaskCreator();
+        if (task.status != TaskStatus.Open) revert TaskAlreadyClaimed();
+
+        task.status = TaskStatus.Cancelled;
+
+        // Refund bounty
+        escrowVault.refund(taskId, msg.sender);
+
+        emit TaskCancelled(taskId, msg.sender, task.bountyAmount);
+    }
+
+    /**
+     * @notice Complete a task (called by VerificationHub after approval)
+     * @param taskId The task ID
+     */
+    function completeTask(uint256 taskId) external {
+        // TODO: Add access control - only VerificationHub can call this
+        Task storage task = _tasks[taskId];
+        if (task.id == 0) revert TaskNotFound();
+
+        task.status = TaskStatus.Completed;
+
+        // Release bounty to agent
+        escrowVault.release(taskId, task.claimedBy);
+
+        emit TaskCompleted(taskId, task.claimedBy, task.bountyAmount);
+    }
+
+    /**
+     * @notice Get a task by ID
+     * @param taskId The task ID
+     * @return The task data
+     */
+    function getTask(uint256 taskId) external view returns (Task memory) {
+        Task storage task = _tasks[taskId];
+        if (task.id == 0) revert TaskNotFound();
+        return task;
+    }
+
+    /**
+     * @notice Get the total number of tasks
+     * @return The task count
+     */
+    function taskCount() external view returns (uint256) {
+        return _taskCounter;
+    }
+}

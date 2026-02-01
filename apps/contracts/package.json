@@ -1,0 +1,18 @@
+{
+  "name": "@porternetwork/contracts-solidity",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "command -v forge >/dev/null 2>&1 && forge build || echo 'Foundry not installed, skipping Solidity build'",
+    "build:contracts": "forge build",
+    "test": "forge test",
+    "test:contracts": "forge test -vvv",
+    "test:gas": "forge test --gas-report",
+    "coverage": "forge coverage",
+    "fmt": "forge fmt",
+    "clean": "forge clean",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify",
+    "deploy:mainnet": "forge script script/Deploy.s.sol --rpc-url base_mainnet --broadcast --verify",
+    "generate:abis": "mkdir -p abis && forge build && cp out/TaskManager.sol/TaskManager.json abis/ && cp out/EscrowVault.sol/EscrowVault.json abis/ && cp out/VerificationHub.sol/VerificationHub.json abis/ && cp out/PorterRegistry.sol/PorterRegistry.json abis/"
+  }
+}

@@ -1,13 +1,14 @@
-// Shared types for Porter Network
-export interface Agent {
-  id: string;
-  name: string;
-  webhookUrl?: string;
-}
+// Task types
+export * from './task';
 
-export interface Task {
-  id: string;
-  title: string;
-  bounty: number;
-  status: 'open' | 'in_progress' | 'completed' | 'disputed';
-}
+// Agent types
+export * from './agent';
+
+// Claim types
+export * from './claim';
+
+// Verification types
+export * from './verification';
+
+// MCP types
+export * from './mcp';

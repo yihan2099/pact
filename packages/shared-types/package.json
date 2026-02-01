@@ -3,5 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
-  "types": "./src/index.ts"
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./task": "./src/task/index.ts",
+    "./agent": "./src/agent/index.ts",
+    "./claim": "./src/claim/index.ts",
+    "./verification": "./src/verification/index.ts",
+    "./mcp": "./src/mcp/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
 }

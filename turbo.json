@@ -5,12 +5,36 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
+    "build:contracts": {
+      "cache": true,
+      "outputs": ["apps/contracts/out/**", "apps/contracts/abis/**"]
+    },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:mcp": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:indexer": {
       "cache": false,
       "persistent": true
     },
     "lint": {},
     "clean": {
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:contracts": {
+      "cache": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "db:migrate": {
       "cache": false
     }
   }

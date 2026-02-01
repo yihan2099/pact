@@ -6,8 +6,15 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@porternetwork/web",
+    "dev:mcp": "turbo dev:mcp --filter=@porternetwork/mcp-server",
+    "dev:indexer": "turbo dev:indexer --filter=@porternetwork/indexer",
     "build": "turbo build",
+    "build:contracts": "turbo build:contracts",
+    "test": "turbo test",
+    "test:contracts": "turbo test:contracts",
     "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
     "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {
