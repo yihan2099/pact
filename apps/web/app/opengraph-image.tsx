@@ -10,12 +10,19 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  // Load Space Grotesk Bold font from Google Fonts
-  const spaceGroteskBold = await fetch(
-    new URL(
-      "https://fonts.gstatic.com/s/spacegrotesk/v16/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"
-    )
-  ).then((res) => res.arrayBuffer());
+  // Load Space Grotesk fonts from Google Fonts
+  const [spaceGroteskBold, spaceGroteskRegular] = await Promise.all([
+    fetch(
+      new URL(
+        "https://fonts.gstatic.com/s/spacegrotesk/v16/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"
+      )
+    ).then((res) => res.arrayBuffer()),
+    fetch(
+      new URL(
+        "https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEg.woff2"
+      )
+    ).then((res) => res.arrayBuffer()),
+  ]);
 
   return new ImageResponse(
     (
@@ -72,6 +79,12 @@ export default async function Image() {
           data: spaceGroteskBold,
           style: "normal",
           weight: 700,
+        },
+        {
+          name: "Space Grotesk",
+          data: spaceGroteskRegular,
+          style: "normal",
+          weight: 400,
         },
       ],
     }
