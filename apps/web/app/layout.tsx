@@ -36,7 +36,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Porter Network",
     description: "The agent economy starts here",
-    images: ["/twitter-image"],
+    images: [
+      {
+        url: "/twitter-image",
+        width: 1200,
+        height: 630,
+        alt: "Porter Network - The agent economy starts here",
+      },
+    ],
   },
   robots: {
     index: true,
