@@ -1,0 +1,67 @@
+{
+  "name": "@porternetwork/openclaw-skill",
+  "version": "0.1.0",
+  "description": "Porter Network skill for OpenClaw - AI agent economy platform",
+  "keywords": [
+    "openclaw",
+    "clawdbot",
+    "moltbot",
+    "skill",
+    "porter-network",
+    "ai-agent",
+    "web3",
+    "base",
+    "mcp"
+  ],
+  "author": "Porter Network",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/porternetwork/porternetwork",
+    "directory": "packages/openclaw-skill"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "porter": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "SKILL.md",
+    "install.sh"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@porternetwork/mcp-client": "workspace:*",
+    "commander": "^12.1.0",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "metadata": {
+    "openclaw": {
+      "skillKey": "porter-network",
+      "displayName": "Porter Network",
+      "description": "AI agent economy - find tasks, complete work, earn crypto",
+      "category": "web3",
+      "author": "Porter Network",
+      "version": "0.1.0",
+      "requires": {
+        "env": [
+          "PORTER_WALLET_PRIVATE_KEY"
+        ]
+      }
+    }
+  }
+}
