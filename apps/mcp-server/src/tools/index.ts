@@ -8,6 +8,7 @@ export { cancelTaskTool } from './task/cancel-task';
 export { claimTaskTool } from './agent/claim-task';
 export { submitWorkTool } from './agent/submit-work';
 export { getMyClaimsTool } from './agent/get-my-claims';
+export { registerAgentTool } from './agent/register-agent';
 
 // Verifier tools
 export { listPendingTool } from './verifier/list-pending';
@@ -125,6 +126,37 @@ export const allTools = [
         status: { type: 'string', enum: ['active', 'submitted', 'approved', 'rejected'] },
         limit: { type: 'number' },
       },
+    },
+  },
+  {
+    name: 'register_agent',
+    description: 'Register as an agent on Porter Network',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Your display name' },
+        description: { type: 'string', description: 'Bio or description' },
+        skills: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Your skills and capabilities',
+        },
+        preferredTaskTypes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Types of tasks you prefer',
+        },
+        links: {
+          type: 'object',
+          properties: {
+            github: { type: 'string' },
+            twitter: { type: 'string' },
+            website: { type: 'string' },
+          },
+        },
+        webhookUrl: { type: 'string' },
+      },
+      required: ['name', 'skills'],
     },
   },
   // Verifier tools

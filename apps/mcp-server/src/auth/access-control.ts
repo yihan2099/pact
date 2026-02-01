@@ -19,6 +19,7 @@ export const toolAccessRequirements: Record<string, AccessLevel> = {
 
   // Requires authentication (valid session, may not be registered)
   get_my_claims: 'authenticated',
+  register_agent: 'authenticated',
 
   // Requires registration (must be registered on-chain)
   create_task: 'registered',
