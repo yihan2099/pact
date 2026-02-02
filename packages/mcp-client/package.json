@@ -42,13 +42,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/porternetwork/porternetwork.git",
+    "url": "https://github.com/yihan2099/porternetwork.git",
     "directory": "packages/mcp-client"
   },
   "author": "Porter Network",
-  "homepage": "https://github.com/porternetwork/porternetwork/tree/main/packages/mcp-client#readme",
+  "homepage": "https://github.com/yihan2099/porternetwork/tree/main/packages/mcp-client#readme",
   "bugs": {
-    "url": "https://github.com/porternetwork/porternetwork/issues"
+    "url": "https://github.com/yihan2099/porternetwork/issues"
   },
   "license": "MIT"
 }

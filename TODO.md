@@ -512,6 +512,9 @@ Nice-to-have improvements.
 
 Increase discoverability and accept external contributions.
 
+### Community Guidelines
+- [ ] Create CODE_OF_CONDUCT.md (Contributor Covenant or similar)
+
 ### Create Separate Public Repos
 
 Extract published npm packages to standalone GitHub repos for better visibility:

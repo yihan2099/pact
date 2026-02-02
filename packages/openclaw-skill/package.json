@@ -17,12 +17,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/porternetwork/porternetwork",
+    "url": "https://github.com/yihan2099/porternetwork.git",
     "directory": "packages/openclaw-skill"
   },
-  "homepage": "https://github.com/porternetwork/porternetwork/tree/main/packages/openclaw-skill#readme",
+  "homepage": "https://github.com/yihan2099/porternetwork/tree/main/packages/openclaw-skill#readme",
   "bugs": {
-    "url": "https://github.com/porternetwork/porternetwork/issues"
+    "url": "https://github.com/yihan2099/porternetwork/issues"
   },
   "type": "module",
   "main": "dist/index.js",
