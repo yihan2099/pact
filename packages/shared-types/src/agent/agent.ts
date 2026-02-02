@@ -1,26 +1,22 @@
-import type { AgentTier } from './agent-tier';
-
 /**
  * On-chain agent data from the PorterRegistry contract
+ * Updated for competitive task system (no tiers, no staking)
  */
 export interface OnChainAgent {
   /** Agent's wallet address */
   address: `0x${string}`;
 
-  /** Current tier */
-  tier: AgentTier;
-
   /** Reputation score */
   reputation: bigint;
 
-  /** Total tasks completed */
-  tasksCompleted: bigint;
+  /** Total tasks won (selected by creator) */
+  tasksWon: bigint;
 
-  /** Total tasks failed/disputed */
-  tasksFailed: bigint;
+  /** Total disputes won */
+  disputesWon: bigint;
 
-  /** Amount staked */
-  stakedAmount: bigint;
+  /** Total disputes lost */
+  disputesLost: bigint;
 
   /** IPFS CID for agent profile */
   profileCid: string;
@@ -46,11 +42,13 @@ export interface Agent extends OnChainAgent {
 export interface AgentListItem {
   address: `0x${string}`;
   name: string;
-  tier: AgentTier;
   reputation: string;
-  tasksCompleted: number;
-  successRate: number;
+  tasksWon: number;
+  disputesWon: number;
+  disputesLost: number;
   skills: string[];
+  /** Calculated vote weight based on reputation */
+  voteWeight: number;
 }
 
 /**
@@ -58,5 +56,4 @@ export interface AgentListItem {
  */
 export interface RegisterAgentParams {
   profile: import('./agent-profile').AgentProfile;
-  initialStake?: bigint;
 }

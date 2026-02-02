@@ -1,10 +1,10 @@
-import type { TaskListItem } from '../task/task';
+import type { TaskListItem, OnChainSubmission } from '../task/task';
 import type { AgentListItem } from '../agent/agent';
-import type { ClaimWithSubmission, ClaimStatus } from '../claim/claim';
-import type { PendingVerification, VerdictOutcome } from '../verification/verdict';
+import type { DisputeListItem, DisputeStatus } from '../dispute';
 
 /**
  * MCP tool response types
+ * Updated for competitive task system with optimistic verification
  */
 
 // Task tool responses
@@ -34,10 +34,25 @@ export interface GetTaskResponse {
     value: string | number;
     required: boolean;
   }>;
-  claimedBy?: string;
-  claimedAt?: string;
-  submissionCid?: string;
+  /** All submissions for this task */
+  submissions?: SubmissionInfo[];
+  /** Number of submissions */
+  submissionCount: number;
+  /** Selected winner address (if any) */
+  winnerAddress?: string;
+  /** When winner was selected */
+  selectedAt?: string;
+  /** Challenge deadline (48h after selection) */
+  challengeDeadline?: string;
   createdAt: string;
+}
+
+export interface SubmissionInfo {
+  agent: string;
+  submissionCid: string;
+  submittedAt: string;
+  updatedAt: string;
+  isWinner: boolean;
 }
 
 export interface CreateTaskResponse {
@@ -53,46 +68,94 @@ export interface CancelTaskResponse {
   refundAmount: string;
 }
 
-// Agent tool responses
-export interface ClaimTaskResponse {
-  taskId: string;
-  claimId: string;
-  deadline: string | null;
-  txHash: string;
-}
-
+// Agent submission responses
 export interface SubmitWorkResponse {
   taskId: string;
   submissionCid: string;
   txHash: string;
+  isUpdate: boolean;
 }
 
-export interface GetMyClaimsResponse {
-  claims: Array<{
-    claimId: string;
+export interface GetMySubmissionsResponse {
+  submissions: Array<{
     taskId: string;
     taskTitle: string;
-    status: ClaimStatus;
-    claimedAt: string;
-    deadline: string | null;
+    taskStatus: string;
+    submissionCid: string;
+    submittedAt: string;
+    updatedAt: string;
+    isWinner: boolean;
     bountyAmount: string;
   }>;
-  total: number;
-}
-
-// Verifier tool responses
-export interface ListPendingVerificationsResponse {
-  verifications: PendingVerification[];
   total: number;
   hasMore: boolean;
 }
 
-export interface SubmitVerdictResponse {
+// Creator selection responses
+export interface SelectWinnerResponse {
   taskId: string;
-  claimId: string;
-  verdictId: string;
-  outcome: VerdictOutcome;
-  feedbackCid: string;
+  winnerAddress: string;
+  challengeDeadline: string;
+  txHash: string;
+}
+
+export interface RejectAllResponse {
+  taskId: string;
+  refundAmount: string;
+  txHash: string;
+}
+
+export interface FinalizeTaskResponse {
+  taskId: string;
+  winnerAddress: string;
+  bountyReleased: string;
+  txHash: string;
+}
+
+// Dispute responses
+export interface StartDisputeResponse {
+  disputeId: string;
+  taskId: string;
+  stake: string;
+  votingDeadline: string;
+  txHash: string;
+}
+
+export interface SubmitVoteResponse {
+  disputeId: string;
+  voteWeight: number;
+  txHash: string;
+}
+
+export interface GetDisputeResponse {
+  id: string;
+  taskId: string;
+  disputer: string;
+  disputeStake: string;
+  votingDeadline: string;
+  status: DisputeStatus;
+  disputerWon: boolean | null;
+  votesForDisputer: string;
+  votesAgainstDisputer: string;
+  votes?: Array<{
+    voter: string;
+    supportsDisputer: boolean;
+    weight: number;
+    votedAt: string;
+  }>;
+  createdAt: string;
+}
+
+export interface ListDisputesResponse {
+  disputes: DisputeListItem[];
+  total: number;
+  hasMore: boolean;
+}
+
+export interface ResolveDisputeResponse {
+  disputeId: string;
+  taskId: string;
+  disputerWon: boolean;
   txHash: string;
 }
 
@@ -107,13 +170,19 @@ export interface GetBalanceResponse {
 export interface GetProfileResponse {
   address: string;
   name: string;
-  tier: string;
   reputation: string;
-  tasksCompleted: number;
-  successRate: number;
+  tasksWon: number;
+  disputesWon: number;
+  disputesLost: number;
   skills: string[];
-  isVerifier: boolean;
-  stakedAmount: string;
+  /** Calculated vote weight for disputes */
+  voteWeight: number;
+}
+
+export interface GetVoteWeightResponse {
+  address: string;
+  reputation: string;
+  voteWeight: number;
 }
 
 // Error response

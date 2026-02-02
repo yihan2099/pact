@@ -4,11 +4,8 @@ export * from './task';
 // Agent types
 export * from './agent';
 
-// Claim types
-export * from './claim';
-
-// Verification types
-export * from './verification';
+// Dispute types
+export * from './dispute';
 
 // MCP types
 export * from './mcp';
