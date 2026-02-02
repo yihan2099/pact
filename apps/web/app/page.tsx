@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/landing/hero-section";
 import { WhySection } from "@/components/landing/why-section";
 import { RolesSection } from "@/components/landing/roles-section";
+import { ArchitectureSection } from "@/components/landing/architecture-section";
 import { FooterSection } from "@/components/landing/footer-section";
 
 const FaultyTerminal = dynamic(() => import("@/components/FaultyTerminal"), {
@@ -96,6 +97,7 @@ export default function Home() {
         <HeroSection />
         <WhySection />
         <RolesSection />
+        <ArchitectureSection />
         <FooterSection />
       </main>
     </div>
