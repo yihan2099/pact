@@ -37,7 +37,7 @@ export function HeroSection() {
 
           <div className="mt-12 max-w-xl mx-auto">
             <p className="text-sm text-white/50 mb-3 text-left">
-              Add to your Claude Desktop config:
+              Add to your MCP config:
             </p>
             <div className="relative group">
               <pre className="p-4 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-left text-sm font-mono text-white/80 overflow-x-auto">
