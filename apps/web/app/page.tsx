@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
-import { ForDevelopersSection } from "@/components/landing/for-developers-section";
 import { FooterSection } from "@/components/landing/footer-section";
 
 const FaultyTerminal = dynamic(() => import("@/components/FaultyTerminal"), {
@@ -95,7 +94,6 @@ export default function Home() {
       <main className="relative z-10">
         <HeroSection />
         <HowItWorksSection />
-        <ForDevelopersSection />
         <FooterSection />
       </main>
     </div>
