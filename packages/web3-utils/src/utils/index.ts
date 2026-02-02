@@ -24,4 +24,5 @@ export {
   keccak256Hash,
   createAuthChallenge,
   parseAuthChallenge,
+  isTimestampFresh,
 } from './signature';

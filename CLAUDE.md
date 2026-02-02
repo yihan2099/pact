@@ -84,14 +84,24 @@ The MCP server uses wallet signature authentication with session-based access co
 4. Subsequent tool calls include sessionId for authentication
 
 **Access Levels:**
-- `public`: No auth required (`list_tasks`, `get_task`, auth tools)
-- `authenticated`: Valid session required (`get_my_submissions`)
-- `registered`: On-chain registration required (`create_task`, `cancel_task`, `submit_work`)
+- `public`: No auth required (`list_tasks`, `get_task`, `get_dispute`, `list_disputes`, auth tools)
+- `authenticated`: Valid session required (`get_my_submissions`, `register_agent`, `resolve_dispute`)
+- `registered`: On-chain registration required (`create_task`, `cancel_task`, `submit_work`, `update_profile`, `start_dispute`, `submit_vote`)
 
 **Key Files:**
 - `apps/mcp-server/src/auth/session-manager.ts` - Session CRUD with Redis storage (in-memory fallback), 24h TTL
-- `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements
+- `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements with registration refresh
+- `apps/mcp-server/src/auth/wallet-signature.ts` - Challenge generation with Redis storage
 - `apps/mcp-server/src/tools/auth/` - Auth tool handlers
+- `apps/mcp-server/src/tools/dispute/` - Dispute tools (get, list, start, vote, resolve)
+- `apps/mcp-server/src/tools/agent/update-profile.ts` - Agent profile updates
+
+**Security Features:**
+- Redis-based session and challenge storage (with in-memory fallback)
+- Registration refresh for mid-session on-chain registration
+- Security event logging service for audit trails
+- CORS restriction with configurable origins
+- Security headers (CSP, X-Frame-Options, HSTS)
 
 ### Data Flow
 

@@ -14,13 +14,21 @@ import { cancelTaskTool } from './tools/task/cancel-task';
 import { submitWorkTool } from './tools/agent/submit-work';
 import { getMySubmissionsTool } from './tools/agent/get-my-submissions';
 import { registerAgentTool } from './tools/agent/register-agent';
+import { updateProfileTool } from './tools/agent/update-profile';
+import {
+  getDisputeTool,
+  listDisputesTool,
+  startDisputeTool,
+  submitVoteTool,
+  resolveDisputeTool,
+} from './tools/dispute';
 import {
   getChallengeHandler,
   verifySignatureHandler,
   getSessionHandler,
 } from './tools/auth';
 import { getSession } from './auth/session-manager';
-import { checkAccess } from './auth/access-control';
+import { checkAccessWithRegistrationRefresh, toolAccessRequirements } from './auth/access-control';
 import { allPrompts, getPromptContent } from './prompts';
 
 export interface ServerContext {
@@ -108,8 +116,8 @@ export function createMcpServer() {
       }
     }
 
-    // Check access control
-    const accessCheck = checkAccess(name, context);
+    // Check access control (with on-chain registration refresh for registered tools)
+    const accessCheck = await checkAccessWithRegistrationRefresh(name, context);
     if (!accessCheck.allowed) {
       return {
         content: [
@@ -123,6 +131,11 @@ export function createMcpServer() {
         ],
         isError: true,
       };
+    }
+
+    // If registration was just detected, update the context
+    if (accessCheck.registrationUpdated) {
+      context.isRegistered = true;
     }
 
     try {
@@ -161,6 +174,26 @@ export function createMcpServer() {
           break;
         case 'register_agent':
           result = await registerAgentTool.handler(args, context);
+          break;
+        case 'update_profile':
+          result = await updateProfileTool.handler(args, context);
+          break;
+
+        // Dispute tools
+        case 'get_dispute':
+          result = await getDisputeTool.handler(args);
+          break;
+        case 'list_disputes':
+          result = await listDisputesTool.handler(args);
+          break;
+        case 'start_dispute':
+          result = await startDisputeTool.handler(args, context);
+          break;
+        case 'submit_vote':
+          result = await submitVoteTool.handler(args, context);
+          break;
+        case 'resolve_dispute':
+          result = await resolveDisputeTool.handler(args);
           break;
         default:
           throw new Error(`Unknown tool: ${name}`);

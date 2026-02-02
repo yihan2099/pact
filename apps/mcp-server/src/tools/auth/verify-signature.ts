@@ -1,6 +1,6 @@
 import { verifyChallengeSignature } from '../../auth/wallet-signature';
 import { createSession } from '../../auth/session-manager';
-import { isAgentRegistered } from '@porternetwork/web3-utils';
+import { isAgentRegistered, isValidAddress } from '@porternetwork/web3-utils';
 
 /**
  * Input for auth_verify tool
@@ -58,8 +58,8 @@ export async function verifySignatureHandler(
 ): Promise<VerifySignatureOutput> {
   const input = args as VerifySignatureInput;
 
-  // Validate inputs
-  if (!input.walletAddress?.startsWith('0x') || input.walletAddress.length !== 42) {
+  // SECURITY: Validate wallet address using viem's isAddress for proper hex validation
+  if (!input.walletAddress || !isValidAddress(input.walletAddress)) {
     throw new Error('Invalid wallet address format');
   }
 

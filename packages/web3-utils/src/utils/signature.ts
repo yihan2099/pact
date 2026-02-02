@@ -79,7 +79,13 @@ export function parseAuthChallenge(message: string): {
   const result: { address?: string; nonce?: string; timestamp?: string } = {};
 
   for (const line of lines) {
-    const [key, value] = line.split(': ');
+    // SECURITY: Split only on first ': ' to prevent injection via value
+    const colonIndex = line.indexOf(': ');
+    if (colonIndex === -1) continue;
+
+    const key = line.slice(0, colonIndex);
+    const value = line.slice(colonIndex + 2);
+
     if (key === 'Address') {
       result.address = value;
     } else if (key === 'Nonce') {
@@ -90,4 +96,31 @@ export function parseAuthChallenge(message: string): {
   }
 
   return result;
+}
+
+/**
+ * SECURITY: Validate challenge timestamp is within acceptable window
+ * @param timestamp - ISO 8601 timestamp string
+ * @param maxAgeMs - Maximum age in milliseconds (default 5 minutes)
+ * @returns true if timestamp is valid and fresh
+ */
+export function isTimestampFresh(timestamp: string, maxAgeMs: number = 5 * 60 * 1000): boolean {
+  try {
+    const challengeTime = new Date(timestamp).getTime();
+    const now = Date.now();
+
+    // Reject future timestamps (with 30 second tolerance for clock skew)
+    if (challengeTime > now + 30000) {
+      return false;
+    }
+
+    // Reject old timestamps
+    if (now - challengeTime > maxAgeMs) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -44,7 +44,7 @@ function getIdentifier(c: Context): string {
  * 1. Global rate limit per IP (100/min)
  * 2. Operation-specific rate limit per session/IP
  *
- * Fails open if rate limiting is unavailable.
+ * SECURITY: Fails closed if rate limiting is unavailable to prevent abuse.
  */
 export function createMcpRateLimitMiddleware(): MiddlewareHandler {
   return async (c: Context, next: Next) => {
@@ -102,8 +102,16 @@ export function createMcpRateLimitMiddleware(): MiddlewareHandler {
         }
       }
     } catch (error) {
-      // Fail open - allow request if rate limiter is unavailable
-      console.error('Rate limiter error, allowing request:', error);
+      // SECURITY: Fail closed - reject request if rate limiter is unavailable
+      // This prevents abuse when Redis is down or misconfigured
+      console.error('Rate limiter error, rejecting request for safety:', error);
+      return c.json(
+        {
+          error: 'Service temporarily unavailable',
+          message: 'Rate limiting service is unavailable. Please try again later.',
+        },
+        503
+      );
     }
 
     await next();

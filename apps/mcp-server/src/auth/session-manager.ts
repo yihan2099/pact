@@ -129,6 +129,52 @@ export async function getSession(sessionId: string): Promise<AuthSession | null>
 }
 
 /**
+ * Update a session's registration status
+ * Used when an agent registers mid-session
+ */
+export async function updateSessionRegistration(
+  sessionId: string,
+  isRegistered: boolean
+): Promise<boolean> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      const sessionKey = `${SESSION_PREFIX}${sessionId}`;
+      const session = await redis.get<AuthSession>(sessionKey);
+
+      if (!session) {
+        return false;
+      }
+
+      // Update the session with new registration status
+      const updatedSession: AuthSession = {
+        ...session,
+        isRegistered,
+      };
+
+      // Calculate remaining TTL
+      const remainingMs = session.expiresAt - Date.now();
+      const remainingSeconds = Math.max(1, Math.floor(remainingMs / 1000));
+
+      await redis.set(sessionKey, JSON.stringify(updatedSession), { ex: remainingSeconds });
+      return true;
+    } catch (error) {
+      console.warn('Redis error in updateSessionRegistration, falling back to memory:', error);
+    }
+  }
+
+  // Fallback to in-memory storage
+  const session = memorySessionStore.get(sessionId);
+  if (session) {
+    session.isRegistered = isRegistered;
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Invalidate (delete) a session
  */
 export async function invalidateSession(sessionId: string): Promise<boolean> {

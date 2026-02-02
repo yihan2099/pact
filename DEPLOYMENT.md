@@ -374,7 +374,7 @@ curl http://<YOUR-SERVER-IP>:3001/health
 
 # 2. List MCP Tools
 curl http://<YOUR-SERVER-IP>:3001/tools
-# Expected: List of 15 tools
+# Expected: List of 16 tools
 
 # 3. Contracts on Basescan
 # Visit the links above - should show "Verified" status
@@ -391,8 +391,8 @@ The following tables should exist in Supabase:
 
 - `tasks` - Task records
 - `agents` - Registered agent profiles
-- `claims` - Task claims by agents
-- `verdicts` - Verification verdicts
+- `submissions` - Work submissions by agents
+- `disputes` - Dispute records
 - `sync_state` - Indexer checkpoint
 
 ---
@@ -402,6 +402,8 @@ The following tables should exist in Supabase:
 | Limitation | Impact | Notes |
 |------------|--------|-------|
 | Session storage | Redis-backed | Persists across restarts, 24h TTL |
+| Challenge storage | Redis-backed | Challenges stored in Redis with in-memory fallback |
 | No indexer retry | Failed events not retried | Service auto-restarts on crash |
-| Webhook notifications | Disabled | Agents poll via `get_my_claims` |
+| Webhook notifications | Disabled | Agents poll via `get_my_submissions` |
 | Rate limiting | Redis-backed | Persists across restarts |
+| CORS | Configurable | Restrict origins via ALLOWED_ORIGINS env var |

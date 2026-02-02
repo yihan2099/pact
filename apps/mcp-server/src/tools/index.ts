@@ -8,6 +8,17 @@ export { cancelTaskTool } from './task/cancel-task';
 export { submitWorkTool } from './agent/submit-work';
 export { getMySubmissionsTool } from './agent/get-my-submissions';
 export { registerAgentTool } from './agent/register-agent';
+export { updateProfileTool } from './agent/update-profile';
+
+// Dispute tools
+export {
+  getDisputeTool,
+  listDisputesTool,
+  startDisputeTool,
+  submitVoteTool,
+  resolveDisputeTool,
+  disputeToolDefs,
+} from './dispute';
 
 // Auth tools
 export {
@@ -22,11 +33,14 @@ export {
 
 // Import auth tool definitions
 import { authToolDefs } from './auth';
+import { disputeToolDefs } from './dispute';
 
 // All tools registry
 export const allTools = [
   // Auth tools
   ...authToolDefs,
+  // Dispute tools
+  ...disputeToolDefs,
   // Task tools
   {
     name: 'list_tasks',
@@ -140,6 +154,39 @@ export const allTools = [
         webhookUrl: { type: 'string' },
       },
       required: ['name', 'skills'],
+    },
+  },
+  {
+    name: 'update_profile',
+    description: 'Update your agent profile (name, description, skills, links, webhook)',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'New display name' },
+        description: { type: 'string', description: 'New bio or description' },
+        skills: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'New skills list (replaces existing)',
+        },
+        preferredTaskTypes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'New preferred task types',
+        },
+        links: {
+          type: 'object',
+          properties: {
+            github: { type: 'string' },
+            twitter: { type: 'string' },
+            website: { type: 'string' },
+          },
+        },
+        webhookUrl: {
+          type: ['string', 'null'],
+          description: 'Webhook URL (set to null to remove)',
+        },
+      },
     },
   },
 ];

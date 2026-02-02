@@ -1,4 +1,6 @@
 import type { ServerContext } from '../server';
+import { isAgentRegistered } from '@porternetwork/web3-utils';
+import { updateSessionRegistration } from './session-manager';
 
 /**
  * Access level requirements for tools
@@ -26,6 +28,14 @@ export const toolAccessRequirements: Record<string, AccessLevel> = {
   create_task: 'registered',
   cancel_task: 'registered',
   submit_work: 'registered',
+  update_profile: 'registered',
+
+  // Dispute tools
+  get_dispute: 'public',
+  list_disputes: 'public',
+  start_dispute: 'registered',
+  submit_vote: 'registered',
+  resolve_dispute: 'authenticated',
 };
 
 /**
@@ -37,7 +47,7 @@ export interface AccessCheckResult {
 }
 
 /**
- * Check if a context has access to a tool
+ * Check if a context has access to a tool (synchronous check)
  */
 export function checkAccess(
   toolName: string,
@@ -71,7 +81,7 @@ export function checkAccess(
     return { allowed: true };
   }
 
-  // Check registration
+  // Check registration - note: this may be stale, use checkAccessWithRegistrationRefresh for registered tools
   if (!context.isRegistered) {
     return {
       allowed: false,
@@ -88,6 +98,68 @@ export function checkAccess(
   return {
     allowed: false,
     reason: 'Access denied',
+  };
+}
+
+/**
+ * Check access with on-chain registration refresh for registered-level tools
+ * This allows agents who register mid-session to access registered tools
+ */
+export async function checkAccessWithRegistrationRefresh(
+  toolName: string,
+  context: ServerContext
+): Promise<AccessCheckResult & { registrationUpdated?: boolean }> {
+  const requiredLevel = toolAccessRequirements[toolName];
+
+  // For non-registered tools, use the fast synchronous check
+  if (requiredLevel !== 'registered') {
+    return checkAccess(toolName, context);
+  }
+
+  // Unknown tool - deny by default
+  if (!requiredLevel) {
+    return {
+      allowed: false,
+      reason: `Unknown tool: ${toolName}`,
+    };
+  }
+
+  // Check authentication first
+  if (!context.isAuthenticated) {
+    return {
+      allowed: false,
+      reason: 'Authentication required. Call auth_get_challenge and auth_verify first.',
+    };
+  }
+
+  // If already registered in session, allow
+  if (context.isRegistered) {
+    return { allowed: true };
+  }
+
+  // Session says not registered - re-check on-chain
+  // This handles the case where an agent registered mid-session
+  try {
+    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const isNowRegistered = await isAgentRegistered(context.callerAddress, chainId);
+
+    if (isNowRegistered && context.sessionId) {
+      // Update the session to reflect new registration status
+      await updateSessionRegistration(context.sessionId, true);
+
+      return {
+        allowed: true,
+        registrationUpdated: true,
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to check on-chain registration:', error);
+    // Fall through to deny if we can't verify
+  }
+
+  return {
+    allowed: false,
+    reason: 'Agent must be registered on-chain to use this tool.',
   };
 }
 

@@ -4,13 +4,15 @@ pragma solidity ^0.8.24;
 import {IDisputeResolver} from "./interfaces/IDisputeResolver.sol";
 import {ITaskManager} from "./interfaces/ITaskManager.sol";
 import {IPorterRegistry} from "./interfaces/IPorterRegistry.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title DisputeResolver
  * @notice Handles disputes when agents disagree with creator's selection/rejection
  * @dev Community votes with reputation-weighted voting to resolve disputes
+ * @dev SECURITY: Uses ReentrancyGuard to prevent reentrancy attacks on stake transfers
  */
-contract DisputeResolver is IDisputeResolver {
+contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     // Constants
     uint256 public constant MIN_DISPUTE_STAKE = 0.01 ether;
     uint256 public constant DISPUTE_STAKE_PERCENT = 1; // 1% of bounty
@@ -139,8 +141,9 @@ contract DisputeResolver is IDisputeResolver {
     /**
      * @notice Resolve a dispute after voting period ends
      * @param disputeId The dispute ID
+     * @dev SECURITY: nonReentrant prevents reentrancy attacks on stake transfers
      */
-    function resolveDispute(uint256 disputeId) external {
+    function resolveDispute(uint256 disputeId) external nonReentrant {
         Dispute storage dispute = _disputes[disputeId];
         if (dispute.id == 0) revert DisputeNotFound();
         if (dispute.status != DisputeStatus.Active) revert DisputeAlreadyResolved();
@@ -290,8 +293,9 @@ contract DisputeResolver is IDisputeResolver {
      * @notice Withdraw accumulated slashed stakes (owner only)
      * @param recipient The address to receive funds
      * @param amount The amount to withdraw
+     * @dev SECURITY: nonReentrant prevents reentrancy attacks on withdrawals
      */
-    function withdrawSlashedStakes(address recipient, uint256 amount) external onlyOwner {
+    function withdrawSlashedStakes(address recipient, uint256 amount) external onlyOwner nonReentrant {
         (bool success,) = recipient.call{value: amount}("");
         if (!success) revert TransferFailed();
     }

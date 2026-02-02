@@ -8,19 +8,24 @@ import {
 } from '@porternetwork/database';
 import type { WorkSubmission } from '@porternetwork/shared-types';
 
+// SECURITY: IPFS CID v0 and v1 format validation
+const cidRegex = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{58,})$/;
+
 export const submitWorkSchema = z.object({
-  taskId: z.string().min(1),
-  summary: z.string().min(1),
-  description: z.string().optional(),
+  taskId: z.string().min(1).max(100), // SECURITY: Limit task ID length
+  summary: z.string().min(1).max(1000), // SECURITY: Limit summary length
+  description: z.string().max(50000).optional(), // SECURITY: Limit description length
   deliverables: z.array(
     z.object({
       type: z.enum(['code', 'document', 'data', 'file', 'other']),
-      description: z.string().min(1),
-      cid: z.string().optional(),
-      url: z.string().url().optional(),
+      description: z.string().min(1).max(2000), // SECURITY: Limit description
+      // SECURITY: Validate CID format if provided
+      cid: z.string().regex(cidRegex, 'Invalid IPFS CID format').optional(),
+      // SECURITY: Validate URL format (zod already validates)
+      url: z.string().url().max(2000).optional(),
     })
-  ).min(1),
-  creatorNotes: z.string().optional(),
+  ).min(1).max(20), // SECURITY: Limit number of deliverables
+  creatorNotes: z.string().max(5000).optional(), // SECURITY: Limit notes length
 });
 
 export type SubmitWorkInput = z.infer<typeof submitWorkSchema>;

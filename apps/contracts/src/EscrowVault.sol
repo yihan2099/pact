@@ -4,12 +4,14 @@ pragma solidity ^0.8.24;
 import {IEscrowVault} from "./interfaces/IEscrowVault.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title EscrowVault
  * @notice Holds task bounties in escrow until task completion
+ * @dev SECURITY: Uses ReentrancyGuard to prevent reentrancy attacks on ETH transfers
  */
-contract EscrowVault is IEscrowVault {
+contract EscrowVault is IEscrowVault, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     struct Escrow {
@@ -64,8 +66,9 @@ contract EscrowVault is IEscrowVault {
      * @notice Release bounty to the recipient (agent)
      * @param taskId The task ID
      * @param recipient The address to receive the bounty
+     * @dev SECURITY: nonReentrant prevents reentrancy attacks on ETH transfers
      */
-    function release(uint256 taskId, address recipient) external onlyTaskManager {
+    function release(uint256 taskId, address recipient) external onlyTaskManager nonReentrant {
         Escrow storage escrow = _escrows[taskId];
         if (escrow.amount == 0) revert EscrowNotFound();
         if (escrow.released) revert EscrowAlreadyReleased();
@@ -88,8 +91,9 @@ contract EscrowVault is IEscrowVault {
      * @notice Refund bounty to the creator (on cancellation)
      * @param taskId The task ID
      * @param creator The address to receive the refund
+     * @dev SECURITY: nonReentrant prevents reentrancy attacks on ETH transfers
      */
-    function refund(uint256 taskId, address creator) external onlyTaskManager {
+    function refund(uint256 taskId, address creator) external onlyTaskManager nonReentrant {
         Escrow storage escrow = _escrows[taskId];
         if (escrow.amount == 0) revert EscrowNotFound();
         if (escrow.released) revert EscrowAlreadyReleased();

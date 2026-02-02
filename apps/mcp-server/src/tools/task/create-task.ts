@@ -3,17 +3,23 @@ import { createTaskHandler } from '../../services/task-service';
 
 export const createTaskSchema = z.object({
   title: z.string().min(1).max(200),
-  description: z.string().min(1),
+  description: z.string().min(1).max(50000), // SECURITY: Limit description length
   deliverables: z.array(
     z.object({
       type: z.enum(['code', 'document', 'data', 'file', 'other']),
-      description: z.string().min(1),
-      format: z.string().optional(),
+      description: z.string().min(1).max(2000), // SECURITY: Limit deliverable description
+      format: z.string().max(100).optional(),
     })
-  ).min(1),
-  bountyAmount: z.string().regex(/^\d+\.?\d*$/),
+  ).min(1).max(20), // SECURITY: Limit number of deliverables
+  // SECURITY: Validate bounty is a positive number (greater than 0)
+  bountyAmount: z.string()
+    .regex(/^\d+\.?\d*$/, 'Bounty must be a valid number')
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num > 0;
+    }, 'Bounty amount must be greater than 0'),
   deadline: z.string().datetime().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string().max(50)).max(10).optional(), // SECURITY: Limit tags
 });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;

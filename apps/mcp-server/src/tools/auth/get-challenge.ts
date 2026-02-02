@@ -1,4 +1,5 @@
 import { generateChallenge } from '../../auth/wallet-signature';
+import { isValidAddress } from '@porternetwork/web3-utils';
 
 /**
  * Input for auth_get_challenge tool
@@ -44,19 +45,15 @@ export async function getChallengeHandler(
 ): Promise<GetChallengeOutput> {
   const input = args as GetChallengeInput;
 
-  // Validate wallet address format
-  if (!input.walletAddress || !input.walletAddress.startsWith('0x')) {
-    throw new Error('Invalid wallet address format. Must start with 0x');
-  }
-
-  if (input.walletAddress.length !== 42) {
-    throw new Error('Invalid wallet address length. Must be 42 characters');
+  // SECURITY: Validate wallet address using viem's isAddress for proper hex validation
+  if (!input.walletAddress || !isValidAddress(input.walletAddress)) {
+    throw new Error('Invalid wallet address format');
   }
 
   const walletAddress = input.walletAddress as `0x${string}`;
 
-  // Generate challenge
-  const { challenge, nonce, expiresAt } = generateChallenge(walletAddress);
+  // Generate challenge (now async with Redis support)
+  const { challenge, nonce, expiresAt } = await generateChallenge(walletAddress);
 
   return {
     challenge,
