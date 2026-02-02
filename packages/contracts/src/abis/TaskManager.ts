@@ -1,6 +1,6 @@
 /**
  * TaskManager contract ABI
- * Generated from Foundry build output
+ * Updated for competitive task system
  */
 export const TaskManagerABI = [
   // Events
@@ -18,15 +18,6 @@ export const TaskManagerABI = [
   },
   {
     type: 'event',
-    name: 'TaskClaimed',
-    inputs: [
-      { name: 'taskId', type: 'uint256', indexed: true },
-      { name: 'agent', type: 'address', indexed: true },
-      { name: 'claimDeadline', type: 'uint256', indexed: false },
-    ],
-  },
-  {
-    type: 'event',
     name: 'WorkSubmitted',
     inputs: [
       { name: 'taskId', type: 'uint256', indexed: true },
@@ -36,11 +27,46 @@ export const TaskManagerABI = [
   },
   {
     type: 'event',
-    name: 'TaskCompleted',
+    name: 'SubmissionUpdated',
     inputs: [
       { name: 'taskId', type: 'uint256', indexed: true },
       { name: 'agent', type: 'address', indexed: true },
+      { name: 'submissionCid', type: 'string', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'WinnerSelected',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'winner', type: 'address', indexed: true },
+      { name: 'challengeDeadline', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'AllSubmissionsRejected',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'reason', type: 'string', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TaskCompleted',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'winner', type: 'address', indexed: true },
       { name: 'bountyAmount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TaskRefunded',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'creator', type: 'address', indexed: true },
+      { name: 'refundAmount', type: 'uint256', indexed: false },
     ],
   },
   {
@@ -58,7 +84,14 @@ export const TaskManagerABI = [
     inputs: [
       { name: 'taskId', type: 'uint256', indexed: true },
       { name: 'disputer', type: 'address', indexed: true },
-      { name: 'reason', type: 'string', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'DisputeResolved',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'disputerWon', type: 'bool', indexed: false },
     ],
   },
 
@@ -78,11 +111,11 @@ export const TaskManagerABI = [
           { name: 'bountyAmount', type: 'uint256' },
           { name: 'bountyToken', type: 'address' },
           { name: 'specificationCid', type: 'string' },
-          { name: 'claimedBy', type: 'address' },
-          { name: 'claimedAt', type: 'uint256' },
-          { name: 'submissionCid', type: 'string' },
           { name: 'createdAtBlock', type: 'uint256' },
           { name: 'deadline', type: 'uint256' },
+          { name: 'selectedWinner', type: 'address' },
+          { name: 'selectedAt', type: 'uint256' },
+          { name: 'challengeDeadline', type: 'uint256' },
         ],
       },
     ],
@@ -93,6 +126,62 @@ export const TaskManagerABI = [
     name: 'taskCount',
     inputs: [],
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSubmission',
+    inputs: [
+      { name: 'taskId', type: 'uint256' },
+      { name: 'agent', type: 'address' },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          { name: 'agent', type: 'address' },
+          { name: 'submissionCid', type: 'string' },
+          { name: 'submittedAt', type: 'uint256' },
+          { name: 'updatedAt', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSubmissions',
+    inputs: [{ name: 'taskId', type: 'uint256' }],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple[]',
+        components: [
+          { name: 'agent', type: 'address' },
+          { name: 'submissionCid', type: 'string' },
+          { name: 'submittedAt', type: 'uint256' },
+          { name: 'updatedAt', type: 'uint256' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSubmissionCount',
+    inputs: [{ name: 'taskId', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'hasSubmitted',
+    inputs: [
+      { name: 'taskId', type: 'uint256' },
+      { name: 'agent', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
   },
 
@@ -111,13 +200,6 @@ export const TaskManagerABI = [
   },
   {
     type: 'function',
-    name: 'claimTask',
-    inputs: [{ name: 'taskId', type: 'uint256' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
     name: 'submitWork',
     inputs: [
       { name: 'taskId', type: 'uint256' },
@@ -128,8 +210,55 @@ export const TaskManagerABI = [
   },
   {
     type: 'function',
+    name: 'selectWinner',
+    inputs: [
+      { name: 'taskId', type: 'uint256' },
+      { name: 'winner', type: 'address' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'rejectAll',
+    inputs: [
+      { name: 'taskId', type: 'uint256' },
+      { name: 'reason', type: 'string' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'finalizeTask',
+    inputs: [{ name: 'taskId', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'cancelTask',
     inputs: [{ name: 'taskId', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+
+  // Dispute resolver functions (called by DisputeResolver)
+  {
+    type: 'function',
+    name: 'markDisputed',
+    inputs: [{ name: 'taskId', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'resolveDispute',
+    inputs: [
+      { name: 'taskId', type: 'uint256' },
+      { name: 'disputerWon', type: 'bool' },
+      { name: 'disputer', type: 'address' },
+    ],
     outputs: [],
     stateMutability: 'nonpayable',
   },

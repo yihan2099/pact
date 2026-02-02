@@ -1,6 +1,6 @@
 /**
  * PorterRegistry contract ABI
- * Generated from Foundry build output
+ * Updated for competitive task system (no tiers, no staking)
  */
 export const PorterRegistryABI = [
   // Events
@@ -22,15 +22,6 @@ export const PorterRegistryABI = [
   },
   {
     type: 'event',
-    name: 'TierUpdated',
-    inputs: [
-      { name: 'agent', type: 'address', indexed: true },
-      { name: 'oldTier', type: 'uint8', indexed: false },
-      { name: 'newTier', type: 'uint8', indexed: false },
-    ],
-  },
-  {
-    type: 'event',
     name: 'ReputationUpdated',
     inputs: [
       { name: 'agent', type: 'address', indexed: true },
@@ -40,19 +31,13 @@ export const PorterRegistryABI = [
   },
   {
     type: 'event',
-    name: 'Staked',
-    inputs: [
-      { name: 'agent', type: 'address', indexed: true },
-      { name: 'amount', type: 'uint256', indexed: false },
-    ],
+    name: 'AgentDeactivated',
+    inputs: [{ name: 'agent', type: 'address', indexed: true }],
   },
   {
     type: 'event',
-    name: 'Unstaked',
-    inputs: [
-      { name: 'agent', type: 'address', indexed: true },
-      { name: 'amount', type: 'uint256', indexed: false },
-    ],
+    name: 'AgentReactivated',
+    inputs: [{ name: 'agent', type: 'address', indexed: true }],
   },
 
   // Read functions
@@ -65,11 +50,10 @@ export const PorterRegistryABI = [
         name: '',
         type: 'tuple',
         components: [
-          { name: 'tier', type: 'uint8' },
           { name: 'reputation', type: 'uint256' },
-          { name: 'tasksCompleted', type: 'uint256' },
-          { name: 'tasksFailed', type: 'uint256' },
-          { name: 'stakedAmount', type: 'uint256' },
+          { name: 'tasksWon', type: 'uint256' },
+          { name: 'disputesWon', type: 'uint256' },
+          { name: 'disputesLost', type: 'uint256' },
           { name: 'profileCid', type: 'string' },
           { name: 'registeredAt', type: 'uint256' },
           { name: 'isActive', type: 'bool' },
@@ -87,7 +71,14 @@ export const PorterRegistryABI = [
   },
   {
     type: 'function',
-    name: 'getStake',
+    name: 'getReputation',
+    inputs: [{ name: 'agent', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getVoteWeight',
     inputs: [{ name: 'agent', type: 'address' }],
     outputs: [{ name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -110,15 +101,58 @@ export const PorterRegistryABI = [
   },
   {
     type: 'function',
-    name: 'stake',
+    name: 'deactivate',
     inputs: [],
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    name: 'unstake',
-    inputs: [{ name: 'amount', type: 'uint256' }],
+    name: 'reactivate',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+
+  // Authorized contract functions
+  {
+    type: 'function',
+    name: 'addReputation',
+    inputs: [
+      { name: 'agent', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'removeReputation',
+    inputs: [
+      { name: 'agent', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'recordTaskWin',
+    inputs: [{ name: 'agent', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'recordDisputeWin',
+    inputs: [{ name: 'agent', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'recordDisputeLoss',
+    inputs: [{ name: 'agent', type: 'address' }],
     outputs: [],
     stateMutability: 'nonpayable',
   },

@@ -1,4 +1,4 @@
 export { TaskManagerABI } from './TaskManager';
 export { EscrowVaultABI } from './EscrowVault';
-export { VerificationHubABI } from './VerificationHub';
+export { DisputeResolverABI } from './DisputeResolver';
 export { PorterRegistryABI } from './PorterRegistry';

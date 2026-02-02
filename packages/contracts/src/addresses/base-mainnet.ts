@@ -1,11 +1,11 @@
 /**
  * Contract addresses on Base mainnet
- * Update these after deploying contracts
+ * Updated for competitive task system
  */
 export const BASE_MAINNET_ADDRESSES = {
   taskManager: '0x0000000000000000000000000000000000000000' as `0x${string}`,
   escrowVault: '0x0000000000000000000000000000000000000000' as `0x${string}`,
-  verificationHub: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+  disputeResolver: '0x0000000000000000000000000000000000000000' as `0x${string}`,
   porterRegistry: '0x0000000000000000000000000000000000000000' as `0x${string}`,
 } as const;
 
