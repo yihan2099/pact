@@ -502,9 +502,9 @@ export async function getTaskChallengeDeadline(taskId: bigint): Promise<{
     args: [taskId],
   });
 
-  // Task struct: [id, creator, status, bountyAmount, bountyToken, specCid, selectedWinner, selectedAt, challengeDeadline, deadline, createdAtBlock]
-  const taskData = result as readonly unknown[];
-  const challengeDeadline = taskData[8] as bigint;
+  // Task struct: {id, creator, status, bountyAmount, bountyToken, specCid, selectedWinner, selectedAt, challengeDeadline, deadline, createdAtBlock}
+  const taskData = result as unknown as { challengeDeadline: bigint };
+  const challengeDeadline = taskData.challengeDeadline;
   const deadlineMs = Number(challengeDeadline) * 1000;
   const now = Date.now();
 

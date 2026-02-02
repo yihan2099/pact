@@ -52,31 +52,28 @@ bun test src/__tests__/e2e/
 
 ## Test Coverage
 
-The test covers steps 1-5 of the task lifecycle:
+The test covers the competitive task lifecycle:
 
 | Step | Action | MCP Tool | Contract Function |
 |------|--------|----------|-------------------|
 | 1 | Auth | auth_get_challenge + auth_verify | - |
 | 2 | Register Agent | register_agent | register(profileCid) |
 | 3 | Create Task | create_task | createTask(...) |
-| 4 | Claim Task | claim_task | claimTask(taskId) |
-| 5 | Submit Work | submit_work | submitWork(taskId, cid) |
-| 6 | Verify | ⏭️ Skipped | - |
-| 7 | Payout | ⏭️ Skipped | - |
+| 4 | Submit Work | submit_work | submitWork(taskId, cid) |
+| 5 | Select Winner | select_winner | selectWinner(taskId, winner) |
+| 6 | Finalize | finalize_task | finalizeTask(taskId) |
 
-### Why Skip Verification?
+### Note on Challenge Window
 
-The PorterRegistry contract requires Elite-tier agents (1000+ reputation, 5 ETH stake) to verify work. On a fresh testnet, no agents have accumulated reputation yet.
-
-**Future fix:** Add `grantEliteStatus(address)` owner function to PorterRegistry for testnet bootstrap.
+After selecting a winner, there is a 48-hour challenge window where other submitters can dispute the decision. For testnet E2E tests, finalization is done after the challenge window passes or can be tested with a fresh task.
 
 ## Contract Addresses (Base Sepolia)
 
 ```
-PorterRegistry:   0x985865096c6ffbb5D0637E02Ff9C2153c4B07687
-EscrowVault:      0xB1eD512aab13fFA1f9fd0e22106e52aC2DBD6cdd
-TaskManager:      0xEdBBD1096ACdDBBc10bbA50d3b0f4d3186243581
-VerificationHub:  0x75A4e4609620C7c18aA8A6999E263B943AA09BA0
+PorterRegistry:   0x2d136042424dC00cf859c81b664CC78fbE139bD5
+EscrowVault:      0x91256394De003C99B9F47b4a4Ea396B9A305fc8F
+TaskManager:      0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E
+DisputeResolver:  0x8964586a472cf6b363C2339289ded3D2140C397F
 ```
 
 ## Troubleshooting
