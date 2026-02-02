@@ -3,7 +3,7 @@ export {
   uploadTaskSpecification,
   uploadAgentProfile,
   uploadWorkSubmission,
-  uploadVerificationFeedback,
+  uploadDisputeEvidence,
 } from './upload-json';
 export type { UploadJsonOptions, UploadResult } from './upload-json';
 

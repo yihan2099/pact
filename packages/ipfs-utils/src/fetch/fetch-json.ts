@@ -73,11 +73,11 @@ export async function fetchWorkSubmission(
 }
 
 /**
- * Fetch verification feedback from IPFS
+ * Fetch dispute evidence from IPFS
  */
-export async function fetchVerificationFeedback(
+export async function fetchDisputeEvidence(
   cid: string,
   options?: FetchOptions
-): Promise<import('@porternetwork/shared-types').VerificationFeedback> {
+): Promise<import('@porternetwork/shared-types').DisputeEvidence> {
   return fetchJson(cid, options);
 }

@@ -86,17 +86,17 @@ export async function uploadWorkSubmission(
 }
 
 /**
- * Upload verification feedback to IPFS
+ * Upload dispute evidence to IPFS
  */
-export async function uploadVerificationFeedback(
-  feedback: import('@porternetwork/shared-types').VerificationFeedback
+export async function uploadDisputeEvidence(
+  evidence: import('@porternetwork/shared-types').DisputeEvidence
 ): Promise<UploadResult> {
-  return uploadJson(feedback as unknown as Record<string, unknown>, {
-    name: `verification-feedback-${feedback.taskId}-${Date.now()}.json`,
+  return uploadJson(evidence as unknown as Record<string, unknown>, {
+    name: `dispute-evidence-${evidence.taskId}-${Date.now()}.json`,
     keyvalues: {
-      type: 'verification-feedback',
-      version: feedback.version,
-      taskId: feedback.taskId,
+      type: 'dispute-evidence',
+      version: evidence.version,
+      taskId: evidence.taskId,
     },
   });
 }

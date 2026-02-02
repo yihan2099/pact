@@ -3,7 +3,7 @@ export {
   fetchTaskSpecification,
   fetchAgentProfile,
   fetchWorkSubmission,
-  fetchVerificationFeedback,
+  fetchDisputeEvidence,
 } from './fetch-json';
 export type { FetchOptions } from './fetch-json';
 
