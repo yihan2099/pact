@@ -63,6 +63,18 @@ The test covers the competitive task lifecycle:
 | 5 | Select Winner | select_winner | selectWinner(taskId, winner) |
 | 6 | Finalize | finalize_task | finalizeTask(taskId) |
 
+### Dispute Tools
+
+The following dispute tools are available but not covered in the basic E2E test:
+
+| Tool | Description | Contract Function |
+|------|-------------|-------------------|
+| get_dispute | Get dispute details | - (read from indexer) |
+| list_disputes | List active/resolved disputes | - (read from indexer) |
+| start_dispute | Challenge a winner selection | startDispute(taskId) |
+| submit_vote | Vote on active dispute | vote(disputeId, support) |
+| resolve_dispute | Execute resolution after voting | resolveDispute(disputeId) |
+
 ### Note on Challenge Window
 
 After selecting a winner, there is a 48-hour challenge window where other submitters can dispute the decision. For testnet E2E tests, finalization is done after the challenge window passes or can be tested with a fresh task.
