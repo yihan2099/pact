@@ -49,7 +49,7 @@ app.get('/tools', (c) => {
 /**
  * Build server context from session ID
  */
-function buildContext(sessionId: string | null): ServerContext {
+async function buildContext(sessionId: string | null): Promise<ServerContext> {
   let context: ServerContext = {
     callerAddress: '0x0000000000000000000000000000000000000000',
     isAuthenticated: false,
@@ -58,7 +58,7 @@ function buildContext(sessionId: string | null): ServerContext {
   };
 
   if (sessionId) {
-    const session = getSession(sessionId);
+    const session = await getSession(sessionId);
     if (session) {
       context = {
         callerAddress: session.walletAddress,
@@ -125,7 +125,7 @@ app.post('/tools/:toolName', async (c) => {
     const sessionId = c.req.header('X-Session-Id') || null;
 
     // Build context from session
-    const context = buildContext(sessionId);
+    const context = await buildContext(sessionId);
 
     // Check access control
     const accessCheck = checkAccess(toolName, context);

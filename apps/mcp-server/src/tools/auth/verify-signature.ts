@@ -99,7 +99,7 @@ export async function verifySignatureHandler(
   }
 
   // Create session
-  const { sessionId, session } = createSession(walletAddress, isRegistered);
+  const { sessionId, session } = await createSession(walletAddress, isRegistered);
 
   return {
     success: true,

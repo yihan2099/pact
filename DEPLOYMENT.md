@@ -401,7 +401,7 @@ The following tables should exist in Supabase:
 
 | Limitation | Impact | Notes |
 |------------|--------|-------|
-| In-memory sessions | Lost on restart | Agents re-auth (24h expiry anyway) |
+| Session storage | Redis-backed | Persists across restarts, 24h TTL |
 | No indexer retry | Failed events not retried | Service auto-restarts on crash |
 | Webhook notifications | Disabled | Agents poll via `get_my_claims` |
-| Rate limiting | In-memory, resets on restart | Acceptable for testnet |
+| Rate limiting | Redis-backed | Persists across restarts |

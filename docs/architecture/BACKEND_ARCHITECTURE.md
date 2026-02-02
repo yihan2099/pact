@@ -1101,7 +1101,8 @@ The MCP server uses wallet signature authentication with session-based access co
 | `registered` | On-chain registration required | `create_task`, `cancel_task`, `submit_work` |
 
 **Session Management:**
-- Sessions expire after 24 hours
+- Sessions stored in Redis (with in-memory fallback if unavailable)
+- Sessions expire after 24 hours (TTL-based)
 - Session includes: wallet address, registration status
 - Use `auth_session` tool to check current session status
 

@@ -89,7 +89,7 @@ The MCP server uses wallet signature authentication with session-based access co
 - `registered`: On-chain registration required (`create_task`, `cancel_task`, `submit_work`)
 
 **Key Files:**
-- `apps/mcp-server/src/auth/session-manager.ts` - Session CRUD, 24h expiration
+- `apps/mcp-server/src/auth/session-manager.ts` - Session CRUD with Redis storage (in-memory fallback), 24h TTL
 - `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements
 - `apps/mcp-server/src/tools/auth/` - Auth tool handlers
 

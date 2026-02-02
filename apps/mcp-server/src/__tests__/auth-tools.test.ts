@@ -45,7 +45,7 @@ describe('Auth Tools', () => {
   describe('auth_session', () => {
     test('should return valid session info', async () => {
       const wallet = '0xcccccccccccccccccccccccccccccccccccccccc' as `0x${string}`;
-      const { sessionId } = createSession(wallet, true);
+      const { sessionId } = await createSession(wallet, true);
 
       const result = await getSessionHandler({ sessionId });
 
@@ -65,7 +65,7 @@ describe('Auth Tools', () => {
 
     test('should invalidate session when action is invalidate', async () => {
       const wallet = '0xdddddddddddddddddddddddddddddddddddddddd' as `0x${string}`;
-      const { sessionId } = createSession(wallet, false);
+      const { sessionId } = await createSession(wallet, false);
 
       // Session exists
       const beforeResult = await getSessionHandler({ sessionId });

@@ -105,10 +105,10 @@ Issues identified during architectural review (2026-02-02). Organized by severit
   - Files: `apps/contracts/src/TaskManager.sol:77-87`, `apps/contracts/src/DisputeResolver.sol`
 
 #### MCP Server - Session Storage
-- [ ] **In-memory session storage** - Sessions stored in `Map<string, AuthSession>`, lost on restart
-  - Risk: All agents logged out on server restart; no horizontal scaling
-  - Recommendation: Use Redis or similar persistent store for production
-  - File: `apps/mcp-server/src/auth/session-manager.ts:19`
+- [x] ~~**In-memory session storage**~~ - **RESOLVED**: Now uses Redis with in-memory fallback
+  - Sessions persist across restarts via Upstash Redis
+  - Supports horizontal scaling
+  - File: `apps/mcp-server/src/auth/session-manager.ts`
 
 #### MCP Server - Missing Dispute Tools
 - [ ] **No MCP tools for dispute flow** - Agents cannot participate in disputes via MCP

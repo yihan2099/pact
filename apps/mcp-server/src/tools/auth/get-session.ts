@@ -59,7 +59,7 @@ export async function getSessionHandler(
   const action = input.action || 'get';
 
   if (action === 'invalidate') {
-    const wasInvalidated = invalidateSession(input.sessionId);
+    const wasInvalidated = await invalidateSession(input.sessionId);
     return {
       valid: false,
       message: wasInvalidated
@@ -69,7 +69,7 @@ export async function getSessionHandler(
   }
 
   // Get session info
-  const session = getSession(input.sessionId);
+  const session = await getSession(input.sessionId);
 
   if (!session) {
     return {

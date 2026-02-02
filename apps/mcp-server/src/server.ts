@@ -97,7 +97,7 @@ export function createMcpServer() {
     };
 
     if (sessionId) {
-      const session = getSession(sessionId);
+      const session = await getSession(sessionId);
       if (session) {
         context = {
           callerAddress: session.walletAddress,
