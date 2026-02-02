@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Script, console} from "forge-std/Script.sol";
 import {TaskManager} from "../src/TaskManager.sol";
 import {EscrowVault} from "../src/EscrowVault.sol";
-import {VerificationHub} from "../src/VerificationHub.sol";
+import {DisputeResolver} from "../src/DisputeResolver.sol";
 import {PorterRegistry} from "../src/PorterRegistry.sol";
 
 contract DeployScript is Script {
@@ -39,10 +39,15 @@ contract DeployScript is Script {
         // Verify prediction was correct
         require(address(taskManager) == predictedTaskManager, "TaskManager address mismatch!");
 
-        // 5. Deploy VerificationHub
-        VerificationHub verificationHub =
-            new VerificationHub(address(taskManager), address(porterRegistry));
-        console.log("VerificationHub deployed at:", address(verificationHub));
+        // 5. Deploy DisputeResolver
+        DisputeResolver disputeResolver =
+            new DisputeResolver(address(taskManager), address(porterRegistry));
+        console.log("DisputeResolver deployed at:", address(disputeResolver));
+
+        // 6. Configure access control
+        taskManager.setDisputeResolver(address(disputeResolver));
+        porterRegistry.setTaskManager(address(taskManager));
+        porterRegistry.setDisputeResolver(address(disputeResolver));
 
         vm.stopBroadcast();
 
@@ -51,6 +56,6 @@ contract DeployScript is Script {
         console.log("PorterRegistry:", address(porterRegistry));
         console.log("EscrowVault:", address(escrowVault));
         console.log("TaskManager:", address(taskManager));
-        console.log("VerificationHub:", address(verificationHub));
+        console.log("DisputeResolver:", address(disputeResolver));
     }
 }

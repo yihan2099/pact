@@ -3,22 +3,15 @@ pragma solidity ^0.8.24;
 
 /**
  * @title IPorterRegistry
- * @notice Interface for the PorterRegistry contract
+ * @notice Interface for the PorterRegistry contract - simplified reputation-only system
+ * @dev Removed tier system and staking - just tracks reputation and dispute history
  */
 interface IPorterRegistry {
-    enum AgentTier {
-        Newcomer,
-        Established,
-        Verified,
-        Elite
-    }
-
     struct Agent {
-        AgentTier tier;
         uint256 reputation;
-        uint256 tasksCompleted;
-        uint256 tasksFailed;
-        uint256 stakedAmount;
+        uint256 tasksWon;        // Tasks where agent was selected winner
+        uint256 disputesWon;     // Disputes won by agent
+        uint256 disputesLost;    // Disputes lost by agent
         string profileCid;
         uint256 registeredAt;
         bool isActive;
@@ -28,31 +21,31 @@ interface IPorterRegistry {
 
     event AgentUpdated(address indexed agent, string profileCid);
 
-    event TierUpdated(address indexed agent, AgentTier oldTier, AgentTier newTier);
-
     event ReputationUpdated(address indexed agent, uint256 oldReputation, uint256 newReputation);
 
-    event Staked(address indexed agent, uint256 amount);
+    event TaskWon(address indexed agent);
 
-    event Unstaked(address indexed agent, uint256 amount);
+    event DisputeWon(address indexed agent);
+
+    event DisputeLost(address indexed agent);
 
     function register(string calldata profileCid) external;
 
     function updateProfile(string calldata profileCid) external;
 
-    function stake() external payable;
-
-    function unstake(uint256 amount) external;
-
     function getAgent(address agent) external view returns (Agent memory);
 
     function isRegistered(address agent) external view returns (bool);
 
-    function getStake(address agent) external view returns (uint256);
+    // Reputation management (called by TaskManager/DisputeResolver)
+    function incrementTasksWon(address agent) external;
 
-    function incrementCompleted(address agent) external;
+    function incrementDisputesWon(address agent) external;
 
-    function incrementFailed(address agent) external;
+    function incrementDisputesLost(address agent) external;
 
     function updateReputation(address agent, int256 delta) external;
+
+    // Vote weight calculation for disputes
+    function getVoteWeight(address agent) external view returns (uint256);
 }

@@ -5,7 +5,8 @@ import {IPorterRegistry} from "./interfaces/IPorterRegistry.sol";
 
 /**
  * @title PorterRegistry
- * @notice Manages agent registration, reputation, and staking
+ * @notice Manages agent registration and reputation - simplified model without tiers/staking
+ * @dev Reputation is earned through winning tasks and disputes, lost through losing disputes
  */
 contract PorterRegistry is IPorterRegistry {
     // State
@@ -14,23 +15,11 @@ contract PorterRegistry is IPorterRegistry {
     // Access control
     address public owner;
     address public taskManager;
-    address public verificationHub;
-
-    // Tier thresholds
-    uint256 public constant ESTABLISHED_REPUTATION = 100;
-    uint256 public constant VERIFIED_REPUTATION = 500;
-    uint256 public constant ELITE_REPUTATION = 1000;
-
-    // Staking requirements for higher tiers
-    uint256 public constant VERIFIED_STAKE = 1 ether;
-    uint256 public constant ELITE_STAKE = 5 ether;
+    address public disputeResolver;
 
     // Errors
     error AlreadyRegistered();
     error NotRegistered();
-    error InsufficientStake();
-    error StakeAmountTooLow();
-    error WithdrawFailed();
     error OnlyOwner();
     error Unauthorized();
 
@@ -40,7 +29,7 @@ contract PorterRegistry is IPorterRegistry {
     }
 
     modifier onlyAuthorized() {
-        if (msg.sender != taskManager && msg.sender != verificationHub) {
+        if (msg.sender != taskManager && msg.sender != disputeResolver) {
             revert Unauthorized();
         }
         _;
@@ -59,11 +48,11 @@ contract PorterRegistry is IPorterRegistry {
     }
 
     /**
-     * @notice Set the VerificationHub address (callable by owner)
-     * @param _verificationHub The VerificationHub address
+     * @notice Set the DisputeResolver address (callable by owner)
+     * @param _disputeResolver The DisputeResolver address
      */
-    function setVerificationHub(address _verificationHub) external onlyOwner {
-        verificationHub = _verificationHub;
+    function setDisputeResolver(address _disputeResolver) external onlyOwner {
+        disputeResolver = _disputeResolver;
     }
 
     /**
@@ -74,11 +63,10 @@ contract PorterRegistry is IPorterRegistry {
         if (_agents[msg.sender].registeredAt != 0) revert AlreadyRegistered();
 
         _agents[msg.sender] = Agent({
-            tier: AgentTier.Newcomer,
             reputation: 0,
-            tasksCompleted: 0,
-            tasksFailed: 0,
-            stakedAmount: 0,
+            tasksWon: 0,
+            disputesWon: 0,
+            disputesLost: 0,
             profileCid: profileCid,
             registeredAt: block.timestamp,
             isActive: true
@@ -100,42 +88,7 @@ contract PorterRegistry is IPorterRegistry {
     }
 
     /**
-     * @notice Stake ETH to increase tier eligibility
-     */
-    function stake() external payable {
-        if (_agents[msg.sender].registeredAt == 0) revert NotRegistered();
-        if (msg.value == 0) revert StakeAmountTooLow();
-
-        _agents[msg.sender].stakedAmount += msg.value;
-
-        emit Staked(msg.sender, msg.value);
-
-        // Check for tier upgrade
-        _updateTier(msg.sender);
-    }
-
-    /**
-     * @notice Unstake ETH
-     * @param amount Amount to unstake
-     */
-    function unstake(uint256 amount) external {
-        Agent storage agent = _agents[msg.sender];
-        if (agent.registeredAt == 0) revert NotRegistered();
-        if (agent.stakedAmount < amount) revert InsufficientStake();
-
-        agent.stakedAmount -= amount;
-
-        (bool success,) = msg.sender.call{value: amount}("");
-        if (!success) revert WithdrawFailed();
-
-        emit Unstaked(msg.sender, amount);
-
-        // Check for tier downgrade
-        _updateTier(msg.sender);
-    }
-
-    /**
-     * @notice Update agent reputation (called by TaskManager/VerificationHub)
+     * @notice Update agent reputation (called by TaskManager/DisputeResolver)
      * @param agent The agent address
      * @param delta The reputation change (can be negative)
      */
@@ -157,26 +110,54 @@ contract PorterRegistry is IPorterRegistry {
         }
 
         emit ReputationUpdated(agent, oldReputation, a.reputation);
-
-        _updateTier(agent);
     }
 
     /**
-     * @notice Increment completed tasks (called by TaskManager)
+     * @notice Increment tasks won (called by TaskManager)
      * @param agent The agent address
      */
-    function incrementCompleted(address agent) external onlyAuthorized {
+    function incrementTasksWon(address agent) external onlyAuthorized {
         if (_agents[agent].registeredAt == 0) revert NotRegistered();
-        _agents[agent].tasksCompleted++;
+        _agents[agent].tasksWon++;
+        emit TaskWon(agent);
     }
 
     /**
-     * @notice Increment failed tasks (called by TaskManager)
+     * @notice Increment disputes won (called by DisputeResolver)
      * @param agent The agent address
      */
-    function incrementFailed(address agent) external onlyAuthorized {
+    function incrementDisputesWon(address agent) external onlyAuthorized {
         if (_agents[agent].registeredAt == 0) revert NotRegistered();
-        _agents[agent].tasksFailed++;
+        _agents[agent].disputesWon++;
+        emit DisputeWon(agent);
+    }
+
+    /**
+     * @notice Increment disputes lost (called by DisputeResolver)
+     * @param agent The agent address
+     */
+    function incrementDisputesLost(address agent) external onlyAuthorized {
+        if (_agents[agent].registeredAt == 0) revert NotRegistered();
+        _agents[agent].disputesLost++;
+        emit DisputeLost(agent);
+    }
+
+    /**
+     * @notice Calculate vote weight for disputes based on reputation
+     * @dev Weight = max(1, floor(log2(reputation + 1)))
+     * @param agent The agent address
+     * @return The vote weight
+     */
+    function getVoteWeight(address agent) external view returns (uint256) {
+        Agent storage a = _agents[agent];
+        if (a.registeredAt == 0) return 0;
+
+        // Calculate log2(reputation + 1) using bit manipulation
+        uint256 repPlusOne = a.reputation + 1;
+        uint256 weight = _log2(repPlusOne);
+
+        // Minimum weight of 1 for registered agents
+        return weight > 0 ? weight : 1;
     }
 
     /**
@@ -198,33 +179,17 @@ contract PorterRegistry is IPorterRegistry {
     }
 
     /**
-     * @notice Get agent's staked amount
-     * @param agent The agent address
-     * @return The staked amount
+     * @dev Calculate floor(log2(x)) for x > 0
+     * Returns 0 for x = 0 or x = 1
      */
-    function getStake(address agent) external view returns (uint256) {
-        return _agents[agent].stakedAmount;
-    }
+    function _log2(uint256 x) private pure returns (uint256) {
+        if (x <= 1) return 0;
 
-    /**
-     * @dev Update agent tier based on reputation and stake
-     */
-    function _updateTier(address agent) private {
-        Agent storage a = _agents[agent];
-        AgentTier oldTier = a.tier;
-        AgentTier newTier = AgentTier.Newcomer;
-
-        if (a.reputation >= ELITE_REPUTATION && a.stakedAmount >= ELITE_STAKE) {
-            newTier = AgentTier.Elite;
-        } else if (a.reputation >= VERIFIED_REPUTATION && a.stakedAmount >= VERIFIED_STAKE) {
-            newTier = AgentTier.Verified;
-        } else if (a.reputation >= ESTABLISHED_REPUTATION) {
-            newTier = AgentTier.Established;
+        uint256 result = 0;
+        while (x > 1) {
+            x >>= 1;
+            result++;
         }
-
-        if (newTier != oldTier) {
-            a.tier = newTier;
-            emit TierUpdated(agent, oldTier, newTier);
-        }
+        return result;
     }
 }
