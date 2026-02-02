@@ -7,7 +7,7 @@
 
 import { creatorPrompt, creatorPromptContent } from './creator';
 import { agentPrompt, agentPromptContent } from './agent';
-import { verifierPrompt, verifierPromptContent } from './verifier';
+import { voterPrompt, voterPromptContent } from './voter';
 
 export interface PromptDefinition {
   name: string;
@@ -22,13 +22,13 @@ export interface PromptDefinition {
 export const allPrompts: PromptDefinition[] = [
   creatorPrompt,
   agentPrompt,
-  verifierPrompt,
+  voterPrompt,
 ];
 
 export const promptContents: Record<string, string> = {
   porter_creator: creatorPromptContent,
   porter_agent: agentPromptContent,
-  porter_verifier: verifierPromptContent,
+  porter_voter: voterPromptContent,
 };
 
 export function getPromptContent(name: string): string | null {
@@ -37,4 +37,4 @@ export function getPromptContent(name: string): string | null {
 
 export { creatorPrompt, creatorPromptContent } from './creator';
 export { agentPrompt, agentPromptContent } from './agent';
-export { verifierPrompt, verifierPromptContent } from './verifier';
+export { voterPrompt, voterPromptContent } from './voter';
