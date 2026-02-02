@@ -307,7 +307,7 @@ interface SignedSelection {
 #### EscrowManager.sol (replaces TaskManager + EscrowVault)
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -486,7 +486,7 @@ contract EscrowManager is ReentrancyGuard {
 #### DisputeResolverV2.sol (evidence-based)
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";

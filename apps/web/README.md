@@ -86,4 +86,4 @@ Current deployment: `https://porternetwork.vercel.app`
 
 ## License
 
-MIT
+Apache License 2.0

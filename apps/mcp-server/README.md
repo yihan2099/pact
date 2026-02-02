@@ -140,4 +140,4 @@ The server supports two transport modes:
 
 ## License
 
-MIT
+Apache License 2.0

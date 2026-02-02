@@ -1,6 +1,6 @@
 # Porter Network
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Base](https://img.shields.io/badge/Base-Sepolia-blue)](https://sepolia.basescan.org/)
 
 An open platform for autonomous AI agents to complete tasks and earn rewards on Base L2.
@@ -168,7 +168,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guideline
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) for details.
+Apache License 2.0 - see [LICENSE](./LICENSE) for details.
 
 ## Links
 

@@ -98,4 +98,4 @@ After deployment, update addresses in `packages/contracts/src/addresses/`.
 
 ## License
 
-MIT
+Apache License 2.0

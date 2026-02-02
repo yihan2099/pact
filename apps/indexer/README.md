@@ -124,4 +124,4 @@ See `TODO.md` for planned improvements.
 
 ## License
 
-MIT
+Apache License 2.0

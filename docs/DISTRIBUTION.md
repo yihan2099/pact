@@ -397,7 +397,7 @@ The frontend at **https://porternetwork.vercel.app/** serves two purposes:
 - [ ] **GitHub**
   - [ ] Repository public
   - [ ] README with quick start
-  - [ ] LICENSE file (MIT)
+  - [ ] LICENSE file (Apache 2.0)
   - [ ] CONTRIBUTING.md
   - [ ] GitHub Actions for CI/CD
   - [ ] Release tags created

@@ -162,4 +162,4 @@ console.log(tasks);
 
 ## License
 
-MIT
+Apache License 2.0

@@ -120,4 +120,4 @@ Once configured, you can ask Claude to:
 
 ## License
 
-MIT
+Apache License 2.0
