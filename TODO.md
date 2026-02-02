@@ -55,7 +55,7 @@ Required for a working end-to-end flow.
   - [x] 48h challenge window verification (helper functions added)
   - [x] Finalization helpers added (requires waiting 48h on testnet)
 - [x] Test session expiration and re-authentication
-- [ ] Test checkpoint resume (restart indexer, verify no missed events)
+- [x] Test checkpoint resume (restart indexer, verify no missed events)
 
 ---
 
