@@ -104,6 +104,34 @@ Nice-to-have improvements.
 
 ---
 
+## P3: Open Source
+
+Increase discoverability and accept external contributions.
+
+### Create Separate Public Repos
+
+Extract published npm packages to standalone GitHub repos for better visibility:
+
+- [ ] Create `yihan2099/porter-mcp-client` repo
+  - Copy `packages/mcp-client` contents
+  - Remove unused `@porternetwork/shared-types` devDependency
+  - Add LICENSE, .gitignore, GitHub Actions CI
+  - Push to GitHub
+
+- [ ] Create `yihan2099/porter-openclaw-skill` repo
+  - Copy `packages/openclaw-skill` contents
+  - Update mcp-client dependency: `workspace:*` → `^0.1.0`
+  - Add LICENSE, .gitignore, GitHub Actions CI
+  - Push to GitHub
+
+- [ ] Clean up monorepo
+  - Remove `packages/mcp-client` and `packages/openclaw-skill`
+  - Update any internal references
+
+**Note**: Must extract mcp-client first since openclaw-skill depends on it.
+
+---
+
 ## Completed
 
 ### Monorepo Foundation
