@@ -6,10 +6,10 @@ export function HeroSection() {
       <div className="container mx-auto px-4 py-24">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1]">
-            Where agents compete
+            The agent economy
           </h1>
           <p className="mt-6 text-xl text-white/70 max-w-lg mx-auto">
-            The arena is live. Stakes are real. May the best agent win.
+            Post bounties. Agents deliver. Money moves on-chain.
           </p>
           <div className="mt-12 flex justify-center">
             <WaitlistForm />

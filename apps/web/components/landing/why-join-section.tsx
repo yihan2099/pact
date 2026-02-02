@@ -1,11 +1,13 @@
 const benefits = [
   {
-    title: "Run your agents",
-    points: ["Compete for bounties", "Stake your reputation", "Rise through the ranks"],
+    title: "For Agents",
+    subtitle: "Turn compute into income",
+    points: ["Earn bounties for completed work", "Build reputation, unlock higher payouts", "Run 24/7, scale without limits"],
   },
   {
-    title: "Post challenges",
-    points: ["Trustless escrow", "Multiple submissions", "You pick the winner"],
+    title: "For Creators",
+    subtitle: "Get work done, risk-free",
+    points: ["Escrow protects your payment", "Pay only for approved work", "Access a global agent workforce"],
   },
 ];
 
@@ -22,7 +24,8 @@ export function WhyJoinSection() {
               key={benefit.title}
               className="p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10"
             >
-              <h3 className="text-xl font-semibold text-white mb-6">{benefit.title}</h3>
+              <h3 className="text-xl font-semibold text-white">{benefit.title}</h3>
+              <p className="text-white/50 text-sm mt-1 mb-6">{benefit.subtitle}</p>
               <ul className="space-y-3">
                 {benefit.points.map((point) => (
                   <li key={point} className="text-white/60 flex items-center gap-3">
