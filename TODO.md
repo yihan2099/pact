@@ -1,6 +1,6 @@
 # Porter Network TODO
 
-> Last Updated: 2026-02-02
+> Last Updated: 2026-02-02 (Security improvements added)
 
 ## Priority Legend
 
@@ -77,7 +77,20 @@ Required before mainnet launch.
 - [ ] Smart contract audit (external)
 - [ ] MCP server security review
 - [x] Rate limiting implementation (packages/rate-limit, integrated in MCP server)
+- [x] Rate limiting fails closed when Redis unavailable
+- [x] Challenge overwrite protection (nonce-based storage)
+- [x] Challenge timestamp freshness validation
+- [x] Wallet address validation with viem's isAddress
+- [x] CORS restriction with configurable origins
+- [x] Security headers (CSP, X-Frame-Options, HSTS, etc.)
+- [x] Input validation limits (description, tags, deliverables)
+- [x] ReentrancyGuard on smart contracts (EscrowVault, DisputeResolver)
+- [x] Security event logging service
+- [x] Redis-based session storage (with in-memory fallback)
 - [ ] Input sanitization audit
+- [ ] Redis-based challenge storage (replace in-memory Map for production)
+- [ ] IP-based anomaly detection (failed auth tracking, rate patterns)
+- [ ] Two-phase commit for large bounties
 
 ### Reliability
 - [ ] Error alerting (Sentry, PagerDuty, or similar)
@@ -124,10 +137,8 @@ Issues identified during architectural review (2026-02-02). Organized by severit
   - Recommendation: Cap voters per dispute, or batch resolution, or off-chain reputation with Merkle proofs
   - File: `apps/contracts/src/DisputeResolver.sol:210-218`
 
-- [ ] **No reentrancy guard** - `DisputeResolver._processDisputeOutcome` uses `.call{value:}()` for ETH transfers
-  - Risk: While checks-effects-interactions pattern is followed, defense-in-depth is missing
-  - Recommendation: Add OpenZeppelin `ReentrancyGuard`
-  - File: `apps/contracts/src/DisputeResolver.sol:185`
+- [x] ~~**No reentrancy guard**~~ - **RESOLVED**: Added OpenZeppelin `ReentrancyGuard` to EscrowVault and DisputeResolver
+  - Files: `apps/contracts/src/EscrowVault.sol`, `apps/contracts/src/DisputeResolver.sol`
 
 - [ ] **No SafeERC20 for token transfers** - `TaskManager.createTask` doesn't verify ERC20 transfers
   - Risk: Non-standard ERC20 tokens may fail silently
@@ -174,12 +185,10 @@ Issues identified during architectural review (2026-02-02). Organized by severit
   - Recommendation: Re-check on-chain status for `registered`-level tools, or allow session refresh
   - File: `apps/mcp-server/src/auth/session-manager.ts:8`
 
-- [ ] **No rate limiting on auth tools** - `auth_get_challenge` and `auth_verify` appear unprotected
-  - Risk: Challenge generation spam
-  - Recommendation: Apply rate limiting to auth endpoints
+- [x] ~~**No rate limiting on auth tools**~~ - **RESOLVED**: Rate limiting applied to all /tools/* endpoints
+  - File: `apps/mcp-server/src/http-server.ts`
 
-- [ ] **Challenge predictability** - Challenges may lack timestamp/nonce for replay protection
-  - Recommendation: Include timestamp, store nonces, use 5-minute expiration
+- [x] ~~**Challenge predictability**~~ - **RESOLVED**: Challenges include timestamp, nonces stored by UUID, 5-minute expiration
   - File: `apps/mcp-server/src/auth/wallet-signature.ts`
 
 #### MCP Server - Missing Features
@@ -196,6 +205,51 @@ Issues identified during architectural review (2026-02-02). Organized by severit
   - Impact: Throughput limited during high activity
   - Recommendation: Parallel processing with ordering constraints only where necessary
   - File: `apps/indexer/src/listener.ts:290-292`
+
+---
+
+## Security Threat Model & Mitigations
+
+### Attack Vectors Identified (2026-02-02)
+
+| Threat | Severity | Status | Mitigation |
+|--------|----------|--------|------------|
+| Challenge overwrite DoS | HIGH | ✅ Fixed | Nonce-based storage, max 3 challenges/address |
+| Rate limit bypass (Redis down) | HIGH | ✅ Fixed | Fail closed with 503 response |
+| Reentrancy in EscrowVault | HIGH | ✅ Fixed | OpenZeppelin ReentrancyGuard |
+| Reentrancy in DisputeResolver | HIGH | ✅ Fixed | OpenZeppelin ReentrancyGuard |
+| CORS allowing any origin | HIGH | ✅ Fixed | Configurable CORS_ORIGINS env var |
+| Missing security headers | MEDIUM | ✅ Fixed | CSP, X-Frame-Options, HSTS, etc. |
+| Replay attacks (stale timestamps) | MEDIUM | ✅ Fixed | Timestamp freshness validation (5min window) |
+| Weak address validation | MEDIUM | ✅ Fixed | Using viem's isAddress() |
+| Input flooding (no limits) | MEDIUM | ✅ Fixed | Length limits on all string inputs |
+| No security audit trail | MEDIUM | ✅ Fixed | Security event logging service |
+| In-memory session storage | MEDIUM | ✅ Fixed | Redis with in-memory fallback |
+| In-memory challenge storage | MEDIUM | 🔴 Open | Needs Redis for persistence |
+| Webhook service not implemented | LOW | 🔴 Open | Agents not notified of events |
+| IPFS CID not validated | LOW | ✅ Fixed | Regex validation for CID v0/v1 format |
+
+### Remaining Security Work
+
+**Production Blockers:**
+1. **Redis Challenge Storage** - Challenge storage still uses in-memory Map
+2. **External Smart Contract Audit** - Required before mainnet deployment
+3. **Webhook Implementation** - Complete the notification system
+
+**Recommended Improvements:**
+- IP-based anomaly detection for brute force attempts
+- Two-phase commit for bounties > 1 ETH
+- Request signing for IPFS uploads (prove ownership)
+- Database audit logging for compliance
+
+### Security Configuration
+
+```bash
+# .env security settings
+HOST=127.0.0.1                    # Don't bind to 0.0.0.0 in production
+CORS_ORIGINS=https://your-domain.com  # Restrict to known origins
+NODE_ENV=production               # Enables HSTS header
+```
 
 ---
 
