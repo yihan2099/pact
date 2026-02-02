@@ -92,6 +92,113 @@ Required before mainnet launch.
 
 ---
 
+## Design Review Issues
+
+Issues identified during architectural review (2026-02-02). Organized by severity.
+
+### High Priority (P1)
+
+#### Smart Contracts - Centralization Risk
+- [ ] **Owner privileges too broad** - `TaskManager` and `DisputeResolver` owners can replace critical contract addresses (`setDisputeResolver`, `setPorterRegistry`) and withdraw slashed stakes
+  - Risk: Single point of failure; owner compromise allows fund theft via malicious contract replacement
+  - Recommendation: Add timelock (e.g., 48h delay) or multisig for admin functions, or make addresses immutable after deployment
+  - Files: `apps/contracts/src/TaskManager.sol:77-87`, `apps/contracts/src/DisputeResolver.sol`
+
+#### MCP Server - Session Storage
+- [ ] **In-memory session storage** - Sessions stored in `Map<string, AuthSession>`, lost on restart
+  - Risk: All agents logged out on server restart; no horizontal scaling
+  - Recommendation: Use Redis or similar persistent store for production
+  - File: `apps/mcp-server/src/auth/session-manager.ts:19`
+
+#### MCP Server - Missing Dispute Tools
+- [ ] **No MCP tools for dispute flow** - Agents cannot participate in disputes via MCP
+  - Missing: `start_dispute`, `submit_vote`, `resolve_dispute` tools
+  - Impact: AI agents can't initiate or vote on disputes, limiting platform utility
+  - Recommendation: Add dispute-related tools to complete the agent workflow
+
+### Medium Priority (P2)
+
+#### Smart Contracts - Gas/Safety
+- [ ] **Unbounded voter loop** - `DisputeResolver.resolveDispute()` iterates all voters to update reputation
+  - Risk: Could exceed block gas limit with many voters
+  - Recommendation: Cap voters per dispute, or batch resolution, or off-chain reputation with Merkle proofs
+  - File: `apps/contracts/src/DisputeResolver.sol:210-218`
+
+- [ ] **No reentrancy guard** - `DisputeResolver._processDisputeOutcome` uses `.call{value:}()` for ETH transfers
+  - Risk: While checks-effects-interactions pattern is followed, defense-in-depth is missing
+  - Recommendation: Add OpenZeppelin `ReentrancyGuard`
+  - File: `apps/contracts/src/DisputeResolver.sol:185`
+
+- [ ] **No SafeERC20 for token transfers** - `TaskManager.createTask` doesn't verify ERC20 transfers
+  - Risk: Non-standard ERC20 tokens may fail silently
+  - Recommendation: Use `SafeERC20.safeTransferFrom` in `EscrowVault.deposit`
+  - File: `apps/contracts/src/TaskManager.sol:127-128`
+
+- [ ] **Hardcoded time constants** - `CHALLENGE_WINDOW`, `VOTING_PERIOD`, `SELECTION_DEADLINE` can't be adjusted
+  - Risk: No flexibility without contract redeployment
+  - Recommendation: Make governance-controllable or owner-adjustable with bounds
+  - Files: `apps/contracts/src/TaskManager.sol`, `apps/contracts/src/DisputeResolver.sol`
+
+#### Database
+- [ ] **Numeric values stored as strings** - `bounty_amount` stored as TEXT requiring RPC functions for comparison
+  - Impact: Query complexity, potential performance issues
+  - Recommendation: Use PostgreSQL `NUMERIC` type, or store both wei (string) and ETH (numeric) columns
+  - File: `packages/database/src/queries/task-queries.ts:44-47`
+
+#### Indexer - Reliability
+- [ ] **Single contract checkpoint** - Only `taskManager` address is checkpointed
+  - Risk: Events from other contracts could be missed on crash between processing
+  - Recommendation: Checkpoint per contract, or use transaction-based checkpointing
+  - File: `apps/indexer/src/listener.ts:298`
+
+- [ ] **No dead letter queue** - Failed event processing is logged but not retried
+  - Risk: Critical events could be silently dropped
+  - Recommendation: Implement DLQ or persistent retry mechanism
+  - File: `apps/indexer/src/listener.ts:306-308`
+
+- [ ] **No idempotency in handlers** - Events could be processed twice on restart if checkpoint fails
+  - Risk: Duplicate database entries
+  - Recommendation: Use database transactions or upserts with unique constraints
+  - File: `apps/indexer/src/handlers/`
+
+### Low Priority (P3)
+
+#### Smart Contracts - Bugs
+- [ ] **`refundExpiredTask` bug** - Tasks without deadlines always revert
+  - Issue: `selectionDeadline` calculation incomplete, function always reverts for deadline-less tasks
+  - File: `apps/contracts/src/TaskManager.sol:287-289`
+
+#### MCP Server - Edge Cases
+- [ ] **Registration status caching** - `AuthSession.isRegistered` set at session creation, never updated
+  - Impact: Agent registers on-chain mid-session but MCP still sees them as unregistered
+  - Recommendation: Re-check on-chain status for `registered`-level tools, or allow session refresh
+  - File: `apps/mcp-server/src/auth/session-manager.ts:8`
+
+- [ ] **No rate limiting on auth tools** - `auth_get_challenge` and `auth_verify` appear unprotected
+  - Risk: Challenge generation spam
+  - Recommendation: Apply rate limiting to auth endpoints
+
+- [ ] **Challenge predictability** - Challenges may lack timestamp/nonce for replay protection
+  - Recommendation: Include timestamp, store nonces, use 5-minute expiration
+  - File: `apps/mcp-server/src/auth/wallet-signature.ts`
+
+#### MCP Server - Missing Features
+- [ ] **No `update_profile` tool** - Contract supports `updateProfile` but no MCP tool exists
+  - Impact: Agents can't update skills/links via MCP
+
+#### Architecture
+- [ ] **Staleness indicators missing** - MCP reads from Supabase but doesn't indicate if indexer is behind
+  - Impact: Agents may see stale data without knowing
+  - Recommendation: Add staleness indicators to responses, or health checks for indexer lag
+
+#### Performance
+- [ ] **Sequential event processing** - Events processed one at a time in indexer
+  - Impact: Throughput limited during high activity
+  - Recommendation: Parallel processing with ordering constraints only where necessary
+  - File: `apps/indexer/src/listener.ts:290-292`
+
+---
+
 ## P3: Enhancements
 
 Nice-to-have improvements.
