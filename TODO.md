@@ -92,6 +92,241 @@ Required before mainnet launch.
 
 ---
 
+## Smart Contract Upgradeability Strategy
+
+### Current State: Immutable Contracts
+
+Porter Network contracts are currently **non-upgradeable** (immutable). Every version update requires deploying new contracts at new addresses.
+
+**How Version Updates Work Today:**
+1. Make contract changes (e.g., bug fix, new feature)
+2. Deploy entirely new contracts → new addresses
+3. Update `packages/contracts/src/addresses/*.ts` with new addresses
+4. Redeploy all services (MCP server, indexer, web app) to point to new contracts
+5. Old contracts remain on-chain but become inactive
+
+**Version Types:**
+- **Patch (v1.0.0 → v1.0.1)**: Bug fixes, security patches
+- **Minor (v1.0.0 → v1.1.0)**: New features (backward compatible)
+- **Major (v1.0.0 → v2.0.0)**: Breaking changes (interface changes, state changes)
+
+**Trade-offs:**
+- ✅ **Pros**: Simpler code, lower gas costs, more secure (no upgrade risks), transparent to users
+- ❌ **Cons**: Cannot fix bugs without redeployment, users must migrate, data migration complexity
+
+### Path to Upgradeability
+
+If frequent updates or bug fixes become necessary, consider implementing upgradeability for v2.0.0.
+
+#### Option 1: Transparent Proxy Pattern (OpenZeppelin)
+
+**Implementation:**
+- [ ] **Phase 1: Add OpenZeppelin Upgrades**
+  ```bash
+  cd apps/contracts
+  forge install OpenZeppelin/openzeppelin-contracts-upgradeable
+  ```
+
+- [ ] **Phase 2: Convert Contracts to Upgradeable**
+  - [ ] Replace constructors with `initialize()` functions using `initializer` modifier
+  - [ ] Inherit from `*Upgradeable` base contracts (e.g., `OwnableUpgradeable`)
+  - [ ] Add storage gaps (`uint256[50] private __gap`) to all contracts
+  - [ ] Remove immutable variables (proxies don't support them)
+  - [ ] Update TaskManager dependencies (EscrowVault, DisputeResolver) to be mutable
+
+- [ ] **Phase 3: Create Proxy Deployment Script**
+  - [ ] Deploy implementation contracts (TaskManager, EscrowVault, etc.)
+  - [ ] Deploy ProxyAdmin contract
+  - [ ] Deploy TransparentUpgradeableProxy for each contract
+  - [ ] Initialize proxies with constructor args
+  - [ ] Transfer ProxyAdmin ownership to multisig/timelock
+
+- [ ] **Phase 4: Implement Upgrade Workflow**
+  - [ ] Create upgrade script: `script/Upgrade.s.sol`
+  - [ ] Add tests for upgrade scenarios (storage layout, state preservation)
+  - [ ] Document upgrade process in runbook
+  - [ ] Set up multisig or timelock for upgrade governance
+
+**Example Contract Changes:**
+```solidity
+// Before (immutable)
+contract TaskManager is Ownable {
+    IEscrowVault public immutable escrowVault;
+
+    constructor(address _escrow) Ownable(msg.sender) {
+        escrowVault = IEscrowVault(_escrow);
+    }
+}
+
+// After (upgradeable)
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+contract TaskManager is Initializable, OwnableUpgradeable {
+    IEscrowVault public escrowVault; // no longer immutable
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address _escrow) public initializer {
+        __Ownable_init(msg.sender);
+        escrowVault = IEscrowVault(_escrow);
+    }
+
+    uint256[49] private __gap; // storage gap
+}
+```
+
+**Upgrade Flow:**
+```bash
+# 1. Deploy new implementation
+forge script script/UpgradeTaskManager.s.sol --rpc-url base_sepolia
+
+# 2. Upgrade proxy (via ProxyAdmin)
+cast send $PROXY_ADMIN \
+  "upgrade(address,address)" \
+  $TASK_MANAGER_PROXY \
+  $NEW_IMPLEMENTATION \
+  --rpc-url base_sepolia
+
+# 3. No need to update addresses in services (proxy address stays same)
+```
+
+**Benefits:**
+- ✅ Fix bugs without changing addresses
+- ✅ Add features incrementally
+- ✅ Preserve all existing state/data
+- ✅ Users don't need to migrate
+
+**Risks:**
+- ❌ Storage layout collisions (must maintain order)
+- ❌ Centralization risk (upgrade key compromise)
+- ❌ Higher gas costs (~2000 gas per delegatecall)
+- ❌ Increased complexity (initializers, storage gaps)
+
+#### Option 2: Diamond Pattern (EIP-2535)
+
+For advanced use cases with selective upgrades:
+
+- [ ] **Implement Diamond Pattern**
+  - [ ] Split contracts into "facets" (TaskFacet, SubmissionFacet, etc.)
+  - [ ] Deploy DiamondCutFacet, DiamondLoupeFacet
+  - [ ] Create Diamond proxy
+  - [ ] Add/remove/replace facets as needed
+
+**Best for:**
+- Large, modular systems (100+ functions)
+- Selective feature upgrades
+- Complex state management
+
+**Trade-off:** Much higher complexity, only worth it for very large systems
+
+#### Option 3: Hybrid Approach (Recommended)
+
+**Immutable core + Upgradeable periphery:**
+
+```solidity
+// IMMUTABLE: Security-critical core
+contract TaskManagerCore {
+    // Core: task creation, escrow, finalization
+    // Never changes after audit
+}
+
+// UPGRADEABLE: Feature extensions
+contract TaskManagerExtensions is UUPSUpgradeable {
+    ITaskManagerCore public immutable core;
+
+    // Extensions: search, filters, reputation algorithms
+    // Can iterate without risk
+}
+```
+
+**Benefits:**
+- ✅ Security-critical code is immutable (trusted)
+- ✅ Can iterate on features safely
+- ✅ Clear separation of concerns
+
+### Decision Points
+
+**Stay Immutable If:**
+- ✅ Infrequent updates (every 3-6+ months)
+- ✅ Security is paramount (DeFi, high-value)
+- ✅ Contract logic is stable and well-tested
+- ✅ Users value transparency over flexibility
+
+**Switch to Upgradeable If:**
+- ❌ Frequent bug fixes needed (rapid iteration)
+- ❌ New features added regularly
+- ❌ User migration is too disruptive
+- ❌ Competitive pressure requires fast updates
+
+**Current Recommendation:** Stay immutable for MVP/v1.x, reassess after mainnet launch and 3-6 months of stability data.
+
+### Governance & Security
+
+If implementing upgradeability:
+
+- [ ] **Add Timelock Contract**
+  - 48-hour delay on upgrades
+  - Community can review changes before execution
+  - Emergency pause function (separate from upgrade)
+
+- [ ] **Set Up Multisig**
+  - Use Gnosis Safe or similar
+  - Require 3-of-5 or 4-of-7 signatures
+  - Distribute keys across team members
+
+- [ ] **Implement Upgrade Process**
+  1. Deploy new implementation to testnet
+  2. Test upgrade on testnet fork
+  3. Post upgrade proposal on governance forum
+  4. 48h community review period
+  5. Multisig approves upgrade
+  6. Timelock executes after delay
+  7. Monitor for 24h post-upgrade
+
+- [ ] **Emergency Procedures**
+  - Pause functionality (separate from upgrade)
+  - Emergency multisig for critical fixes
+  - Clear escalation path
+
+### Testing Strategy for Upgrades
+
+- [ ] **Storage Layout Tests**
+  ```solidity
+  // Test that storage slots match between versions
+  function test_StorageLayoutUnchanged() public {
+      // Use forge-std storage assertions
+  }
+  ```
+
+- [ ] **Upgrade Simulation Tests**
+  ```solidity
+  function test_UpgradePreservesState() public {
+      // 1. Deploy v1, create tasks
+      // 2. Upgrade to v2
+      // 3. Verify all tasks still exist and functional
+  }
+  ```
+
+- [ ] **Fork Testing**
+  ```bash
+  # Test upgrades against mainnet fork
+  forge test --fork-url $BASE_MAINNET_RPC_URL
+  ```
+
+### References
+
+- [OpenZeppelin Upgrades Docs](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
+- [OpenZeppelin Proxy Patterns](https://docs.openzeppelin.com/contracts/5.x/api/proxy)
+- [EIP-1967: Proxy Storage Slots](https://eips.ethereum.org/EIPS/eip-1967)
+- [EIP-2535: Diamond Standard](https://eips.ethereum.org/EIPS/eip-2535)
+- [Proxy Upgrade Pattern Guide](https://blog.openzeppelin.com/the-transparent-proxy-pattern)
+
+---
+
 ## Design Review Issues
 
 Issues identified during architectural review (2026-02-02). Organized by severity.
