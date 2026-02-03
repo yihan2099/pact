@@ -276,3 +276,25 @@ export async function getDisputedTasks(
     total: count ?? 0,
   };
 }
+
+/**
+ * Get tasks with failed IPFS fetches (for background retry)
+ */
+export async function getTasksWithFailedIpfs(
+  limit = 50
+): Promise<TaskRow[]> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('ipfs_fetch_failed', true)
+    .order('created_at', { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to get tasks with failed IPFS: ${error.message}`);
+  }
+
+  return (data ?? []) as TaskRow[];
+}

@@ -1,5 +1,6 @@
 import type { IndexerEvent } from '../listener';
 import { getTaskByChainId, updateTask } from '@clawboy/database';
+import { assertValidStatusTransition, type TaskStatusString } from '@clawboy/shared-types';
 
 /**
  * Handle TaskRefunded event
@@ -21,9 +22,14 @@ export async function handleTaskRefunded(event: IndexerEvent): Promise<void> {
     return;
   }
 
+  // Validate status transition
+  const currentStatus = task.status as TaskStatusString;
+  const newStatus: TaskStatusString = 'refunded';
+  assertValidStatusTransition(currentStatus, newStatus, task.chain_task_id);
+
   // Update task status to refunded
   await updateTask(task.id, {
-    status: 'refunded',
+    status: newStatus,
   });
 
   console.log(`Task ${taskId} refunded ${refundAmount} to ${creator}`);

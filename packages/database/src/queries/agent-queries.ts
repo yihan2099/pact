@@ -216,3 +216,25 @@ export function calculateVoteWeight(reputation: string | number): number {
   if (rep <= 0) return 1;
   return Math.max(1, Math.floor(Math.log2(rep + 1)));
 }
+
+/**
+ * Get agents with failed IPFS fetches (for background retry)
+ */
+export async function getAgentsWithFailedIpfs(
+  limit = 50
+): Promise<AgentRow[]> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('agents')
+    .select('*')
+    .eq('ipfs_fetch_failed', true)
+    .order('created_at', { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to get agents with failed IPFS: ${error.message}`);
+  }
+
+  return (data ?? []) as AgentRow[];
+}

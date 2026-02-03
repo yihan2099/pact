@@ -24,6 +24,7 @@ export interface Database {
           selected_at: string | null;
           challenge_deadline: string | null;
           submission_count: number;
+          ipfs_fetch_failed: boolean;
           created_at_block: string;
           created_at: string;
           updated_at: string;
@@ -44,6 +45,7 @@ export interface Database {
           selected_at?: string | null;
           challenge_deadline?: string | null;
           submission_count?: number;
+          ipfs_fetch_failed?: boolean;
           created_at_block: string;
           created_at?: string;
           updated_at?: string;
@@ -64,6 +66,7 @@ export interface Database {
           selected_at?: string | null;
           challenge_deadline?: string | null;
           submission_count?: number;
+          ipfs_fetch_failed?: boolean;
           created_at_block?: string;
           created_at?: string;
           updated_at?: string;
@@ -81,6 +84,7 @@ export interface Database {
           name: string;
           skills: string[];
           is_active: boolean;
+          ipfs_fetch_failed: boolean;
           registered_at: string;
           created_at: string;
           updated_at: string;
@@ -96,6 +100,7 @@ export interface Database {
           name: string;
           skills?: string[];
           is_active?: boolean;
+          ipfs_fetch_failed?: boolean;
           registered_at: string;
           created_at?: string;
           updated_at?: string;
@@ -111,6 +116,7 @@ export interface Database {
           name?: string;
           skills?: string[];
           is_active?: boolean;
+          ipfs_fetch_failed?: boolean;
           registered_at?: string;
           created_at?: string;
           updated_at?: string;
@@ -124,6 +130,7 @@ export interface Database {
           submission_cid: string;
           submission_index: number;
           is_winner: boolean;
+          ipfs_fetch_failed: boolean;
           submitted_at: string;
           updated_at: string;
           created_at: string;
@@ -135,6 +142,7 @@ export interface Database {
           submission_cid: string;
           submission_index: number;
           is_winner?: boolean;
+          ipfs_fetch_failed?: boolean;
           submitted_at: string;
           updated_at: string;
           created_at?: string;
@@ -146,6 +154,7 @@ export interface Database {
           submission_cid?: string;
           submission_index?: number;
           is_winner?: boolean;
+          ipfs_fetch_failed?: boolean;
           submitted_at?: string;
           updated_at?: string;
           created_at?: string;
@@ -251,6 +260,91 @@ export interface Database {
           contract_address?: string;
           last_synced_block?: string;
           updated_at?: string;
+        };
+      };
+      processed_events: {
+        Row: {
+          id: string;
+          chain_id: number;
+          block_number: string;
+          tx_hash: string;
+          log_index: number;
+          event_name: string;
+          processed_at: string;
+        };
+        Insert: {
+          id?: string;
+          chain_id: number;
+          block_number: string;
+          tx_hash: string;
+          log_index: number;
+          event_name: string;
+          processed_at?: string;
+        };
+        Update: {
+          id?: string;
+          chain_id?: number;
+          block_number?: string;
+          tx_hash?: string;
+          log_index?: number;
+          event_name?: string;
+          processed_at?: string;
+        };
+      };
+      failed_events: {
+        Row: {
+          id: string;
+          chain_id: number;
+          block_number: string;
+          tx_hash: string;
+          log_index: number;
+          event_name: string;
+          event_data: Record<string, unknown>;
+          error_message: string;
+          error_stack: string | null;
+          retry_count: number;
+          max_retries: number;
+          status: string; // 'pending', 'retrying', 'failed', 'resolved'
+          created_at: string;
+          last_retry_at: string | null;
+          resolved_at: string | null;
+          resolution_notes: string | null;
+        };
+        Insert: {
+          id?: string;
+          chain_id: number;
+          block_number: string;
+          tx_hash: string;
+          log_index: number;
+          event_name: string;
+          event_data: Record<string, unknown>;
+          error_message: string;
+          error_stack?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          status?: string;
+          created_at?: string;
+          last_retry_at?: string | null;
+          resolved_at?: string | null;
+          resolution_notes?: string | null;
+        };
+        Update: {
+          id?: string;
+          chain_id?: number;
+          block_number?: string;
+          tx_hash?: string;
+          log_index?: number;
+          event_name?: string;
+          event_data?: Record<string, unknown>;
+          error_message?: string;
+          error_stack?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          status?: string;
+          created_at?: string;
+          last_retry_at?: string | null;
+          resolved_at?: string | null;
+          resolution_notes?: string | null;
         };
       };
     };

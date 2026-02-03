@@ -2,37 +2,170 @@
  * Clawboy Event Indexer
  *
  * Syncs blockchain events to the Supabase database for fast querying.
+ * Includes idempotency protection and dead-letter queue for failed events.
  */
 
-import { createEventListener } from './listener';
+import { createEventListener, type IndexerEvent } from './listener';
 import { processEvent } from './processor';
+import {
+  isEventProcessed,
+  markEventProcessed,
+  addFailedEvent,
+  getRetryableFailedEvents,
+  updateFailedEventRetry,
+  resolveFailedEvent,
+} from '@clawboy/database';
+import { startIpfsRetryJob } from './jobs';
+
+const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+
+/**
+ * Process an event with idempotency check and DLQ support
+ */
+async function processEventWithIdempotency(event: IndexerEvent): Promise<void> {
+  // Check if already processed (idempotency)
+  const alreadyProcessed = await isEventProcessed(
+    chainId,
+    event.transactionHash,
+    event.logIndex
+  );
+
+  if (alreadyProcessed) {
+    console.log(
+      `Skipping already processed event: ${event.name} (tx: ${event.transactionHash}, log: ${event.logIndex})`
+    );
+    return;
+  }
+
+  try {
+    // Process the event
+    await processEvent(event);
+
+    // Mark as processed (idempotency protection)
+    await markEventProcessed({
+      chainId,
+      blockNumber: event.blockNumber.toString(),
+      txHash: event.transactionHash,
+      logIndex: event.logIndex,
+      eventName: event.name,
+    });
+
+    console.log(
+      `Successfully processed and marked: ${event.name} (block: ${event.blockNumber})`
+    );
+  } catch (error) {
+    // Add to dead-letter queue
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error(`Failed to process event ${event.name}, adding to DLQ:`, errorMessage);
+
+    await addFailedEvent({
+      chainId,
+      blockNumber: event.blockNumber.toString(),
+      txHash: event.transactionHash,
+      logIndex: event.logIndex,
+      eventName: event.name,
+      eventData: event.args as Record<string, unknown>,
+      errorMessage,
+      errorStack,
+    });
+
+    // Don't re-throw - we've recorded the failure
+  }
+}
+
+/**
+ * Process retryable events from the DLQ
+ */
+async function processRetryableEvents(): Promise<void> {
+  const retryableEvents = await getRetryableFailedEvents(10);
+
+  if (retryableEvents.length === 0) {
+    return;
+  }
+
+  console.log(`Processing ${retryableEvents.length} retryable events from DLQ`);
+
+  for (const failedEvent of retryableEvents) {
+    try {
+      // Reconstruct the event
+      const event: IndexerEvent = {
+        name: failedEvent.event_name,
+        blockNumber: BigInt(failedEvent.block_number),
+        transactionHash: failedEvent.tx_hash as `0x${string}`,
+        logIndex: failedEvent.log_index,
+        args: failedEvent.event_data,
+      };
+
+      // Try to process again
+      await processEvent(event);
+
+      // Mark as processed in both tables
+      await markEventProcessed({
+        chainId: failedEvent.chain_id,
+        blockNumber: failedEvent.block_number,
+        txHash: failedEvent.tx_hash,
+        logIndex: failedEvent.log_index,
+        eventName: failedEvent.event_name,
+      });
+
+      // Resolve the DLQ entry
+      await resolveFailedEvent(failedEvent.id, 'Successfully processed on retry');
+
+      console.log(
+        `Successfully retried event: ${failedEvent.event_name} (attempt ${failedEvent.retry_count + 1})`
+      );
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      console.error(
+        `Retry failed for event ${failedEvent.event_name} (attempt ${failedEvent.retry_count + 1}):`,
+        errorMessage
+      );
+
+      await updateFailedEventRetry(failedEvent.id, errorMessage, errorStack);
+    }
+  }
+}
 
 async function main() {
   console.log('Starting Clawboy Indexer...');
 
-  const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
   const pollingIntervalMs = parseInt(process.env.POLLING_INTERVAL_MS || '5000', 10);
+  const dlqRetryIntervalMs = parseInt(process.env.DLQ_RETRY_INTERVAL_MS || '60000', 10);
+  const ipfsRetryIntervalMs = parseInt(process.env.IPFS_RETRY_INTERVAL_MS || '300000', 10);
 
   console.log(`Chain ID: ${chainId}`);
   console.log(`Polling interval: ${pollingIntervalMs}ms`);
+  console.log(`DLQ retry interval: ${dlqRetryIntervalMs}ms`);
+  console.log(`IPFS retry interval: ${ipfsRetryIntervalMs}ms`);
 
   // Create event listener
   const listener = createEventListener(chainId, pollingIntervalMs);
 
-  // Set up event handler
-  listener.onEvent(async (event) => {
+  // Set up event handler with idempotency
+  listener.onEvent(processEventWithIdempotency);
+
+  // Set up DLQ retry interval
+  const dlqRetryInterval = setInterval(async () => {
     try {
-      await processEvent(event);
+      await processRetryableEvents();
     } catch (error) {
-      console.error('Failed to process event:', error);
-      // In production, implement retry logic or dead letter queue
+      console.error('Error processing DLQ:', error);
     }
-  });
+  }, dlqRetryIntervalMs);
+
+  // Start IPFS retry job for failed IPFS fetches
+  const stopIpfsRetryJob = startIpfsRetryJob(ipfsRetryIntervalMs);
 
   // Handle graceful shutdown
   const shutdown = () => {
     console.log('Shutting down...');
     listener.stop();
+    clearInterval(dlqRetryInterval);
+    stopIpfsRetryJob();
     process.exit(0);
   };
 
@@ -43,6 +176,9 @@ async function main() {
   try {
     await listener.start();
     console.log('Indexer started successfully');
+
+    // Initial DLQ check
+    await processRetryableEvents();
   } catch (error) {
     console.error('Failed to start indexer:', error);
     process.exit(1);

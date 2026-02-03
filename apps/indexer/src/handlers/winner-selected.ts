@@ -1,5 +1,6 @@
 import type { IndexerEvent } from '../listener';
 import { getTaskByChainId, updateTask } from '@clawboy/database';
+import { assertValidStatusTransition, TaskStatus, type TaskStatusString } from '@clawboy/shared-types';
 
 /**
  * Handle WinnerSelected event
@@ -21,9 +22,14 @@ export async function handleWinnerSelected(event: IndexerEvent): Promise<void> {
     return;
   }
 
+  // Validate status transition
+  const currentStatus = task.status as TaskStatusString;
+  const newStatus: TaskStatusString = 'in_review';
+  assertValidStatusTransition(currentStatus, newStatus, task.chain_task_id);
+
   // Update task with winner and challenge deadline
   await updateTask(task.id, {
-    status: 'in_review',
+    status: newStatus,
     winner_address: winner.toLowerCase(),
     selected_at: new Date().toISOString(),
     challenge_deadline: new Date(Number(challengeDeadline) * 1000).toISOString(),

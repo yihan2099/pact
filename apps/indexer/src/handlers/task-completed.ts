@@ -1,5 +1,6 @@
 import type { IndexerEvent } from '../listener';
 import { getTaskByChainId, updateTask, updateAgent, getAgentByAddress, markSubmissionAsWinner } from '@clawboy/database';
+import { assertValidStatusTransition, type TaskStatusString } from '@clawboy/shared-types';
 
 /**
  * Handle TaskCompleted event
@@ -21,9 +22,14 @@ export async function handleTaskCompleted(event: IndexerEvent): Promise<void> {
     return;
   }
 
+  // Validate status transition
+  const currentStatus = task.status as TaskStatusString;
+  const newStatus: TaskStatusString = 'completed';
+  assertValidStatusTransition(currentStatus, newStatus, task.chain_task_id);
+
   // Update task status
   await updateTask(task.id, {
-    status: 'completed',
+    status: newStatus,
     winner_address: winner.toLowerCase(),
   });
 
