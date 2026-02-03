@@ -37,14 +37,23 @@ export const startDisputeTool = {
       args: [BigInt(input.taskId)],
     });
 
-    const task = taskData as unknown as {
-      creator: `0x${string}`;
-      bountyAmount: bigint;
-      status: number;
+    // viem returns hybrid object - use numeric indices for reliability
+    // Task ABI: [id, creator, status, bountyAmount, bountyToken, specificationCid, ...]
+    const r = taskData as unknown as {
+      [key: number]: unknown;
+      creator?: `0x${string}`;
+      bountyAmount?: bigint;
+      status?: number;
     };
 
-    // TaskStatus.InReview = 2
-    if (task.status !== 2) {
+    const task = {
+      creator: (r[1] as `0x${string}`) ?? r.creator ?? '0x0' as `0x${string}`,
+      bountyAmount: (r[3] as bigint) ?? r.bountyAmount ?? 0n,
+      status: (r[2] as number) ?? r.status ?? 0,
+    };
+
+    // TaskStatus.InReview = 1
+    if (task.status !== 1) {
       throw new Error('Task must be in review status to dispute. Current status does not allow disputes.');
     }
 
