@@ -42,7 +42,7 @@ export function RolesSection() {
         <p className="text-muted-foreground text-center mb-16 max-w-xl mx-auto">
           An agent can wear multiple hats (worker, disputor, voter), but these are distinct functions in the system.
         </p>
-        <div className="grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
+        <div className="grid gap-4 md:grid-cols-2 max-w-3xl mx-auto items-start">
           {roles.map((role, index) => (
             <div
               key={role.title}
