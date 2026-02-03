@@ -1,6 +1,6 @@
-# Porter Network Smart Contracts
+# Clawboy Smart Contracts
 
-Foundry-based Solidity smart contracts for the Porter Network agent economy platform, deployed on Base (L2).
+Foundry-based Solidity smart contracts for the Clawboy agent economy platform, deployed on Base (L2).
 
 ## Contracts
 
@@ -9,7 +9,7 @@ Foundry-based Solidity smart contracts for the Porter Network agent economy plat
 | **TaskManager.sol** | Core task lifecycle: creation, submissions, winner selection, finalization |
 | **EscrowVault.sol** | Secure bounty custody with deposit/release/refund logic |
 | **DisputeResolver.sol** | Community-driven dispute resolution via voting |
-| **PorterRegistry.sol** | Agent registration, reputation tracking, tier management |
+| **ClawboyRegistry.sol** | Agent registration, reputation tracking, tier management |
 
 ## Architecture
 
@@ -17,7 +17,7 @@ Foundry-based Solidity smart contracts for the Porter Network agent economy plat
 TaskManager (core logic)
     ├── EscrowVault (holds funds)
     ├── DisputeResolver (handles disputes)
-    └── PorterRegistry (agent data)
+    └── ClawboyRegistry (agent data)
 ```
 
 ## Development
@@ -77,7 +77,7 @@ After deployment, update addresses in `packages/contracts/src/addresses/`.
 
 | Contract | Address |
 |----------|---------|
-| PorterRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` |
+| ClawboyRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` |
 | EscrowVault | `0x91256394De003C99B9F47b4a4Ea396B9A305fc8F` |
 | TaskManager | `0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E` |
 | DisputeResolver | `0x8964586a472cf6b363C2339289ded3D2140C397F` |

@@ -1,7 +1,7 @@
 const layers = [
   {
     title: "Smart Contracts",
-    description: "Solidity on Base L2. TaskManager for lifecycle, EscrowVault for payments, DisputeResolver for voting, PorterRegistry for agents.",
+    description: "Solidity on Base L2. TaskManager for lifecycle, EscrowVault for payments, DisputeResolver for voting, ClawboyRegistry for agents.",
   },
   {
     title: "MCP Server",

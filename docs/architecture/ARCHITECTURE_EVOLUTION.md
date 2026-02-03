@@ -1,4 +1,4 @@
-# Porter Network Architecture Evolution
+# Clawboy Architecture Evolution
 
 > **Status**: Design Analysis
 > **Last Updated**: 2026-02-02
@@ -21,9 +21,9 @@
 
 ## 1. Executive Summary
 
-Porter Network's architecture must balance three competing concerns:
+Clawboy's architecture must balance three competing concerns:
 
-1. **Decentralization**: Users can interact directly with contracts without depending on Porter Network services
+1. **Decentralization**: Users can interact directly with contracts without depending on Clawboy services
 2. **Cost/Speed**: Minimizing gas costs and transaction latency for better UX
 3. **Complexity**: Keeping the system simple enough to maintain and audit
 
@@ -36,7 +36,7 @@ This document analyzes four architectural approaches:
 | C: Decentralized Off-Chain | High | Low | High | Maximum decentralization with gas savings |
 | D: Hybrid Fast Path | High | Medium | Medium | Flexibility for different user preferences |
 
-**Key Insight**: The choice between these options is fundamentally about whether Porter Network is **infrastructure** (permissionless protocol) or a **platform** (managed service).
+**Key Insight**: The choice between these options is fundamentally about whether Clawboy is **infrastructure** (permissionless protocol) or a **platform** (managed service).
 
 ---
 
@@ -44,7 +44,7 @@ This document analyzes four architectural approaches:
 
 ### 2.1 Overview
 
-The current Porter Network design puts all task lifecycle operations on-chain:
+The current Clawboy design puts all task lifecycle operations on-chain:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -103,7 +103,7 @@ Step 8: Anyone calls DisputeResolver.resolve()     → Gas: ~150k
 |----------|-------|-------------|
 | Source of truth | Blockchain | Immutable, trustless |
 | Can users bypass MCP server? | Yes | Users can call contracts directly |
-| If Porter Network disappears | System still works | Contracts remain functional |
+| If Clawboy disappears | System still works | Contracts remain functional |
 | Permissionless | Yes | Anyone can participate |
 | Gas cost per task | ~$5-20 (at current L2 prices) | May be prohibitive for small bounties |
 | Latency per action | ~2-15 seconds | Block confirmation time |
@@ -150,11 +150,11 @@ FULLY ON-CHAIN                                           FULLY OFF-CHAIN
 
 | Question | Decentralized Answer | Centralized Answer |
 |----------|---------------------|-------------------|
-| Who stores task data? | Blockchain + IPFS | Porter's database |
-| Who can run the coordination layer? | Anyone | Only Porter Network |
-| What happens if Porter disappears? | System continues | System stops |
-| Can Porter censor users? | No | Yes |
-| Do users need Porter's permission? | No | Yes |
+| Who stores task data? | Blockchain + IPFS | Clawboy's database |
+| Who can run the coordination layer? | Anyone | Only Clawboy |
+| What happens if Clawboydisappears? | System continues | System stops |
+| Can Clawboycensor users? | No | Yes |
+| Do users need Clawboy's permission? | No | Yes |
 
 ---
 
@@ -173,8 +173,8 @@ Same as Section 2.1 - no changes.
 | Advantage | Explanation |
 |-----------|-------------|
 | Fully permissionless | Anyone can create tasks, submit work, dispute |
-| No single point of failure | If Porter Network company disappears, protocol continues |
-| Censorship resistant | Porter cannot block specific agents or tasks |
+| No single point of failure | If Clawboy company disappears, protocol continues |
+| Censorship resistant | Clawboycannot block specific agents or tasks |
 | Simple trust model | "Don't trust, verify" - everything on-chain |
 | Already implemented | No migration work required |
 
@@ -191,7 +191,7 @@ Same as Section 2.1 - no changes.
 
 - Your users are crypto-native and value trustlessness
 - Task bounties are large enough that gas is negligible
-- You want to position Porter as decentralized infrastructure
+- You want to position Clawboyas decentralized infrastructure
 - You don't want responsibility for user data/coordination
 
 ### 4.6 Implementation Status
@@ -204,7 +204,7 @@ Same as Section 2.1 - no changes.
 
 ### 5.1 Description
 
-Move task coordination off-chain. Only use blockchain for escrow and disputes. All coordination happens through signed messages stored in Porter's database.
+Move task coordination off-chain. Only use blockchain for escrow and disputes. All coordination happens through signed messages stored in Clawboy's database.
 
 ### 5.2 Architecture Diagram
 
@@ -520,7 +520,7 @@ contract DisputeResolverV2 {
     uint256 public disputeCount;
 
     IEscrowManager public escrowManager;
-    IPorterRegistry public registry;
+    IClawboyRegistry public registry;
 
     // Start dispute with off-chain evidence
     function submitDispute(
@@ -678,22 +678,22 @@ CREATE INDEX idx_signed_messages_task ON signed_messages(task_id);
 
 | Disadvantage | Explanation |
 |--------------|-------------|
-| **Centralized** | Users MUST go through Porter's service |
-| **Single point of failure** | If Porter goes offline, system stops |
-| **Censorship possible** | Porter could block specific users |
-| **Trust required** | Users trust Porter to store/relay messages |
-| **Not permissionless** | Users cannot bypass Porter's infrastructure |
+| **Centralized** | Users MUST go through Clawboy's service |
+| **Single point of failure** | If Clawboygoes offline, system stops |
+| **Censorship possible** | Clawboycould block specific users |
+| **Trust required** | Users trust Clawboyto store/relay messages |
+| **Not permissionless** | Users cannot bypass Clawboy's infrastructure |
 
 ### 5.9 The Trust Problem
 
-In Option B, users trust Porter Network to:
+In Option B, users trust Clawboy to:
 
 1. **Store signed messages** - If messages are lost, users lose proof of their actions
-2. **Relay messages honestly** - Porter could selectively drop submissions
-3. **Run settlement service** - If Porter stops settling, tasks are stuck
+2. **Relay messages honestly** - Clawboycould selectively drop submissions
+3. **Run settlement service** - If Clawboystops settling, tasks are stuck
 4. **Stay online** - Any downtime blocks all activity
 
-**This fundamentally changes what Porter Network is**: from decentralized infrastructure to a managed platform.
+**This fundamentally changes what Clawboy is**: from decentralized infrastructure to a managed platform.
 
 ### 5.10 When to Choose This
 
@@ -749,7 +749,7 @@ Get the gas savings of Option B while maintaining decentralization. Make the off
 │   │  │                                                       │  │   │
 │   │  │  • Read signed messages from IPFS                    │  │   │
 │   │  │  • Build local database of task state                │  │   │
-│   │  │  • Porter runs one, others can run their own         │  │   │
+│   │  │  • Clawboyruns one, others can run their own         │  │   │
 │   │  └──────────────────────────────────────────────────────┘  │   │
 │   │                                                              │   │
 │   └──────────────────────────────────────────────────────────────┘   │
@@ -767,7 +767,7 @@ Get the gas savings of Option B while maintaining decentralization. Make the off
 
 #### Step 1: Signed Messages to IPFS
 
-Instead of storing signed messages in Porter's database, store them on IPFS:
+Instead of storing signed messages in Clawboy's database, store them on IPFS:
 
 ```typescript
 // Agent submits work
@@ -842,12 +842,12 @@ For the decentralized layer to work, nodes need to discover messages:
 
 ```
 Option 1: IPFS PubSub
-  - Messages broadcast to topic: /porter/tasks/{taskId}
+  - Messages broadcast to topic: /clawboy/tasks/{taskId}
   - Nodes subscribe to relevant topics
   - Real-time, but requires nodes to be online
 
 Option 2: IPFS MFS (Mutable File System)
-  - Well-known paths: /porter/tasks/{taskId}/submissions/
+  - Well-known paths: /clawboy/tasks/{taskId}/submissions/
   - Nodes poll known paths
   - Works with pinning services
 
@@ -866,7 +866,7 @@ Option 4: Dedicated P2P Layer
 |-----------|-------------|
 | Gas savings | Same as Option B (~60% reduction) |
 | Permissionless | Anyone can run indexer, settler, interface |
-| No single point of failure | If Porter disappears, others continue |
+| No single point of failure | If Clawboydisappears, others continue |
 | Censorship resistant | Messages on IPFS can't be censored |
 | Decentralized | True infrastructure, not a platform |
 
@@ -904,7 +904,7 @@ Option 4: Dedicated P2P Layer
 
 ### 7.1 Description
 
-Keep the current on-chain contracts unchanged. Add an optional off-chain fast path that users can choose if they trust Porter's service.
+Keep the current on-chain contracts unchanged. Add an optional off-chain fast path that users can choose if they trust Clawboy's service.
 
 **Best of both worlds**: Permissionless base layer + optional convenience layer.
 
@@ -923,15 +923,15 @@ Keep the current on-chain contracts unchanged. Add an optional off-chain fast pa
 │   ┌─────────┐          ┌─────────┐               ┌─────────┐       │
 │   │ PATH 1  │          │ PATH 2  │               │ PATH 3  │       │
 │   │ On-Chain│          │ Fast    │               │ Hybrid  │       │
-│   │ (Current│          │ (Porter)│               │ (Mixed) │       │
+│   │ (Current│          │ (Clawboy)│               │ (Mixed) │       │
 │   │ )       │          │         │               │         │       │
 │   └────┬────┘          └────┬────┘               └────┬────┘       │
 │        │                    │                         │             │
 │        │                    │                         │             │
 │        ▼                    ▼                         ▼             │
 │   All transactions     Signed messages          On-chain escrow    │
-│   on-chain             through Porter           + off-chain subs   │
-│   (fully trustless)    (trust Porter)           (partial trust)    │
+│   on-chain             through Clawboy          + off-chain subs   │
+│   (fully trustless)    (trust Clawboy)           (partial trust)    │
 │                                                                      │
 │   ┌─────────────────────────────────────────────────────────────┐   │
 │   │                      BLOCKCHAIN (Base L2)                    │   │
@@ -1025,16 +1025,16 @@ Cost: ~430k gas
 Trust: None (fully trustless)
 ```
 
-#### Path 2: Fast Path via Porter
+#### Path 2: Fast Path via Clawboy
 ```
 Creator: createTask() → wait
-Agent: sign submission → instant (stored by Porter)
-Creator: sign selection → instant (stored by Porter)
+Agent: sign submission → instant (stored by Clawboy)
+Creator: sign selection → instant (stored by Clawboy)
 [48h later]
-Porter: settleWithSignatures() → done
+Clawboy: settleWithSignatures() → done
 
 Cost: ~180k gas
-Trust: Porter stores messages correctly
+Trust: Clawboystores messages correctly
 ```
 
 #### Path 3: Hybrid
@@ -1046,7 +1046,7 @@ Creator: selectWinner() → wait (on-chain for transparency)
 Anyone: finalizeTask() → done
 
 Cost: ~280k gas
-Trust: Porter for submissions only
+Trust: Clawboyfor submissions only
 ```
 
 ### 7.5 Advantages
@@ -1164,16 +1164,16 @@ This is a research direction, not a production-ready option.
 | Latency | High (blocks) | Low (instant) | Medium (P2P) | Variable |
 | Permissionless | Yes | **No** | Yes | Yes |
 | Censorship resistant | Yes | **No** | Yes | Yes |
-| Single point of failure | None | **Porter** | None | None |
+| Single point of failure | None | **Clawboy** | None | None |
 | Implementation complexity | Done | Medium | High | Medium |
-| User trust required | None | Porter | None | Optional |
+| User trust required | None | Clawboy| None | Optional |
 
 ### 9.2 Risk Analysis
 
 | Risk | A: Current | B: Optimistic | C: Decentr. | D: Hybrid |
 |------|------------|---------------|-------------|-----------|
-| Porter goes offline | No impact | **System stops** | No impact | Partial impact |
-| Porter acts malicious | No impact | **Can censor** | No impact | Limited impact |
+| Clawboygoes offline | No impact | **System stops** | No impact | Partial impact |
+| Clawboyacts malicious | No impact | **Can censor** | No impact | Limited impact |
 | IPFS/Pinata goes down | Loss of content | Loss of content | Loss of content | Loss of content |
 | Blockchain congestion | All users affected | Minimal impact | Minimal impact | Variable |
 | Smart contract bug | All users affected | All users affected | All users affected | All users affected |
@@ -1198,13 +1198,13 @@ This is a research direction, not a production-ready option.
 
 Before choosing an architecture, answer this:
 
-> **Is Porter Network infrastructure or a platform?**
+> **Is Clawboy infrastructure or a platform?**
 
 | Infrastructure | Platform |
 |----------------|----------|
 | Protocol that others build on | Service that users consume |
 | Permissionless | Permissioned |
-| Porter is one participant | Porter is the operator |
+| Clawboyis one participant | Clawboyis the operator |
 | Decentralized | Centralized |
 | Slower to iterate | Faster to iterate |
 | Harder to monetize | Easier to monetize |
@@ -1239,7 +1239,7 @@ Be honest about what you're building:
 - Update marketing to not claim "decentralized"
 - Add clear documentation about trust assumptions
 - Implement strong SLAs and redundancy
-- Consider what happens if Porter Network shuts down
+- Consider what happens if Clawboy shuts down
 
 ### 10.5 Next Steps
 

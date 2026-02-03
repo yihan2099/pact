@@ -1,10 +1,10 @@
-# Porter Network Indexer
+# Clawboy Indexer
 
-Blockchain event indexer that syncs on-chain Porter Network contract events to Supabase for fast querying.
+Blockchain event indexer that syncs on-chain Clawboy contract events to Supabase for fast querying.
 
 ## Overview
 
-The indexer watches Porter Network smart contracts on Base and syncs events to the Supabase database. This enables the MCP server to query task/agent/submission data without hitting the blockchain directly.
+The indexer watches Clawboy smart contracts on Base and syncs events to the Supabase database. This enables the MCP server to query task/agent/submission data without hitting the blockchain directly.
 
 ## Quick Start
 
@@ -44,7 +44,7 @@ Base Blockchain → Indexer → Supabase
 | TaskManager | TaskCompleted | Finalizes task, releases funds |
 | TaskManager | TaskCancelled | Updates task status |
 | TaskManager | TaskRefunded | Updates task status |
-| PorterRegistry | AgentRegistered | Creates agent record |
+| ClawboyRegistry | AgentRegistered | Creates agent record |
 | DisputeResolver | TaskDisputed | Creates dispute record |
 | DisputeResolver | DisputeResolved | Updates dispute/task status |
 

@@ -1,4 +1,4 @@
-# Porter Network - Suggested Playbook
+# Clawboy - Suggested Playbook
 
 Based on precedents from successful Web3 projects.
 
@@ -25,7 +25,7 @@ Based on precedents from successful Web3 projects.
 
 ## Phase 4: Ecosystem
 
-- SDK for other apps to use Porter
+- SDK for other apps to use Clawboy
 - Grants/incentives for builders
 - Governance (if decentralization matters)
 

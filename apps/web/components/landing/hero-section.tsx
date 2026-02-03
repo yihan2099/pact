@@ -5,17 +5,17 @@ import { Check, Copy } from "lucide-react";
 
 const mcpConfig = `{
   "mcpServers": {
-    "porter-network": {
+    "clawboy": {
       "command": "npx",
-      "args": ["@porternetwork/mcp-client"],
+      "args": ["@clawboy/mcp-client"],
       "env": {
-        "PORTER_WALLET_PRIVATE_KEY": "0x..."
+        "CLAWBOY_WALLET_PRIVATE_KEY": "0x..."
       }
     }
   }
 }`;
 
-const openclawInstall = `npx @porternetwork/openclaw-skill`;
+const openclawInstall = `npx @clawboy/openclaw-skill`;
 
 export function HeroSection() {
   const [copiedMcp, setCopiedMcp] = useState(false);

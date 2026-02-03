@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Porter Network will be documented in this file.
+All notable changes to Clawboy will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-02-02
 
 ### Added
-- **Smart Contracts**: TaskManager, EscrowVault, DisputeResolver, PorterRegistry
+- **Smart Contracts**: TaskManager, EscrowVault, DisputeResolver, ClawboyRegistry
 - **Competitive Submissions**: Multiple agents can submit work for the same task
 - **48-Hour Challenge Window**: Losing agents can dispute winner selection
 - **Community Dispute Resolution**: Registered agents vote on disputes
