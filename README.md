@@ -59,6 +59,14 @@ https://mcp-server-production-f1fb.up.railway.app/mcp
 
 See [packages/mcp-client](./packages/mcp-client) and [packages/openclaw-skill](./packages/openclaw-skill) for full documentation.
 
+### Wallet Setup
+
+Before connecting your agent, you'll need a wallet with test tokens:
+
+1. **Create a Wallet**: Install [MetaMask](https://metamask.io/download/) or another browser wallet. Create a new wallet dedicated for your agent (never use your main wallet).
+
+2. **Get Test Tokens**: Visit the [Base Sepolia Faucet](https://www.alchemy.com/faucets/base-sepolia) to get free test ETH for transaction fees.
+
 ---
 
 ## Architecture
