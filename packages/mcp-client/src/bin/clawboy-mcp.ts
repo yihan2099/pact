@@ -48,7 +48,7 @@ const TOOLS = [
       properties: {
         status: {
           type: 'string',
-          enum: ['open', 'claimed', 'submitted', 'completed'],
+          enum: ['open', 'in_review', 'completed', 'disputed', 'refunded', 'cancelled'],
           description: 'Filter by task status',
         },
         tags: {
@@ -130,18 +130,14 @@ const TOOLS = [
     },
   },
   {
-    name: 'claim_task',
-    description: 'Claim a task to work on',
+    name: 'cancel_task',
+    description: 'Cancel a task you created (only before submissions)',
     inputSchema: {
       type: 'object' as const,
       properties: {
         taskId: {
           type: 'string',
-          description: 'The task ID to claim',
-        },
-        message: {
-          type: 'string',
-          description: 'Optional message to the task creator',
+          description: 'The task ID to cancel',
         },
       },
       required: ['taskId'],
@@ -149,7 +145,7 @@ const TOOLS = [
   },
   {
     name: 'submit_work',
-    description: 'Submit completed work for a claimed task',
+    description: 'Submit work for a task (competitive - multiple agents can submit)',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -187,20 +183,65 @@ const TOOLS = [
     },
   },
   {
-    name: 'get_my_claims',
-    description: 'Get your claimed tasks',
+    name: 'get_my_submissions',
+    description: 'Get your submitted work for tasks',
     inputSchema: {
       type: 'object' as const,
       properties: {
         status: {
           type: 'string',
-          enum: ['active', 'submitted', 'approved', 'rejected'],
-          description: 'Filter by claim status',
+          enum: ['pending', 'won', 'lost'],
+          description: 'Filter by submission status',
         },
         limit: {
           type: 'number',
           description: 'Number of results',
           default: 20,
+        },
+      },
+    },
+  },
+  {
+    name: 'register_agent',
+    description: 'Register as an agent on-chain to participate in tasks',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Display name for your agent',
+        },
+        description: {
+          type: 'string',
+          description: 'Description of your agent capabilities',
+        },
+        skills: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of skills (e.g., ["python", "react", "solidity"])',
+        },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'update_profile',
+    description: 'Update your agent profile information',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: {
+          type: 'string',
+          description: 'New display name',
+        },
+        description: {
+          type: 'string',
+          description: 'New description',
+        },
+        skills: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Updated skills list',
         },
       },
     },
@@ -293,6 +334,132 @@ const TOOLS = [
     inputSchema: {
       type: 'object' as const,
       properties: {},
+    },
+  },
+  // Dispute tools
+  {
+    name: 'get_dispute',
+    description: 'Get detailed information about a specific dispute',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        disputeId: {
+          type: 'string',
+          description: 'The dispute ID to retrieve',
+        },
+      },
+      required: ['disputeId'],
+    },
+  },
+  {
+    name: 'list_disputes',
+    description: 'List disputes with optional filters',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['voting', 'resolved'],
+          description: 'Filter by dispute status',
+        },
+        taskId: {
+          type: 'string',
+          description: 'Filter by task ID',
+        },
+        limit: {
+          type: 'number',
+          description: 'Number of results to return',
+          default: 20,
+        },
+      },
+    },
+  },
+  {
+    name: 'start_dispute',
+    description: 'Start a dispute to challenge a winner selection (within 48h window)',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        taskId: {
+          type: 'string',
+          description: 'The task ID to dispute',
+        },
+        evidence: {
+          type: 'string',
+          description: 'Evidence supporting your dispute claim',
+        },
+      },
+      required: ['taskId', 'evidence'],
+    },
+  },
+  {
+    name: 'submit_vote',
+    description: 'Vote on an active dispute',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        disputeId: {
+          type: 'string',
+          description: 'The dispute ID to vote on',
+        },
+        support: {
+          type: 'boolean',
+          description: 'True to support the challenger, false to support the original winner',
+        },
+      },
+      required: ['disputeId', 'support'],
+    },
+  },
+  {
+    name: 'resolve_dispute',
+    description: 'Execute resolution of a dispute after the voting period ends',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        disputeId: {
+          type: 'string',
+          description: 'The dispute ID to resolve',
+        },
+      },
+      required: ['disputeId'],
+    },
+  },
+  // Discovery tools
+  {
+    name: 'get_capabilities',
+    description: 'Get available tools and their access status based on your current session',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        sessionId: {
+          type: 'string',
+          description: 'Your session ID (optional, shows public tools if omitted)',
+        },
+        category: {
+          type: 'string',
+          enum: ['auth', 'task', 'agent', 'dispute', 'discovery', 'all'],
+          description: 'Filter tools by category (default: all)',
+        },
+      },
+    },
+  },
+  {
+    name: 'get_workflow_guide',
+    description: 'Get step-by-step workflow guides for a specific role (agent, creator, or voter)',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        role: {
+          type: 'string',
+          enum: ['agent', 'creator', 'voter'],
+          description: 'The role to get workflows for',
+        },
+        workflow: {
+          type: 'string',
+          description: 'Specific workflow to get (e.g., "submit_work", "create_task")',
+        },
+      },
+      required: ['role'],
     },
   },
 ];
