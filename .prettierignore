@@ -1,0 +1,11 @@
+node_modules
+dist
+.next
+out
+build
+*.d.ts
+apps/contracts/**/*.sol
+apps/contracts/lib
+pnpm-lock.yaml
+bun.lockb
+.claude
