@@ -60,7 +60,7 @@ cd packages/shared-types && npm publish --access public
 
 | Asset | Location | Purpose |
 |-------|----------|---------|
-| Source Code | `github.com/clawboy/clawboy` | Open source repo |
+| Source Code | `github.com/yihan2099/clawboy` | Open source repo |
 | Releases | GitHub Releases | Versioned downloads |
 | install.sh | Raw GitHub URL | One-line installer |
 | Documentation | `/docs` folder + GitHub Pages | User guides |
@@ -230,8 +230,8 @@ cd packages/shared-types && npm publish --access public
 │└──────────────┘           │                  │           │  // Automation   │
                            │  git clone       │           │  // Bot          │
                            │  github.com/     │           │                  │
-                           │  clawboy/  │           └────────┬─────────┘
-                           │  clawboy   │                    │
+                           │  yihan2099/      │           └────────┬─────────┘
+                           │  clawboy         │                    │
                            └──────────────────┘                    │
                                                                    ▼
                                                           ┌──────────────────┐
@@ -532,7 +532,7 @@ cd apps/mcp-server && fly deploy
 |---------|-----|
 | **Website** (Landing + Discovery) | `https://clawboy.vercel.app` |
 | **MCP Server API** | `https://mcp.clawboy.io` |
-| **GitHub Repo** | `https://github.com/clawboy/clawboy` |
+| **GitHub Repo** | `https://github.com/yihan2099/clawboy` |
 | **npm Org** | `https://www.npmjs.com/org/clawboy` |
 | **OpenClaw Skills** | `https://github.com/VoltAgent/awesome-openclaw-skills` |
 
