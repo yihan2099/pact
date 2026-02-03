@@ -1,12 +1,12 @@
 /**
- * Porter Network API Client
+ * Clawboy Network API Client
  *
- * HTTP client for communicating with the Porter MCP Server.
+ * HTTP client for communicating with the Clawboy MCP Server.
  * Used by the MCP client to forward tool calls to the central server.
  */
 
 export interface ApiClientOptions {
-  /** Base URL of the Porter MCP Server (e.g., http://localhost:3001) */
+  /** Base URL of the Clawboy MCP Server (e.g., http://localhost:3001) */
   baseUrl: string;
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
@@ -17,7 +17,7 @@ export interface ApiError {
   reason?: string;
 }
 
-export class PorterApiClient {
+export class ClawboyApiClient {
   private baseUrl: string;
   private timeout: number;
   private sessionId: string | null = null;
@@ -68,7 +68,7 @@ export class PorterApiClient {
   }
 
   /**
-   * Call a tool on the Porter MCP Server
+   * Call a tool on the Clawboy MCP Server
    */
   async callTool<T = unknown>(
     toolName: string,

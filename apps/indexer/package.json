@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/indexer",
+  "name": "@clawboy/indexer",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,11 +11,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@porternetwork/contracts": "workspace:*",
-    "@porternetwork/database": "workspace:*",
-    "@porternetwork/ipfs-utils": "workspace:*",
-    "@porternetwork/shared-types": "workspace:*",
-    "@porternetwork/web3-utils": "workspace:*",
+    "@clawboy/contracts": "workspace:*",
+    "@clawboy/database": "workspace:*",
+    "@clawboy/ipfs-utils": "workspace:*",
+    "@clawboy/shared-types": "workspace:*",
+    "@clawboy/web3-utils": "workspace:*",
     "viem": "^2.21.0"
   },
   "devDependencies": {

@@ -35,7 +35,7 @@ export function logSecurityEvent(event: SecurityEvent): void {
   const logEntry = {
     ...event,
     timestamp: event.timestamp || new Date().toISOString(),
-    service: 'porter-mcp-server',
+    service: 'clawboy-mcp-server',
   };
 
   // Use structured logging format

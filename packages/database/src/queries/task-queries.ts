@@ -1,6 +1,6 @@
 import { getSupabaseClient, getSupabaseAdminClient } from '../client';
 import type { TaskRow, TaskInsert, TaskUpdate } from '../schema/tasks';
-import type { TaskStatus } from '@porternetwork/shared-types';
+import type { TaskStatus } from '@clawboy/shared-types';
 
 // Use admin client for write operations (bypasses RLS)
 const getWriteClient = () => getSupabaseAdminClient();

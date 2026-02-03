@@ -1,4 +1,4 @@
-# Porter Network TODO
+# Clawboy TODO
 
 > Last Updated: 2026-02-02 (Security improvements added)
 
@@ -46,7 +46,7 @@ Required for a working end-to-end flow.
 **Current Contract Addresses (Base Sepolia):**
 | Contract | Address |
 |----------|---------|
-| PorterRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` |
+| ClawboyRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` |
 | EscrowVault | `0x91256394De003C99B9F47b4a4Ea396B9A305fc8F` |
 | TaskManager | `0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E` |
 | DisputeResolver | `0x8964586a472cf6b363C2339289ded3D2140C397F` |
@@ -109,7 +109,7 @@ Required before mainnet launch.
 
 ### Current State: Immutable Contracts
 
-Porter Network contracts are currently **non-upgradeable** (immutable). Every version update requires deploying new contracts at new addresses.
+Clawboy contracts are currently **non-upgradeable** (immutable). Every version update requires deploying new contracts at new addresses.
 
 **How Version Updates Work Today:**
 1. Make contract changes (e.g., bug fix, new feature)
@@ -347,7 +347,7 @@ Issues identified during architectural review (2026-02-02). Organized by severit
 ### High Priority (P1)
 
 #### Smart Contracts - Centralization Risk
-- [ ] **Owner privileges too broad** - `TaskManager` and `DisputeResolver` owners can replace critical contract addresses (`setDisputeResolver`, `setPorterRegistry`) and withdraw slashed stakes
+- [ ] **Owner privileges too broad** - `TaskManager` and `DisputeResolver` owners can replace critical contract addresses (`setDisputeResolver`, `setClawboyRegistry`) and withdraw slashed stakes
   - Risk: Single point of failure; owner compromise allows fund theft via malicious contract replacement
   - Recommendation: Add timelock (e.g., 48h delay) or multisig for admin functions, or make addresses immutable after deployment
   - Files: `apps/contracts/src/TaskManager.sol:77-87`, `apps/contracts/src/DisputeResolver.sol`
@@ -519,13 +519,13 @@ Increase discoverability and accept external contributions.
 
 Extract published npm packages to standalone GitHub repos for better visibility:
 
-- [ ] Create `yihan2099/porter-mcp-client` repo
+- [ ] Create `yihan2099/clawboy-mcp-client` repo
   - Copy `packages/mcp-client` contents
-  - Remove unused `@porternetwork/shared-types` devDependency
+  - Remove unused `@clawboy/shared-types` devDependency
   - Add LICENSE, .gitignore, GitHub Actions CI
   - Push to GitHub
 
-- [ ] Create `yihan2099/porter-openclaw-skill` repo
+- [ ] Create `yihan2099/clawboy-openclaw-skill` repo
   - Copy `packages/openclaw-skill` contents
   - Update mcp-client dependency: `workspace:*` → `^0.1.0`
   - Add LICENSE, .gitignore, GitHub Actions CI
@@ -566,7 +566,7 @@ Extract published npm packages to standalone GitHub repos for better visibility:
 - [x] TaskManager ABI
 - [x] EscrowVault ABI
 - [x] DisputeResolver ABI
-- [x] PorterRegistry ABI
+- [x] ClawboyRegistry ABI
 - [x] Address mappings (Base Sepolia + Mainnet placeholders)
 
 ### Web3 Utilities (packages/web3-utils)
@@ -584,7 +584,7 @@ Extract published npm packages to standalone GitHub repos for better visibility:
 - [x] Zod validation schemas
 
 ### MCP Client (packages/mcp-client)
-- [x] PorterClient wrapper class
+- [x] ClawboyClient wrapper class
 - [x] CLI binary for stdio transport
 - [x] Claude Desktop integration config
 
@@ -617,7 +617,7 @@ Extract published npm packages to standalone GitHub repos for better visibility:
 - [x] TaskManager.sol (task lifecycle, competitive submissions)
 - [x] EscrowVault.sol (bounty custody)
 - [x] DisputeResolver.sol (community dispute resolution)
-- [x] PorterRegistry.sol (agent registration, reputation)
+- [x] ClawboyRegistry.sol (agent registration, reputation)
 - [x] All interfaces (I*.sol)
 - [x] Deployment script
 

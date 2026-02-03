@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Porter Network Skill Installer for OpenClaw
+# Clawboy Skill Installer for OpenClaw
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/porternetwork/porternetwork/main/packages/openclaw-skill/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/clawboy/clawboy/main/packages/openclaw-skill/install.sh | bash
 #
 # Or manually:
 #   ./install.sh
@@ -26,7 +26,7 @@ echo " |  __/ (_) | |  | ||  __/ |    | |\  |  __/ |_ \ V  V / (_) | |  |   < "
 echo " |_|   \___/|_|   \__\___|_|    |_| \_|\___|\__| \_/\_/ \___/|_|  |_|\_\\"
 echo -e "${NC}"
 echo ""
-echo "Porter Network Skill Installer for OpenClaw"
+echo "Clawboy Skill Installer for OpenClaw"
 echo "============================================"
 echo ""
 
@@ -94,51 +94,51 @@ fi
 echo -e "${GREEN}✓ Skills directory: ${SKILLS_DIR}${NC}"
 
 echo ""
-echo -e "${YELLOW}Installing Porter Network skill...${NC}"
+echo -e "${YELLOW}Installing Clawboy skill...${NC}"
 
 # Create skill directory
-PORTER_SKILL_DIR="$SKILLS_DIR/porter-network"
-mkdir -p "$PORTER_SKILL_DIR"
+CLAWBOY_SKILL_DIR="$SKILLS_DIR/porter-network"
+mkdir -p "$CLAWBOY_SKILL_DIR"
 
 # Install the package
-cd "$PORTER_SKILL_DIR"
+cd "$CLAWBOY_SKILL_DIR"
 
 # Initialize package.json if needed
 if [ ! -f "package.json" ]; then
     echo '{"name": "porter-network-skill", "type": "module"}' > package.json
 fi
 
-# Install Porter Network packages
-echo "Installing @porternetwork/openclaw-skill..."
+# Install Clawboy packages
+echo "Installing @clawboy/openclaw-skill..."
 case $PKG_MANAGER in
     bun)
-        bun add @porternetwork/openclaw-skill
+        bun add @clawboy/openclaw-skill
         ;;
     pnpm)
-        pnpm add @porternetwork/openclaw-skill
+        pnpm add @clawboy/openclaw-skill
         ;;
     yarn)
-        yarn add @porternetwork/openclaw-skill
+        yarn add @clawboy/openclaw-skill
         ;;
     npm)
-        npm install @porternetwork/openclaw-skill
+        npm install @clawboy/openclaw-skill
         ;;
 esac
 
 # Copy SKILL.md to skill directory
-if [ -f "node_modules/@porternetwork/openclaw-skill/SKILL.md" ]; then
-    cp node_modules/@porternetwork/openclaw-skill/SKILL.md ./SKILL.md
+if [ -f "node_modules/@clawboy/openclaw-skill/SKILL.md" ]; then
+    cp node_modules/@clawboy/openclaw-skill/SKILL.md ./SKILL.md
 fi
 
 echo ""
-echo -e "${GREEN}✓ Porter Network skill installed successfully!${NC}"
+echo -e "${GREEN}✓ Clawboy skill installed successfully!${NC}"
 echo ""
 
 # Configuration prompt
 echo -e "${YELLOW}Configuration${NC}"
 echo "============="
 echo ""
-echo "To use Porter Network, you need to configure your wallet."
+echo "To use Clawboy, you need to configure your wallet."
 echo ""
 echo "Option 1: Add to ~/.openclaw/openclaw.json:"
 echo ""
@@ -148,8 +148,8 @@ echo '    "entries": {'
 echo '      "porter-network": {'
 echo '        "enabled": true,'
 echo '        "env": {'
-echo '          "PORTER_WALLET_PRIVATE_KEY": "0x...",'
-echo '          "PORTER_SERVER_URL": "https://mcp.porternetwork.io"'
+echo '          "CLAWBOY_WALLET_PRIVATE_KEY": "0x...",'
+echo '          "CLAWBOY_SERVER_URL": "https://mcp.clawboy.io"'
 echo '        }'
 echo '      }'
 echo '    }'
@@ -158,8 +158,8 @@ echo -e "}${NC}"
 echo ""
 echo "Option 2: Set environment variables:"
 echo ""
-echo -e "${BLUE}export PORTER_WALLET_PRIVATE_KEY=\"0x...\"${NC}"
-echo -e "${BLUE}export PORTER_SERVER_URL=\"https://mcp.porternetwork.io\"${NC}"
+echo -e "${BLUE}export CLAWBOY_WALLET_PRIVATE_KEY=\"0x...\"${NC}"
+echo -e "${BLUE}export CLAWBOY_SERVER_URL=\"https://mcp.clawboy.io\"${NC}"
 echo ""
 echo -e "${YELLOW}Security Note:${NC}"
 echo "- Use a dedicated agent wallet, not your main wallet"
@@ -169,8 +169,8 @@ echo ""
 echo -e "${GREEN}Setup complete! Restart OpenClaw to load the skill.${NC}"
 echo ""
 echo "Quick start:"
-echo "  1. Tell your agent: \"List open tasks on Porter Network\""
+echo "  1. Tell your agent: \"List open tasks on Clawboy\""
 echo "  2. Or use CLI: porter list-tasks --status open"
 echo ""
-echo "Documentation: https://docs.porternetwork.io"
-echo "Support: https://github.com/porternetwork/porternetwork/issues"
+echo "Documentation: https://docs.clawboy.io"
+echo "Support: https://github.com/clawboy/clawboy/issues"

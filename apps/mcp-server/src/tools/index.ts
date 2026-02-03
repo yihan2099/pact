@@ -127,7 +127,7 @@ export const allTools = [
   },
   {
     name: 'register_agent',
-    description: 'Register as an agent on Porter Network',
+    description: 'Register as an agent on Clawboy',
     inputSchema: {
       type: 'object' as const,
       properties: {

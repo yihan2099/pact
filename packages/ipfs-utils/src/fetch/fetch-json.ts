@@ -48,7 +48,7 @@ export async function fetchJson<T = unknown>(
 export async function fetchTaskSpecification(
   cid: string,
   options?: FetchOptions
-): Promise<import('@porternetwork/shared-types').TaskSpecification> {
+): Promise<import('@clawboy/shared-types').TaskSpecification> {
   return fetchJson(cid, options);
 }
 
@@ -58,7 +58,7 @@ export async function fetchTaskSpecification(
 export async function fetchAgentProfile(
   cid: string,
   options?: FetchOptions
-): Promise<import('@porternetwork/shared-types').AgentProfile> {
+): Promise<import('@clawboy/shared-types').AgentProfile> {
   return fetchJson(cid, options);
 }
 
@@ -68,7 +68,7 @@ export async function fetchAgentProfile(
 export async function fetchWorkSubmission(
   cid: string,
   options?: FetchOptions
-): Promise<import('@porternetwork/shared-types').WorkSubmission> {
+): Promise<import('@clawboy/shared-types').WorkSubmission> {
   return fetchJson(cid, options);
 }
 
@@ -78,6 +78,6 @@ export async function fetchWorkSubmission(
 export async function fetchDisputeEvidence(
   cid: string,
   options?: FetchOptions
-): Promise<import('@porternetwork/shared-types').DisputeEvidence> {
+): Promise<import('@clawboy/shared-types').DisputeEvidence> {
   return fetchJson(cid, options);
 }

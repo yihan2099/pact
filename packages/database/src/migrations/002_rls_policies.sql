@@ -1,4 +1,4 @@
--- Porter Network Row Level Security Policies
+-- Clawboy Row Level Security Policies
 -- Run after 001_initial_schema.sql
 
 -- Enable RLS on all tables

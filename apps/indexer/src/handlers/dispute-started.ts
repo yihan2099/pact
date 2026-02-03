@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { getTaskByChainId, createDispute } from '@porternetwork/database';
+import { getTaskByChainId, createDispute } from '@clawboy/database';
 
 /**
  * Handle DisputeStarted event

@@ -1,26 +1,26 @@
 /**
- * Porter Network OpenClaw Skill
+ * Clawboy OpenClaw Skill
  *
- * This module provides the Porter Network integration for OpenClaw agents.
- * It exports utilities for programmatic access to Porter Network tools.
+ * This module provides the Clawboy integration for OpenClaw agents.
+ * It exports utilities for programmatic access to Clawboy tools.
  */
 
-export { PorterApiClient } from '@porternetwork/mcp-client';
-export type { ApiClientOptions, ApiError } from '@porternetwork/mcp-client';
+export { ClawboyApiClient } from '@clawboy/mcp-client';
+export type { ApiClientOptions, ApiError } from '@clawboy/mcp-client';
 
 /**
- * Porter Network Skill metadata for OpenClaw
+ * Clawboy Skill metadata for OpenClaw
  */
 export const skillMetadata = {
-  name: 'porter-network',
-  displayName: 'Porter Network',
+  name: 'clawboy',
+  displayName: 'Clawboy',
   description: 'AI agent economy - find tasks, complete work, earn crypto',
   version: '0.1.0',
-  author: 'Porter Network',
+  author: 'Clawboy',
   category: 'web3',
   requires: {
-    env: ['PORTER_WALLET_PRIVATE_KEY'],
-    optionalEnv: ['PORTER_SERVER_URL', 'PORTER_RPC_URL'],
+    env: ['CLAWBOY_WALLET_PRIVATE_KEY'],
+    optionalEnv: ['CLAWBOY_SERVER_URL', 'CLAWBOY_RPC_URL'],
   },
   capabilities: [
     'list-tasks',
@@ -37,21 +37,21 @@ export const skillMetadata = {
  * Default configuration
  */
 export const defaultConfig = {
-  serverUrl: 'https://mcp.porternetwork.io',
+  serverUrl: 'https://mcp.clawboy.vercel.app',
   rpcUrl: 'https://sepolia.base.org',
   chainId: 84532, // Base Sepolia
 };
 
 /**
- * Create a configured Porter API client
+ * Create a configured Clawboy API client
  */
-export function createPorterClient(options?: {
+export function createClawboyClient(options?: {
   serverUrl?: string;
   timeout?: number;
 }) {
-  const { PorterApiClient } = require('@porternetwork/mcp-client');
-  return new PorterApiClient({
-    baseUrl: options?.serverUrl || process.env.PORTER_SERVER_URL || defaultConfig.serverUrl,
+  const { ClawboyApiClient } = require('@clawboy/mcp-client');
+  return new ClawboyApiClient({
+    baseUrl: options?.serverUrl || process.env.CLAWBOY_SERVER_URL || defaultConfig.serverUrl,
     timeout: options?.timeout || 30000,
   });
 }

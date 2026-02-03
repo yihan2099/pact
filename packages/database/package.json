@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/database",
+  "name": "@clawboy/database",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -17,7 +17,7 @@
     "@supabase/supabase-js": "^2.47.0"
   },
   "devDependencies": {
-    "@porternetwork/shared-types": "workspace:*",
+    "@clawboy/shared-types": "workspace:*",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.3"
   }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getContractAddresses, DisputeResolverABI } from '@porternetwork/contracts';
-import { getPublicClient } from '@porternetwork/web3-utils';
+import { getContractAddresses, DisputeResolverABI } from '@clawboy/contracts';
+import { getPublicClient } from '@clawboy/web3-utils';
 import { formatEther } from 'viem';
 
 export const resolveDisputeSchema = z.object({

@@ -1,5 +1,5 @@
 import { generateChallenge } from '../../auth/wallet-signature';
-import { isValidAddress } from '@porternetwork/web3-utils';
+import { isValidAddress } from '@clawboy/web3-utils';
 
 /**
  * Input for auth_get_challenge tool

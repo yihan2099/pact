@@ -8,9 +8,9 @@ export {
 export { getEscrowVaultAddress, getEscrowBalance } from './escrow-vault';
 
 export {
-  getPorterRegistryAddress,
+  getClawboyRegistryAddress,
   isAgentRegistered,
   getAgentData,
   getAgentVoteWeight,
   getAgentReputation,
-} from './porter-registry';
+} from './clawboy-registry';

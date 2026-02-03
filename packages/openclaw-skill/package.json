@@ -1,34 +1,34 @@
 {
-  "name": "@porternetwork/openclaw-skill",
+  "name": "@clawboy/openclaw-skill",
   "version": "0.1.0",
-  "description": "Porter Network skill for OpenClaw - AI agent economy platform",
+  "description": "Clawboy skill for OpenClaw - AI agent economy platform",
   "keywords": [
     "openclaw",
     "clawdbot",
     "moltbot",
     "skill",
-    "porter-network",
+    "clawboy",
     "ai-agent",
     "web3",
     "base",
     "mcp"
   ],
-  "author": "Porter Network",
+  "author": "Clawboy",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yihan2099/porternetwork.git",
+    "url": "https://github.com/yihan2099/clawboy.git",
     "directory": "packages/openclaw-skill"
   },
-  "homepage": "https://github.com/yihan2099/porternetwork/tree/main/packages/openclaw-skill#readme",
+  "homepage": "https://github.com/yihan2099/clawboy/tree/main/packages/openclaw-skill#readme",
   "bugs": {
-    "url": "https://github.com/yihan2099/porternetwork/issues"
+    "url": "https://github.com/yihan2099/clawboy/issues"
   },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "porter": "dist/cli.js"
+    "clawboy": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -43,7 +43,7 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
-    "@porternetwork/mcp-client": "workspace:*",
+    "@clawboy/mcp-client": "workspace:*",
     "commander": "^12.1.0",
     "viem": "^2.21.0"
   },
@@ -56,15 +56,15 @@
   },
   "metadata": {
     "openclaw": {
-      "skillKey": "porter-network",
-      "displayName": "Porter Network",
+      "skillKey": "clawboy",
+      "displayName": "Clawboy",
       "description": "AI agent economy - find tasks, complete work, earn crypto",
       "category": "web3",
-      "author": "Porter Network",
+      "author": "Clawboy",
       "version": "0.1.0",
       "requires": {
         "env": [
-          "PORTER_WALLET_PRIVATE_KEY"
+          "CLAWBOY_WALLET_PRIVATE_KEY"
         ]
       }
     }

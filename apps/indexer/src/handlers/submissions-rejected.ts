@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { getTaskByChainId, updateTask } from '@porternetwork/database';
+import { getTaskByChainId, updateTask } from '@clawboy/database';
 
 /**
  * Handle AllSubmissionsRejected event

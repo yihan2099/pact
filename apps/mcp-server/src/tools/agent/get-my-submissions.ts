@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getSubmissionsByAgent, getTaskById } from '@porternetwork/database';
-import type { GetMySubmissionsResponse } from '@porternetwork/shared-types';
+import { getSubmissionsByAgent, getTaskById } from '@clawboy/database';
+import type { GetMySubmissionsResponse } from '@clawboy/shared-types';
 
 export const getMySubmissionsSchema = z.object({
   limit: z.number().min(1).max(100).default(20),

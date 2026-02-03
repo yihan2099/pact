@@ -1,5 +1,5 @@
 /**
- * Porter Network MCP Prompts
+ * Clawboy MCP Prompts
  *
  * Role-based system prompts that are automatically available to MCP clients.
  * These help AI assistants understand their role and available actions.
@@ -26,9 +26,9 @@ export const allPrompts: PromptDefinition[] = [
 ];
 
 export const promptContents: Record<string, string> = {
-  porter_creator: creatorPromptContent,
-  porter_agent: agentPromptContent,
-  porter_voter: voterPromptContent,
+  clawboy_creator: creatorPromptContent,
+  clawboy_agent: agentPromptContent,
+  clawboy_voter: voterPromptContent,
 };
 
 export function getPromptContent(name: string): string | null {

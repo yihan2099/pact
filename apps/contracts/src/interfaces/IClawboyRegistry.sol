@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 /**
- * @title IPorterRegistry
- * @notice Interface for the PorterRegistry contract - simplified reputation-only system
+ * @title IClawboyRegistry
+ * @notice Interface for the ClawboyRegistry contract - simplified reputation-only system
  * @dev Removed tier system and staking - just tracks reputation and dispute history
  */
-interface IPorterRegistry {
+interface IClawboyRegistry {
     struct Agent {
         uint256 reputation;
         uint256 tasksWon;        // Tasks where agent was selected winner

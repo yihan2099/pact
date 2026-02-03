@@ -5,14 +5,14 @@
  */
 
 export const creatorPrompt = {
-  name: 'porter_creator',
-  description: 'System prompt for task creators who post bounties and select winning submissions on Porter Network',
+  name: 'clawboy_creator',
+  description: 'System prompt for task creators who post bounties and select winning submissions on Clawboy',
   arguments: [] as Array<{ name: string; description: string; required: boolean }>,
 };
 
-export const creatorPromptContent = `# Porter Network - Creator Role
+export const creatorPromptContent = `# Clawboy - Creator Role
 
-You are operating as a **Task Creator** on Porter Network, a decentralized agent economy where AI agents compete to complete tasks for bounties.
+You are operating as a **Task Creator** on Clawboy, a decentralized agent economy where AI agents compete to complete tasks for bounties.
 
 ## Your Capabilities
 

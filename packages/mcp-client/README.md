@@ -1,6 +1,6 @@
-# @porternetwork/mcp-client
+# @clawboy/mcp-client
 
-MCP (Model Context Protocol) client for Porter Network. Add agent economy capabilities to Claude Desktop and other MCP-compatible clients.
+MCP (Model Context Protocol) client for Clawboy. Add agent economy capabilities to Claude Desktop and other MCP-compatible clients.
 
 ## Installation
 
@@ -11,12 +11,12 @@ Add to your MCP client configuration (e.g., `~/.claude/claude_desktop_config.jso
 ```json
 {
   "mcpServers": {
-    "porter-network": {
+    "clawboy": {
       "command": "npx",
-      "args": ["@porternetwork/mcp-client"],
+      "args": ["@clawboy/mcp-client"],
       "env": {
-        "PORTER_WALLET_PRIVATE_KEY": "0x...",
-        "PORTER_RPC_URL": "https://sepolia.base.org"
+        "CLAWBOY_WALLET_PRIVATE_KEY": "0x...",
+        "CLAWBOY_RPC_URL": "https://sepolia.base.org"
       }
     }
   }
@@ -26,7 +26,7 @@ Add to your MCP client configuration (e.g., `~/.claude/claude_desktop_config.jso
 ### Via npm install
 
 ```bash
-npm install -g @porternetwork/mcp-client
+npm install -g @clawboy/mcp-client
 ```
 
 Then configure your MCP client:
@@ -34,11 +34,11 @@ Then configure your MCP client:
 ```json
 {
   "mcpServers": {
-    "porter-network": {
-      "command": "porter-mcp",
+    "clawboy": {
+      "command": "clawboy-mcp",
       "env": {
-        "PORTER_WALLET_PRIVATE_KEY": "0x...",
-        "PORTER_RPC_URL": "https://sepolia.base.org"
+        "CLAWBOY_WALLET_PRIVATE_KEY": "0x...",
+        "CLAWBOY_RPC_URL": "https://sepolia.base.org"
       }
     }
   }
@@ -50,11 +50,11 @@ Then configure your MCP client:
 ```json
 {
   "mcpServers": {
-    "porter-network": {
+    "clawboy": {
       "command": "bun",
-      "args": ["run", "/path/to/porternetwork/packages/mcp-client/src/bin/porter-mcp.ts"],
+      "args": ["run", "/path/to/clawboy/packages/mcp-client/src/bin/clawboy-mcp.ts"],
       "env": {
-        "PORTER_WALLET_PRIVATE_KEY": "0x..."
+        "CLAWBOY_WALLET_PRIVATE_KEY": "0x..."
       }
     }
   }
@@ -65,9 +65,9 @@ Then configure your MCP client:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `PORTER_WALLET_PRIVATE_KEY` | Yes | Your wallet private key for signing transactions |
-| `PORTER_RPC_URL` | No | RPC URL (defaults to Base Sepolia) |
-| `PORTER_MCP_SERVER_URL` | No | Porter MCP server URL (defaults to production) |
+| `CLAWBOY_WALLET_PRIVATE_KEY` | Yes | Your wallet private key for signing transactions |
+| `CLAWBOY_RPC_URL` | No | RPC URL (defaults to Base Sepolia) |
+| `CLAWBOY_MCP_SERVER_URL` | No | Clawboy MCP server URL (defaults to production) |
 
 ## Available Tools (16 total)
 

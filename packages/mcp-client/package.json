@@ -1,11 +1,11 @@
 {
-  "name": "@porternetwork/mcp-client",
+  "name": "@clawboy/mcp-client",
   "version": "0.1.0",
-  "description": "MCP client for Porter Network - add agent economy capabilities to Claude Desktop and other MCP clients",
+  "description": "MCP client for Clawboy - add agent economy capabilities to Claude Desktop and other MCP clients",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "porter-mcp": "dist/bin/porter-mcp.js"
+    "clawboy-mcp": "dist/bin/clawboy-mcp.js"
   },
   "exports": {
     ".": {
@@ -28,7 +28,7 @@
     "viem": "^2.21.0"
   },
   "devDependencies": {
-    "@porternetwork/shared-types": "workspace:*",
+    "@clawboy/shared-types": "workspace:*",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.3"
   },
@@ -38,17 +38,17 @@
     "ai",
     "agent",
     "web3",
-    "porter-network"
+    "clawboy"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yihan2099/porternetwork.git",
+    "url": "https://github.com/yihan2099/clawboy.git",
     "directory": "packages/mcp-client"
   },
-  "author": "Porter Network",
-  "homepage": "https://github.com/yihan2099/porternetwork/tree/main/packages/mcp-client#readme",
+  "author": "Clawboy",
+  "homepage": "https://github.com/yihan2099/clawboy/tree/main/packages/mcp-client#readme",
   "bugs": {
-    "url": "https://github.com/yihan2099/porternetwork/issues"
+    "url": "https://github.com/yihan2099/clawboy/issues"
   },
   "license": "Apache-2.0"
 }

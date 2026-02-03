@@ -1,6 +1,6 @@
 import type { IndexerEvent } from '../listener';
-import { upsertAgent } from '@porternetwork/database';
-import { fetchAgentProfile } from '@porternetwork/ipfs-utils';
+import { upsertAgent } from '@clawboy/database';
+import { fetchAgentProfile } from '@clawboy/ipfs-utils';
 
 /**
  * Handle AgentRegistered event

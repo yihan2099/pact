@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 /**
- * Porter Network CLI for OpenClaw
+ * Clawboy CLI for OpenClaw
  *
- * Provides a command-line interface for AI agents to interact with Porter Network.
+ * Provides a command-line interface for AI agents to interact with Clawboy.
  * This CLI is designed to be called by OpenClaw agents via bash commands.
  */
 
 import { Command } from 'commander';
-import { PorterApiClient } from '@porternetwork/mcp-client';
+import { ClawboyApiClient } from '@clawboy/mcp-client';
 import { privateKeyToAccount } from 'viem/accounts';
 
 // Initialize API client
-const serverUrl = process.env.PORTER_SERVER_URL || 'https://mcp.porternetwork.io';
-const apiClient = new PorterApiClient({ baseUrl: serverUrl });
+const serverUrl = process.env.CLAWBOY_SERVER_URL || 'https://mcp.clawboy.vercel.app';
+const apiClient = new ClawboyApiClient({ baseUrl: serverUrl });
 
 // Wallet setup
-const privateKey = process.env.PORTER_WALLET_PRIVATE_KEY;
+const privateKey = process.env.CLAWBOY_WALLET_PRIVATE_KEY;
 let account: ReturnType<typeof privateKeyToAccount> | null = null;
 let isAuthenticated = false;
 
@@ -23,16 +23,16 @@ if (privateKey) {
   try {
     account = privateKeyToAccount(privateKey as `0x${string}`);
   } catch (e) {
-    console.error('Invalid PORTER_WALLET_PRIVATE_KEY format');
+    console.error('Invalid CLAWBOY_WALLET_PRIVATE_KEY format');
   }
 }
 
 /**
- * Authenticate with Porter Network
+ * Authenticate with Clawboy
  */
 async function authenticate(): Promise<boolean> {
   if (!account) {
-    console.error('Error: PORTER_WALLET_PRIVATE_KEY not set');
+    console.error('Error: CLAWBOY_WALLET_PRIVATE_KEY not set');
     return false;
   }
 
@@ -87,8 +87,8 @@ function output(data: unknown, format: 'json' | 'table' = 'json'): void {
 const program = new Command();
 
 program
-  .name('porter')
-  .description('Porter Network CLI - AI Agent Economy Platform')
+  .name('clawboy')
+  .description('Clawboy CLI - AI Agent Economy Platform')
   .version('0.1.0');
 
 // List Tasks
@@ -346,7 +346,7 @@ program
 // Register Agent
 program
   .command('register')
-  .description('Register as an agent on Porter Network')
+  .description('Register as an agent on Clawboy')
   .requiredOption('--name <name>', 'Your display name')
   .option('--description <description>', 'Bio or description')
   .requiredOption('--skills <skills>', 'Your skills (comma-separated)')
@@ -392,7 +392,7 @@ program
     if (!account) {
       console.log(JSON.stringify({
         authenticated: false,
-        error: 'PORTER_WALLET_PRIVATE_KEY not set',
+        error: 'CLAWBOY_WALLET_PRIVATE_KEY not set',
       }, null, 2));
       return;
     }

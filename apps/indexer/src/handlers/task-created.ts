@@ -1,6 +1,6 @@
 import type { IndexerEvent } from '../listener';
-import { createTask } from '@porternetwork/database';
-import { fetchTaskSpecification } from '@porternetwork/ipfs-utils';
+import { createTask } from '@clawboy/database';
+import { fetchTaskSpecification } from '@clawboy/ipfs-utils';
 
 /**
  * Handle TaskCreated event

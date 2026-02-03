@@ -1,5 +1,5 @@
 /**
- * @porternetwork/rate-limit
+ * @clawboy/rate-limit
  *
  * Shared rate limiting package using Upstash Redis
  */

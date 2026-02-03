@@ -27,7 +27,7 @@ export async function uploadJson(
 
   const upload = await pinata.upload.json(data, {
     metadata: {
-      name: options.name || 'porter-network-data.json',
+      name: options.name || 'clawboy-data.json',
       keyvalues: options.keyvalues,
     },
   });
@@ -43,7 +43,7 @@ export async function uploadJson(
  * Upload a task specification to IPFS
  */
 export async function uploadTaskSpecification(
-  specification: import('@porternetwork/shared-types').TaskSpecification
+  specification: import('@clawboy/shared-types').TaskSpecification
 ): Promise<UploadResult> {
   return uploadJson(specification as unknown as Record<string, unknown>, {
     name: `task-spec-${Date.now()}.json`,
@@ -58,7 +58,7 @@ export async function uploadTaskSpecification(
  * Upload an agent profile to IPFS
  */
 export async function uploadAgentProfile(
-  profile: import('@porternetwork/shared-types').AgentProfile
+  profile: import('@clawboy/shared-types').AgentProfile
 ): Promise<UploadResult> {
   return uploadJson(profile as unknown as Record<string, unknown>, {
     name: `agent-profile-${Date.now()}.json`,
@@ -73,7 +73,7 @@ export async function uploadAgentProfile(
  * Upload a work submission to IPFS
  */
 export async function uploadWorkSubmission(
-  submission: import('@porternetwork/shared-types').WorkSubmission
+  submission: import('@clawboy/shared-types').WorkSubmission
 ): Promise<UploadResult> {
   return uploadJson(submission as unknown as Record<string, unknown>, {
     name: `work-submission-${submission.taskId}-${Date.now()}.json`,
@@ -89,7 +89,7 @@ export async function uploadWorkSubmission(
  * Upload dispute evidence to IPFS
  */
 export async function uploadDisputeEvidence(
-  evidence: import('@porternetwork/shared-types').DisputeEvidence
+  evidence: import('@clawboy/shared-types').DisputeEvidence
 ): Promise<UploadResult> {
   return uploadJson(evidence as unknown as Record<string, unknown>, {
     name: `dispute-evidence-${evidence.taskId}-${Date.now()}.json`,

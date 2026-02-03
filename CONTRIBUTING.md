@@ -1,6 +1,6 @@
-# Contributing to Porter Network
+# Contributing to Clawboy
 
-Thank you for your interest in contributing to Porter Network! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Clawboy! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -20,8 +20,8 @@ Be respectful, inclusive, and constructive. We're building an open ecosystem for
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/porternetwork.git
-   cd porternetwork
+   git clone https://github.com/YOUR_USERNAME/clawboy.git
+   cd clawboy
    ```
 3. Install dependencies:
    ```bash
@@ -136,7 +136,7 @@ bun run lint
 ## Project Structure
 
 ```
-porternetwork/
+clawboy/
 ├── apps/
 │   ├── contracts/     # Foundry smart contracts
 │   ├── mcp-server/    # MCP server for AI agents

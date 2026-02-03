@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { getTaskHandler } from '../../services/task-service';
-import { uploadWorkSubmission } from '@porternetwork/ipfs-utils';
+import { uploadWorkSubmission } from '@clawboy/ipfs-utils';
 import {
   getSubmissionByTaskAndAgent,
   createSubmission,
   updateSubmission,
-} from '@porternetwork/database';
-import type { WorkSubmission } from '@porternetwork/shared-types';
+} from '@clawboy/database';
+import type { WorkSubmission } from '@clawboy/shared-types';
 
 // SECURITY: IPFS CID v0 and v1 format validation
 const cidRegex = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{58,})$/;

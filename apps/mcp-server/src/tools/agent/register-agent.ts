@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { uploadAgentProfile } from '@porternetwork/ipfs-utils';
-import type { AgentProfile } from '@porternetwork/shared-types';
+import { uploadAgentProfile } from '@clawboy/ipfs-utils';
+import type { AgentProfile } from '@clawboy/shared-types';
 import { webhookUrlSchema } from '../../utils/webhook-validation';
 
 export const registerAgentSchema = z.object({
@@ -20,7 +20,7 @@ export type RegisterAgentInput = z.infer<typeof registerAgentSchema>;
 
 export const registerAgentTool = {
   name: 'register_agent',
-  description: 'Register as an agent on Porter Network. Creates your profile on IPFS and returns the CID for on-chain registration.',
+  description: 'Register as an agent on Clawboy. Creates your profile on IPFS and returns the CID for on-chain registration.',
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -79,7 +79,7 @@ export const registerAgentTool = {
       message: 'Agent profile created and uploaded to IPFS',
       profileCid: uploadResult.cid,
       callerAddress: context.callerAddress,
-      nextStep: 'Call the PorterRegistry contract\'s register(profileCid) function to complete on-chain registration',
+      nextStep: 'Call the ClawboyRegistry contract\'s register(profileCid) function to complete on-chain registration',
       contractFunction: 'register(string profileCid)',
       contractArgs: {
         profileCid: uploadResult.cid,

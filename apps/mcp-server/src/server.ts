@@ -44,7 +44,7 @@ export interface ServerContext {
 export function createMcpServer() {
   const server = new Server(
     {
-      name: 'porter-network-mcp',
+      name: 'clawboy-mcp',
       version: '0.1.0',
     },
     {
@@ -234,6 +234,6 @@ export async function startServer() {
 
   await server.connect(transport);
 
-  console.error('Porter Network MCP Server started');
+  console.error('Clawboy MCP Server started');
   return server;
 }

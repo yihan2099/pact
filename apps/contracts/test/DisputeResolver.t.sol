@@ -4,16 +4,16 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {TaskManager} from "../src/TaskManager.sol";
 import {EscrowVault} from "../src/EscrowVault.sol";
-import {PorterRegistry} from "../src/PorterRegistry.sol";
+import {ClawboyRegistry} from "../src/ClawboyRegistry.sol";
 import {DisputeResolver} from "../src/DisputeResolver.sol";
 import {ITaskManager} from "../src/interfaces/ITaskManager.sol";
 import {IDisputeResolver} from "../src/interfaces/IDisputeResolver.sol";
-import {IPorterRegistry} from "../src/interfaces/IPorterRegistry.sol";
+import {IClawboyRegistry} from "../src/interfaces/IClawboyRegistry.sol";
 
 contract DisputeResolverTest is Test {
     TaskManager public taskManager;
     EscrowVault public escrowVault;
-    PorterRegistry public porterRegistry;
+    ClawboyRegistry public clawboyRegistry;
     DisputeResolver public disputeResolver;
 
     address public creator = address(0x1);
@@ -26,23 +26,23 @@ contract DisputeResolverTest is Test {
     uint256 public constant BOUNTY_AMOUNT = 1 ether;
 
     function setUp() public {
-        // Deploy PorterRegistry first
-        porterRegistry = new PorterRegistry();
+        // Deploy ClawboyRegistry first
+        clawboyRegistry = new ClawboyRegistry();
 
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
         escrowVault = new EscrowVault(predictedTaskManager);
 
         // Deploy TaskManager
-        taskManager = new TaskManager(address(escrowVault), address(porterRegistry));
+        taskManager = new TaskManager(address(escrowVault), address(clawboyRegistry));
 
         // Deploy DisputeResolver
-        disputeResolver = new DisputeResolver(address(taskManager), address(porterRegistry));
+        disputeResolver = new DisputeResolver(address(taskManager), address(clawboyRegistry));
 
         // Configure access control
         taskManager.setDisputeResolver(address(disputeResolver));
-        porterRegistry.setTaskManager(address(taskManager));
-        porterRegistry.setDisputeResolver(address(disputeResolver));
+        clawboyRegistry.setTaskManager(address(taskManager));
+        clawboyRegistry.setDisputeResolver(address(disputeResolver));
 
         // Give accounts some ETH
         vm.deal(creator, 10 ether);
@@ -54,25 +54,25 @@ contract DisputeResolverTest is Test {
 
         // Register all agents/voters
         vm.prank(agent1);
-        porterRegistry.register("agent1-profile-cid");
+        clawboyRegistry.register("agent1-profile-cid");
 
         vm.prank(agent2);
-        porterRegistry.register("agent2-profile-cid");
+        clawboyRegistry.register("agent2-profile-cid");
 
         vm.prank(voter1);
-        porterRegistry.register("voter1-profile-cid");
+        clawboyRegistry.register("voter1-profile-cid");
 
         vm.prank(voter2);
-        porterRegistry.register("voter2-profile-cid");
+        clawboyRegistry.register("voter2-profile-cid");
 
         vm.prank(voter3);
-        porterRegistry.register("voter3-profile-cid");
+        clawboyRegistry.register("voter3-profile-cid");
 
         // Give voters some reputation for weighted voting
         vm.startPrank(address(taskManager));
-        porterRegistry.updateReputation(voter1, 100); // Weight: 7 (log2(101) ~= 6.66)
-        porterRegistry.updateReputation(voter2, 50);  // Weight: 6 (log2(51) ~= 5.67)
-        porterRegistry.updateReputation(voter3, 10);  // Weight: 4 (log2(11) ~= 3.46)
+        clawboyRegistry.updateReputation(voter1, 100); // Weight: 7 (log2(101) ~= 6.66)
+        clawboyRegistry.updateReputation(voter2, 50);  // Weight: 6 (log2(51) ~= 5.67)
+        clawboyRegistry.updateReputation(voter3, 10);  // Weight: 4 (log2(11) ~= 3.46)
         vm.stopPrank();
     }
 
@@ -332,7 +332,7 @@ contract DisputeResolverTest is Test {
 
         // Register creator so they could theoretically vote
         vm.prank(creator);
-        porterRegistry.register("creator-profile");
+        clawboyRegistry.register("creator-profile");
 
         uint256 stake = disputeResolver.calculateDisputeStake(BOUNTY_AMOUNT);
         vm.prank(agent1);
@@ -409,7 +409,7 @@ contract DisputeResolverTest is Test {
         assertEq(task.selectedWinner, agent1);
 
         // Verify reputation updates
-        IPorterRegistry.Agent memory agentData = porterRegistry.getAgent(agent1);
+        IClawboyRegistry.Agent memory agentData = clawboyRegistry.getAgent(agent1);
         assertEq(agentData.disputesWon, 1);
         assertEq(agentData.tasksWon, 1);
     }
@@ -456,7 +456,7 @@ contract DisputeResolverTest is Test {
         assertEq(uint256(task.status), uint256(ITaskManager.TaskStatus.Refunded));
 
         // Verify reputation penalty for disputer
-        IPorterRegistry.Agent memory agentData = porterRegistry.getAgent(agent1);
+        IClawboyRegistry.Agent memory agentData = clawboyRegistry.getAgent(agent1);
         assertEq(agentData.disputesLost, 1);
         assertEq(agentData.reputation, 0); // Started at 0, -20 clamped to 0
     }
@@ -494,9 +494,9 @@ contract DisputeResolverTest is Test {
         uint256 disputeId = disputeResolver.startDispute{value: stake}(taskId);
 
         // Get vote weights
-        uint256 voter1Weight = porterRegistry.getVoteWeight(voter1); // ~7
-        uint256 voter2Weight = porterRegistry.getVoteWeight(voter2); // ~6
-        uint256 voter3Weight = porterRegistry.getVoteWeight(voter3); // ~4
+        uint256 voter1Weight = clawboyRegistry.getVoteWeight(voter1); // ~7
+        uint256 voter2Weight = clawboyRegistry.getVoteWeight(voter2); // ~6
+        uint256 voter3Weight = clawboyRegistry.getVoteWeight(voter3); // ~4
 
         // voter1 votes for disputer, voter2 and voter3 vote against
         // Total: ~17, For: ~7, Against: ~10
@@ -607,9 +607,9 @@ contract DisputeResolverTest is Test {
         uint256 disputeId = disputeResolver.startDispute{value: stake}(taskId);
 
         // Get initial reputations
-        uint256 voter1RepBefore = porterRegistry.getAgent(voter1).reputation;
-        uint256 voter2RepBefore = porterRegistry.getAgent(voter2).reputation;
-        uint256 voter3RepBefore = porterRegistry.getAgent(voter3).reputation;
+        uint256 voter1RepBefore = clawboyRegistry.getAgent(voter1).reputation;
+        uint256 voter2RepBefore = clawboyRegistry.getAgent(voter2).reputation;
+        uint256 voter3RepBefore = clawboyRegistry.getAgent(voter3).reputation;
 
         // voter1 and voter2 vote for disputer, voter3 votes against
         vm.prank(voter1);
@@ -630,11 +630,11 @@ contract DisputeResolverTest is Test {
         assertTrue(dispute.disputerWon);
 
         // voter1 and voter2 should gain reputation (+3)
-        assertEq(porterRegistry.getAgent(voter1).reputation, voter1RepBefore + 3);
-        assertEq(porterRegistry.getAgent(voter2).reputation, voter2RepBefore + 3);
+        assertEq(clawboyRegistry.getAgent(voter1).reputation, voter1RepBefore + 3);
+        assertEq(clawboyRegistry.getAgent(voter2).reputation, voter2RepBefore + 3);
 
         // voter3 should lose reputation (-2)
-        assertEq(porterRegistry.getAgent(voter3).reputation, voter3RepBefore - 2);
+        assertEq(clawboyRegistry.getAgent(voter3).reputation, voter3RepBefore - 2);
     }
 
     /*//////////////////////////////////////////////////////////////

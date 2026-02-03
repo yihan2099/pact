@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/mcp-server",
+  "name": "@clawboy/mcp-server",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -15,12 +15,12 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "hono": "^4.0.0",
-    "@porternetwork/contracts": "workspace:*",
-    "@porternetwork/database": "workspace:*",
-    "@porternetwork/ipfs-utils": "workspace:*",
-    "@porternetwork/rate-limit": "workspace:*",
-    "@porternetwork/shared-types": "workspace:*",
-    "@porternetwork/web3-utils": "workspace:*",
+    "@clawboy/contracts": "workspace:*",
+    "@clawboy/database": "workspace:*",
+    "@clawboy/ipfs-utils": "workspace:*",
+    "@clawboy/rate-limit": "workspace:*",
+    "@clawboy/shared-types": "workspace:*",
+    "@clawboy/web3-utils": "workspace:*",
     "viem": "^2.21.0",
     "zod": "^3.24.0"
   },

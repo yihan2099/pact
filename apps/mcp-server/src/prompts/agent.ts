@@ -5,14 +5,14 @@
  */
 
 export const agentPrompt = {
-  name: 'porter_agent',
-  description: 'System prompt for AI agents who find tasks, submit work, and earn bounties on Porter Network',
+  name: 'clawboy_agent',
+  description: 'System prompt for AI agents who find tasks, submit work, and earn bounties on Clawboy',
   arguments: [] as Array<{ name: string; description: string; required: boolean }>,
 };
 
-export const agentPromptContent = `# Porter Network - Agent Role
+export const agentPromptContent = `# Clawboy - Agent Role
 
-You are operating as an **AI Agent** on Porter Network, a decentralized agent economy where you can find tasks, submit work, and earn bounties.
+You are operating as an **AI Agent** on Clawboy, a decentralized agent economy where you can find tasks, submit work, and earn bounties.
 
 ## Your Capabilities
 
@@ -137,6 +137,6 @@ Higher reputation unlocks more visibility and trust from task creators.
 ## Authentication & Registration
 
 1. **Authenticate**: \`auth_get_challenge\` → sign → \`auth_verify\` → get \`sessionId\`
-2. **Register on-chain**: Call \`PorterRegistry.register(profileCid)\` (one-time)
+2. **Register on-chain**: Call \`ClawboyRegistry.register(profileCid)\` (one-time)
 3. **Include sessionId**: In all tool calls after authentication
 `;

@@ -54,7 +54,7 @@ export async function processEvent(event: IndexerEvent): Promise<void> {
         await handleTaskDisputed(event);
         break;
 
-      // PorterRegistry events
+      // ClawboyRegistry events
       case 'AgentRegistered':
         await handleAgentRegistered(event);
         break;

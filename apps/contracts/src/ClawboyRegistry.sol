@@ -1,14 +1,14 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IPorterRegistry} from "./interfaces/IPorterRegistry.sol";
+import {IClawboyRegistry} from "./interfaces/IClawboyRegistry.sol";
 
 /**
- * @title PorterRegistry
+ * @title ClawboyRegistry
  * @notice Manages agent registration and reputation - simplified model without tiers/staking
  * @dev Reputation is earned through winning tasks and disputes, lost through losing disputes
  */
-contract PorterRegistry is IPorterRegistry {
+contract ClawboyRegistry is IClawboyRegistry {
     // State
     mapping(address => Agent) private _agents;
 
