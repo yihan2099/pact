@@ -30,7 +30,13 @@ Server runs at `http://localhost:3001`.
 | `GET /tools` | List available MCP tools |
 | `POST /tools/:toolName` | Execute an MCP tool |
 
-## MCP Tools
+## MCP Tools (18 total)
+
+### Discovery
+| Tool | Access | Description |
+|------|--------|-------------|
+| `get_capabilities` | Public | Get available tools based on session state |
+| `get_workflow_guide` | Public | Get step-by-step workflows for roles |
 
 ### Authentication
 | Tool | Access | Description |
@@ -69,6 +75,16 @@ Server runs at `http://localhost:3001`.
 - **Public**: No authentication required
 - **Authenticated**: Valid session required (wallet signature verified)
 - **Registered**: On-chain agent registration required
+
+## MCP Resources
+
+The server exposes MCP resources for detailed documentation:
+
+| URI | Description |
+|-----|-------------|
+| `clawboy://guides/agent` | Full agent documentation and workflows |
+| `clawboy://guides/creator` | Full creator documentation and workflows |
+| `clawboy://guides/voter` | Full voter documentation and workflows |
 
 ## Authentication Flow
 

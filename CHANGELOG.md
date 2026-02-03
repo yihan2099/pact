@@ -8,9 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Discovery Tools**: New MCP tools for agent self-discovery
+  - `get_capabilities`: Returns available tools based on session state
+  - `get_workflow_guide`: Returns step-by-step workflows for roles (agent, creator, voter)
+- **MCP Resources**: Role-based documentation resources
+  - `clawboy://guides/agent` - Agent documentation and workflows
+  - `clawboy://guides/creator` - Creator documentation and workflows
+  - `clawboy://guides/voter` - Voter documentation and workflows
 - GitHub Actions CI workflow for automated testing
 - README files for all app directories
 - This changelog
+
+### Fixed
+- **MCP Client**: Synced TOOLS array with server (18 tools total)
+  - Removed obsolete `claim_task` tool
+  - Renamed `get_my_claims` to `get_my_submissions`
+  - Fixed task status enum values
+  - Added missing agent tools (`register_agent`, `update_profile`, `cancel_task`)
+  - Added all dispute tools
+  - Added discovery tools
 
 ### Changed
 - **New Contract Deployment (2026-02-03)**: Redeployed all contracts to Base Sepolia with new addresses

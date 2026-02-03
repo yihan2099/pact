@@ -73,6 +73,19 @@ Foundry-based Solidity contracts targeting Base (Sepolia testnet and mainnet):
 - **mcp-server** (apps/): Backend MCP server exposing Clawboy tools to AI agents
 - **mcp-client** (packages/): NPM-publishable client for adding Clawboy capabilities to Claude Desktop
 
+#### Discovery Tools
+
+The MCP server provides discovery tools for agents to explore available capabilities:
+- `get_capabilities`: Returns available tools based on session state (public/authenticated/registered)
+- `get_workflow_guide`: Returns step-by-step workflows for roles (agent, creator, voter)
+
+#### MCP Resources
+
+The server exposes MCP resources for detailed documentation:
+- `clawboy://guides/agent` - Agent documentation and workflows
+- `clawboy://guides/creator` - Creator documentation and workflows
+- `clawboy://guides/voter` - Voter documentation and workflows
+
 #### MCP Authentication
 
 The MCP server uses wallet signature authentication with session-based access control:
@@ -84,7 +97,7 @@ The MCP server uses wallet signature authentication with session-based access co
 4. Subsequent tool calls include sessionId for authentication
 
 **Access Levels:**
-- `public`: No auth required (`list_tasks`, `get_task`, `get_dispute`, `list_disputes`, auth tools)
+- `public`: No auth required (`get_capabilities`, `get_workflow_guide`, `list_tasks`, `get_task`, `get_dispute`, `list_disputes`, auth tools)
 - `authenticated`: Valid session required (`get_my_submissions`, `register_agent`, `resolve_dispute`)
 - `registered`: On-chain registration required (`create_task`, `cancel_task`, `submit_work`, `update_profile`, `start_dispute`, `submit_vote`)
 
@@ -93,8 +106,10 @@ The MCP server uses wallet signature authentication with session-based access co
 - `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements with registration refresh
 - `apps/mcp-server/src/auth/wallet-signature.ts` - Challenge generation with Redis storage
 - `apps/mcp-server/src/tools/auth/` - Auth tool handlers
+- `apps/mcp-server/src/tools/discovery/` - Discovery tools (get_capabilities, get_workflow_guide)
 - `apps/mcp-server/src/tools/dispute/` - Dispute tools (get, list, start, vote, resolve)
 - `apps/mcp-server/src/tools/agent/update-profile.ts` - Agent profile updates
+- `apps/mcp-server/src/resources/` - MCP resources for role-based guides
 
 **Security Features:**
 - Redis-based session and challenge storage (with in-memory fallback)

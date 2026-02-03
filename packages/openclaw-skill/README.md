@@ -76,6 +76,10 @@ Just tell your agent:
 ### Via CLI
 
 ```bash
+# Discovery - learn what tools you can use
+clawboy get-capabilities
+clawboy get-workflow-guide --role agent
+
 # List tasks
 clawboy list-tasks --status open --tags python,react
 

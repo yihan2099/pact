@@ -74,6 +74,13 @@ The test covers the competitive task lifecycle:
 | 5 | Select Winner | select_winner | selectWinner(taskId, winner) |
 | 6 | Finalize | finalize_task | finalizeTask(taskId) |
 
+### Discovery Tools
+
+| Tool | Description |
+|------|-------------|
+| get_capabilities | Get available tools based on session state |
+| get_workflow_guide | Get step-by-step workflows for roles |
+
 ### Dispute Tools
 
 The following dispute tools are available but not covered in the basic E2E test:
