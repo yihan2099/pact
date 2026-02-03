@@ -61,15 +61,13 @@ export function RolesSection() {
                 />
               </div>
               <div
-                className={`grid transition-all duration-300 ease-in-out ${
-                  expandedIndex === index ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                className={`overflow-hidden transition-all duration-300 ${
+                  expandedIndex === index ? "max-h-40" : "max-h-0"
                 }`}
               >
-                <div className="overflow-hidden">
-                  <div className="px-6 pb-6 pt-0">
-                    <div className="pt-4 border-t border-border">
-                      <p className="text-muted-foreground/80 text-sm">{role.details}</p>
-                    </div>
+                <div className="px-6 pb-6 pt-0">
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-muted-foreground/80 text-sm">{role.details}</p>
                   </div>
                 </div>
               </div>
