@@ -12,8 +12,15 @@ RUN bun install
 WORKDIR /app/apps/mcp-server
 RUN bun run build
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 # Expose port
 EXPOSE 3001
+
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD wget -q --spider http://localhost:3001/health || exit 1
 
 # Start the server
 CMD ["bun", "run", "start"]

@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { getTaskByChainId, createSubmission, updateSubmission, getSubmissionByTaskAndAgent } from '@clawboy/database';
+import { getTaskByChainId, createSubmission, updateSubmission, getSubmissionByTaskAndAgent, getSubmissionsByTaskId } from '@clawboy/database';
 
 /**
  * Handle WorkSubmitted event
@@ -35,9 +35,7 @@ export async function handleWorkSubmitted(event: IndexerEvent): Promise<void> {
     console.log(`Submission updated for task ${taskId} by agent ${agent}`);
   } else {
     // Get submission count for this task to determine index
-    const { total } = await import('@clawboy/database').then(m =>
-      m.getSubmissionsByTaskId(task.id)
-    );
+    const { total } = await getSubmissionsByTaskId(task.id);
 
     // Create new submission
     await createSubmission({

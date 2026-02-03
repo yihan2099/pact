@@ -12,5 +12,12 @@ RUN bun install
 WORKDIR /app/apps/indexer
 RUN bun run build
 
+# Install procps for healthcheck (pgrep)
+RUN apk add --no-cache procps
+
+# Health check - verify the bun process is running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD pgrep -f "bun" > /dev/null || exit 1
+
 # Start the indexer
 CMD ["bun", "run", "start"]

@@ -1,0 +1,76 @@
+services:
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp-server
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - HOST=0.0.0.0
+      - RPC_URL=${RPC_URL:-https://sepolia.base.org}
+      - CHAIN_ID=${CHAIN_ID:-84532}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
+      - PINATA_JWT=${PINATA_JWT}
+      - PINATA_GATEWAY=${PINATA_GATEWAY}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - clawboy-network
+
+  indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile.indexer
+    environment:
+      - RPC_URL=${RPC_URL:-https://sepolia.base.org}
+      - CHAIN_ID=${CHAIN_ID:-84532}
+      - POLLING_INTERVAL_MS=${POLLING_INTERVAL_MS:-5000}
+      - BATCH_SIZE=${BATCH_SIZE:-100}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}
+      - PINATA_JWT=${PINATA_JWT}
+      - PINATA_GATEWAY=${PINATA_GATEWAY}
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "bun"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - clawboy-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - clawboy-network
+
+networks:
+  clawboy-network:
+    driver: bridge
+
+volumes:
+  redis-data:

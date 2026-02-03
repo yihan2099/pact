@@ -20,10 +20,11 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { createWalletClient, http, type WalletClient } from 'viem';
+import { createWalletClient, createPublicClient, http, formatEther, type WalletClient } from 'viem';
 import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts';
 import { baseSepolia } from 'viem/chains';
 import { ClawboyApiClient } from '../api-client.js';
+import { ClawboyRegistryABI, getContractAddresses } from '@clawboy/contracts';
 
 // Session state for authentication
 interface AuthState {
@@ -435,14 +436,20 @@ async function main() {
 
       // get_balance and get_profile are handled locally (read from chain)
       if (name === 'get_balance') {
-        // TODO: Implement actual balance query from chain
+        const publicClient = createPublicClient({
+          chain: baseSepolia,
+          transport: http(rpcUrl),
+        });
+
+        const balance = await publicClient.getBalance({ address: account.address });
         return {
           content: [
             {
               type: 'text',
               text: JSON.stringify({
                 address: account.address,
-                balance: '0',
+                balance: balance.toString(),
+                balanceFormatted: formatEther(balance),
                 symbol: 'ETH',
                 decimals: 18,
               }),
@@ -452,21 +459,62 @@ async function main() {
       }
 
       if (name === 'get_profile') {
-        // TODO: Implement actual profile query from chain
+        const publicClient = createPublicClient({
+          chain: baseSepolia,
+          transport: http(rpcUrl),
+        });
+
+        const addresses = getContractAddresses(baseSepolia.id);
+        const targetAddress = (typedArgs.address as `0x${string}`) || account.address;
+
+        // Check if registered
+        const isRegistered = await publicClient.readContract({
+          address: addresses.clawboyRegistry,
+          abi: ClawboyRegistryABI,
+          functionName: 'isRegistered',
+          args: [targetAddress],
+        }) as boolean;
+
+        if (!isRegistered) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  address: targetAddress,
+                  isRegistered: false,
+                  message: 'Agent not registered on-chain',
+                }),
+              },
+            ],
+          };
+        }
+
+        // Get agent data from contract
+        const agentData = await publicClient.readContract({
+          address: addresses.clawboyRegistry,
+          abi: ClawboyRegistryABI,
+          functionName: 'getAgent',
+          args: [targetAddress],
+        }) as unknown as readonly [bigint, bigint, bigint, bigint, string, bigint, boolean];
+
+        const [reputation, tasksWon, disputesWon, disputesLost, profileCid, registeredAt, isActive] = agentData;
+
         return {
           content: [
             {
               type: 'text',
               text: JSON.stringify({
-                address: typedArgs.address || account.address,
-                name: authState?.isRegistered ? 'Registered Agent' : 'Unregistered Agent',
-                tier: authState?.tier || 'newcomer',
-                reputation: '0',
-                tasksCompleted: 0,
-                successRate: 0,
-                skills: [],
-                isVerifier: authState?.isVerifier || false,
-                stakedAmount: '0',
+                address: targetAddress,
+                isRegistered: true,
+                isActive,
+                reputation: reputation.toString(),
+                tasksWon: Number(tasksWon),
+                disputesWon: Number(disputesWon),
+                disputesLost: Number(disputesLost),
+                profileCid,
+                registeredAt: Number(registeredAt),
+                registeredAtDate: new Date(Number(registeredAt) * 1000).toISOString(),
               }),
             },
           ],

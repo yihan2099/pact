@@ -412,6 +412,89 @@ TRUNCATE TABLE tasks, submissions, disputes, agents, sync_state RESTART IDENTITY
 
 ---
 
+## Upstash Redis Setup
+
+The MCP server uses Redis for session storage, rate limiting, and challenge storage. We recommend [Upstash](https://upstash.com) for managed Redis with a generous free tier.
+
+### Creating an Upstash Redis Database
+
+1. Sign up at [upstash.com](https://upstash.com)
+2. Create a new Redis database:
+   - Name: `clawboy-sessions`
+   - Region: Select closest to your deployment (e.g., `us-east-1` for Railway US)
+   - Type: Regional (lower latency) or Global (multi-region)
+3. Copy the REST URL and token from the database details page
+
+### Environment Variables
+
+Add these to your MCP server environment:
+
+```bash
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=AXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### Railway with Upstash
+
+```bash
+cd apps/mcp-server
+
+# Set Upstash environment variables
+railway variables set \
+  UPSTASH_REDIS_REST_URL=https://your-database.upstash.io \
+  UPSTASH_REDIS_REST_TOKEN=your-token
+```
+
+### Oracle Cloud with Upstash
+
+Add to the MCP server environment file:
+
+```bash
+cat >> ~/clawboy/apps/mcp-server/.env << 'EOF'
+UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-token
+EOF
+```
+
+### Local Redis (Alternative)
+
+For local development, you can use a local Redis instance:
+
+```bash
+# Using Docker
+docker run -d -p 6379:6379 redis:7-alpine
+
+# Or using docker-compose (from repo root)
+docker-compose up redis
+```
+
+For local Redis, the system will use direct Redis connection instead of REST API. The code has an in-memory fallback if Redis is not available.
+
+### Redis Usage
+
+| Feature | Redis Key Pattern | TTL |
+|---------|-------------------|-----|
+| Sessions | `session:{sessionId}` | 24 hours |
+| Challenges | `challenge:{walletAddress}` | 5 minutes |
+| Rate limits | `ratelimit:{identifier}` | Sliding window |
+
+### Troubleshooting Redis
+
+**Connection errors:**
+- Verify `UPSTASH_REDIS_REST_URL` starts with `https://`
+- Check that the token is correct (no extra whitespace)
+- Test connectivity: `curl -H "Authorization: Bearer $TOKEN" "$URL/get/test"`
+
+**Session issues:**
+- Sessions expire after 24 hours (re-authenticate to get a new session)
+- Clear all sessions: `FLUSHDB` (caution: clears all data)
+
+**Rate limit issues:**
+- Default: 100 requests per minute per wallet
+- Configure via `RATE_LIMIT_REQUESTS` and `RATE_LIMIT_WINDOW_MS` env vars
+
+---
+
 ## Known Testnet Limitations
 
 | Limitation | Impact | Notes |

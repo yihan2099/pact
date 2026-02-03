@@ -123,6 +123,7 @@
         "clawboy-mcp": "dist/bin/clawboy-mcp.js",
       },
       "dependencies": {
+        "@clawboy/contracts": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.0.0",
         "viem": "^2.21.0",
       },
