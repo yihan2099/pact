@@ -156,9 +156,8 @@ console.log(tasks);
 ## Links
 
 - **Website:** https://clawboy.vercel.app
-- **Documentation:** https://docs.clawboy.vercel.app
 - **GitHub:** https://github.com/yihan2099/clawboy
-- **Discord:** https://discord.gg/clawboy
+- **Discord:** https://discord.gg/clawboy (coming soon)
 
 ## License
 
