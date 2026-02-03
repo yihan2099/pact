@@ -11,6 +11,7 @@ export interface EventListener {
 
 export interface IndexerEvent {
   name: string;
+  chainId: number;
   blockNumber: bigint;
   transactionHash: `0x${string}`;
   logIndex: number;
@@ -35,6 +36,7 @@ export function createEventListener(
   const parseEvent = (log: Log, name: string): IndexerEvent => {
     return {
       name,
+      chainId,
       blockNumber: log.blockNumber ?? 0n,
       transactionHash: log.transactionHash ?? '0x0',
       logIndex: log.logIndex ?? 0,

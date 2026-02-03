@@ -55,6 +55,7 @@ export async function handleTaskCreated(event: IndexerEvent): Promise<void> {
 
   // Create task in database
   await createTask({
+    chain_id: event.chainId,
     chain_task_id: taskId.toString(),
     creator_address: creator.toLowerCase(),
     status: 'open',

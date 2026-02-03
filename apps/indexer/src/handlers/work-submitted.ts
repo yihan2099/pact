@@ -14,10 +14,10 @@ export async function handleWorkSubmitted(event: IndexerEvent): Promise<void> {
 
   console.log(`Processing WorkSubmitted: taskId=${taskId}, agent=${agent}`);
 
-  // Find task in database
-  const task = await getTaskByChainId(taskId.toString());
+  // Find task in database (filter by chainId for multi-chain support)
+  const task = await getTaskByChainId(taskId.toString(), event.chainId);
   if (!task) {
-    console.error(`Task ${taskId} not found in database`);
+    console.error(`Task ${taskId} (chain: ${event.chainId}) not found in database`);
     return;
   }
 

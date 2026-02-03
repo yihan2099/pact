@@ -20,6 +20,24 @@ import { startIpfsRetryJob } from './jobs';
 const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
 
 /**
+ * Recursively serialize BigInt values to strings for JSON compatibility
+ */
+function serializeBigInts(obj: unknown): unknown {
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(serializeBigInts);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, serializeBigInts(v)])
+    );
+  }
+  return obj;
+}
+
+/**
  * Process an event with idempotency check and DLQ support
  */
 async function processEventWithIdempotency(event: IndexerEvent): Promise<void> {
@@ -66,7 +84,7 @@ async function processEventWithIdempotency(event: IndexerEvent): Promise<void> {
       txHash: event.transactionHash,
       logIndex: event.logIndex,
       eventName: event.name,
-      eventData: event.args as Record<string, unknown>,
+      eventData: serializeBigInts(event.args) as Record<string, unknown>,
       errorMessage,
       errorStack,
     });
@@ -89,6 +107,21 @@ async function processRetryableEvents(): Promise<void> {
 
   for (const failedEvent of retryableEvents) {
     try {
+      // Check if event was already processed (may have succeeded before DLQ)
+      const alreadyProcessed = await isEventProcessed(
+        failedEvent.chain_id,
+        failedEvent.tx_hash as `0x${string}`,
+        failedEvent.log_index
+      );
+
+      if (alreadyProcessed) {
+        console.log(
+          `DLQ event already processed, resolving: ${failedEvent.event_name} (tx: ${failedEvent.tx_hash})`
+        );
+        await resolveFailedEvent(failedEvent.id, 'Already processed');
+        continue;
+      }
+
       // Reconstruct the event
       const event: IndexerEvent = {
         name: failedEvent.event_name,

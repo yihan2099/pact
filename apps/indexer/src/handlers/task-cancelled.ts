@@ -15,9 +15,9 @@ export async function handleTaskCancelled(event: IndexerEvent): Promise<void> {
   console.log(`Processing TaskCancelled: taskId=${taskId}, creator=${creator}`);
 
   // Find task in database
-  const task = await getTaskByChainId(taskId.toString());
+  const task = await getTaskByChainId(taskId.toString(), event.chainId);
   if (!task) {
-    console.error(`Task ${taskId} not found in database`);
+    console.error(`Task ${taskId} (chain: ${event.chainId}) not found in database`);
     return;
   }
 
