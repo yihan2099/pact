@@ -24,7 +24,7 @@
  * - https://faucet.quicknode.com/base/sepolia
  */
 
-import { describe, test, expect, beforeAll } from 'bun:test';
+import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
 import { formatEther } from 'viem';
 import {
   createTestWallet,
@@ -46,6 +46,7 @@ import {
   resetClients,
   TaskStatus,
   taskStatusToString,
+  gasTracker,
   type TestWallet,
 } from './test-utils';
 
@@ -706,6 +707,11 @@ describe.skipIf(shouldSkipTests)('E2E: Task Cancellation on Base Sepolia', () =>
     console.log('\n========================================');
     console.log('Task Cancellation Tests Complete!');
     console.log('========================================\n');
+  });
+
+  afterAll(() => {
+    // Print gas report at the end of all E2E tests
+    gasTracker.printReport();
   });
 
   // Note: The following test can only be run after the 48h challenge period

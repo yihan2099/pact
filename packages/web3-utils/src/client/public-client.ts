@@ -115,6 +115,8 @@ export async function waitForTransaction(
 ): Promise<{
   blockNumber: bigint;
   status: 'success' | 'reverted';
+  gasUsed: bigint;
+  effectiveGasPrice: bigint;
 }> {
   const client = getPublicClient(chainId);
   const receipt = await client.waitForTransactionReceipt({ hash });
@@ -122,5 +124,7 @@ export async function waitForTransaction(
   return {
     blockNumber: receipt.blockNumber,
     status: receipt.status,
+    gasUsed: receipt.gasUsed,
+    effectiveGasPrice: receipt.effectiveGasPrice,
   };
 }

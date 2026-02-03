@@ -32,6 +32,7 @@ import {
   getBalance,
   waitForTransaction,
 } from '@clawboy/web3-utils';
+import { gasTracker } from './gas-tracker';
 import {
   TaskManagerABI,
   ClawboyRegistryABI,
@@ -206,6 +207,8 @@ export async function registerAgentOnChain(
     throw new Error('Agent registration transaction failed');
   }
 
+  gasTracker.track('register', receipt.gasUsed, receipt.effectiveGasPrice);
+
   return hash;
 }
 
@@ -256,6 +259,8 @@ export async function createTaskOnChain(
     throw new Error('Task creation transaction failed');
   }
 
+  gasTracker.track('createTask', txReceipt.gasUsed, txReceipt.effectiveGasPrice);
+
   // Parse TaskCreated event to get taskId
   let taskId: bigint | undefined;
 
@@ -302,6 +307,8 @@ export async function submitWorkOnChain(
     throw new Error('Work submission transaction failed');
   }
 
+  gasTracker.track('submitWork', receipt.gasUsed, receipt.effectiveGasPrice);
+
   return hash;
 }
 
@@ -324,6 +331,8 @@ export async function selectWinnerOnChain(
   if (receipt.status !== 'success') {
     throw new Error('Select winner transaction failed');
   }
+
+  gasTracker.track('selectWinner', receipt.gasUsed, receipt.effectiveGasPrice);
 
   return hash;
 }
@@ -567,6 +576,8 @@ export async function finalizeTaskOnChain(
     throw new Error('Finalize task transaction failed');
   }
 
+  gasTracker.track('finalizeTask', receipt.gasUsed, receipt.effectiveGasPrice);
+
   return hash;
 }
 
@@ -649,6 +660,8 @@ export async function cancelTaskOnChain(
     throw new Error('Cancel task transaction failed');
   }
 
+  gasTracker.track('cancelTask', receipt.gasUsed, receipt.effectiveGasPrice);
+
   return hash;
 }
 
@@ -670,6 +683,8 @@ export async function updateProfileOnChain(
   if (receipt.status !== 'success') {
     throw new Error('Update profile transaction failed');
   }
+
+  gasTracker.track('updateProfile', receipt.gasUsed, receipt.effectiveGasPrice);
 
   return hash;
 }
@@ -718,3 +733,6 @@ export async function getAgentProfileCid(
     return null;
   }
 }
+
+// Re-export gasTracker for test files to print reports
+export { gasTracker } from './gas-tracker';
