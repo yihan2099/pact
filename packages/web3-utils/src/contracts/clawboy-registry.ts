@@ -2,10 +2,17 @@ import { ClawboyRegistryABI, getContractAddresses } from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
 
 /**
+ * Get default chain ID from environment
+ */
+function getDefaultChainId(): number {
+  return parseInt(process.env.CHAIN_ID || '84532', 10);
+}
+
+/**
  * Get ClawboyRegistry contract address
  */
-export function getClawboyRegistryAddress(chainId: number = 84532): `0x${string}` {
-  const addresses = getContractAddresses(chainId);
+export function getClawboyRegistryAddress(chainId?: number): `0x${string}` {
+  const addresses = getContractAddresses(chainId || getDefaultChainId());
   return addresses.clawboyRegistry;
 }
 
@@ -16,8 +23,9 @@ export async function isAgentRegistered(
   address: `0x${string}`,
   chainId?: number
 ): Promise<boolean> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   return publicClient.readContract({
     address: addresses.clawboyRegistry,
@@ -42,8 +50,9 @@ export async function getAgentData(
   registeredAt: bigint;
   isActive: boolean;
 }> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   const result = await publicClient.readContract({
     address: addresses.clawboyRegistry,
@@ -52,25 +61,25 @@ export async function getAgentData(
     args: [address],
   });
 
-  // Viem returns tuple as array
-  const agent = result as unknown as readonly [
-    bigint,  // reputation
-    bigint,  // tasksWon
-    bigint,  // disputesWon
-    bigint,  // disputesLost
-    string,  // profileCid
-    bigint,  // registeredAt
-    boolean  // isActive
-  ];
+  // Viem returns named tuple as object with ABI component names
+  const agent = result as {
+    reputation: bigint;
+    tasksWon: bigint;
+    disputesWon: bigint;
+    disputesLost: bigint;
+    profileCid: string;
+    registeredAt: bigint;
+    isActive: boolean;
+  };
 
   return {
-    reputation: agent[0],
-    tasksWon: agent[1],
-    disputesWon: agent[2],
-    disputesLost: agent[3],
-    profileCid: agent[4],
-    registeredAt: agent[5],
-    isActive: agent[6],
+    reputation: agent.reputation,
+    tasksWon: agent.tasksWon,
+    disputesWon: agent.disputesWon,
+    disputesLost: agent.disputesLost,
+    profileCid: agent.profileCid,
+    registeredAt: agent.registeredAt,
+    isActive: agent.isActive,
   };
 }
 
@@ -82,8 +91,9 @@ export async function getAgentVoteWeight(
   address: `0x${string}`,
   chainId?: number
 ): Promise<bigint> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   return publicClient.readContract({
     address: addresses.clawboyRegistry,
@@ -100,8 +110,9 @@ export async function getAgentReputation(
   address: `0x${string}`,
   chainId?: number
 ): Promise<bigint> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   return publicClient.readContract({
     address: addresses.clawboyRegistry,

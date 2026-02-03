@@ -10,16 +10,24 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { getChain, getDefaultRpcUrl } from './public-client';
 
 /**
+ * Get default chain ID from environment
+ */
+function getDefaultChainId(): number {
+  return parseInt(process.env.CHAIN_ID || '84532', 10);
+}
+
+/**
  * Create a wallet client from a private key
  */
 export function createWalletFromPrivateKey(
   privateKey: `0x${string}`,
-  chainId: number = 84532,
+  chainId?: number,
   rpcUrl?: string
 ): WalletClient<Transport, Chain, Account> {
+  const resolvedChainId = chainId || getDefaultChainId();
   const account = privateKeyToAccount(privateKey);
-  const chain = getChain(chainId);
-  const url = rpcUrl || getDefaultRpcUrl(chainId);
+  const chain = getChain(resolvedChainId);
+  const url = rpcUrl || getDefaultRpcUrl(resolvedChainId);
 
   return createWalletClient({
     account,

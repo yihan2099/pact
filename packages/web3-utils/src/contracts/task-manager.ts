@@ -3,10 +3,17 @@ import { getPublicClient } from '../client/public-client';
 import type { TaskStatus } from '@clawboy/shared-types';
 
 /**
+ * Get default chain ID from environment
+ */
+function getDefaultChainId(): number {
+  return parseInt(process.env.CHAIN_ID || '84532', 10);
+}
+
+/**
  * Get TaskManager contract address
  */
-export function getTaskManagerAddress(chainId: number = 84532): `0x${string}` {
-  const addresses = getContractAddresses(chainId);
+export function getTaskManagerAddress(chainId?: number): `0x${string}` {
+  const addresses = getContractAddresses(chainId || getDefaultChainId());
   return addresses.taskManager;
 }
 
@@ -14,8 +21,9 @@ export function getTaskManagerAddress(chainId: number = 84532): `0x${string}` {
  * Get task count from contract
  */
 export async function getTaskCount(chainId?: number): Promise<bigint> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   return publicClient.readContract({
     address: addresses.taskManager,
@@ -43,8 +51,9 @@ export async function getTask(
   selectedAt: bigint;
   challengeDeadline: bigint;
 }> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   const result = await publicClient.readContract({
     address: addresses.taskManager,

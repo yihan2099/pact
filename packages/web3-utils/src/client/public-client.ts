@@ -8,7 +8,8 @@ import {
 } from 'viem';
 import { baseSepolia, base } from 'viem/chains';
 
-let publicClient: PublicClient<Transport, Chain> | null = null;
+// Cache clients by chain ID
+const publicClients: Map<number, PublicClient<Transport, Chain>> = new Map();
 
 /**
  * Local Anvil chain configuration
@@ -40,24 +41,27 @@ export function getChain(chainId: number): Chain {
 
 /**
  * Get or create a public client for read operations
+ * Caches clients per chain ID
  */
 export function getPublicClient(
-  chainId: number = 84532,
+  chainId: number = parseInt(process.env.CHAIN_ID || '84532', 10),
   rpcUrl?: string
 ): PublicClient<Transport, Chain> {
-  if (publicClient) {
-    return publicClient;
+  const existingClient = publicClients.get(chainId);
+  if (existingClient) {
+    return existingClient;
   }
 
   const chain = getChain(chainId);
   const url = rpcUrl || getDefaultRpcUrl(chainId);
 
-  publicClient = createPublicClient({
+  const client = createPublicClient({
     chain,
     transport: http(url),
   });
 
-  return publicClient;
+  publicClients.set(chainId, client);
+  return client;
 }
 
 /**
@@ -77,10 +81,10 @@ export function getDefaultRpcUrl(chainId: number): string {
 }
 
 /**
- * Reset the public client (useful for testing)
+ * Reset all cached public clients (useful for testing)
  */
 export function resetPublicClient(): void {
-  publicClient = null;
+  publicClients.clear();
 }
 
 /**

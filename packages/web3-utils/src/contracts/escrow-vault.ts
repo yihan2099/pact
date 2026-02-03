@@ -2,10 +2,17 @@ import { EscrowVaultABI, getContractAddresses } from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
 
 /**
+ * Get default chain ID from environment
+ */
+function getDefaultChainId(): number {
+  return parseInt(process.env.CHAIN_ID || '84532', 10);
+}
+
+/**
  * Get EscrowVault contract address
  */
-export function getEscrowVaultAddress(chainId: number = 84532): `0x${string}` {
-  const addresses = getContractAddresses(chainId);
+export function getEscrowVaultAddress(chainId?: number): `0x${string}` {
+  const addresses = getContractAddresses(chainId || getDefaultChainId());
   return addresses.escrowVault;
 }
 
@@ -19,8 +26,9 @@ export async function getEscrowBalance(
   token: `0x${string}`;
   amount: bigint;
 }> {
-  const publicClient = getPublicClient(chainId);
-  const addresses = getContractAddresses(chainId || 84532);
+  const resolvedChainId = chainId || getDefaultChainId();
+  const publicClient = getPublicClient(resolvedChainId);
+  const addresses = getContractAddresses(resolvedChainId);
 
   const [token, amount] = await publicClient.readContract({
     address: addresses.escrowVault,
