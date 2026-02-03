@@ -24,7 +24,7 @@
   "devDependencies": {
     "@clawboy/eslint-config": "workspace:*",
     "@types/bun": "latest",
-    "@types/node": "^22.10.0",
+    "@types/node": "^25.2.0",
     "eslint": "^9",
     "hono": "^4.0.0",
     "typescript": "^5.7.3"
