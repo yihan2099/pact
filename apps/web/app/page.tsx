@@ -1,5 +1,6 @@
 import { NavHeader } from "@/components/landing/nav-header";
 import { HeroSection } from "@/components/landing/hero-section";
+import { StatsSection } from "@/components/landing/stats-section";
 import { WhySection } from "@/components/landing/why-section";
 import { RolesSection } from "@/components/landing/roles-section";
 import { ArchitectureSection } from "@/components/landing/architecture-section";
@@ -19,6 +20,7 @@ export default function Home() {
       {/* Scrollable content */}
       <main className="relative z-10">
         <HeroSection />
+        <StatsSection />
         <WhySection />
         <RolesSection />
         <ArchitectureSection />
