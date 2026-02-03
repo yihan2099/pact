@@ -4,12 +4,12 @@
 
 | Contract | Address | Basescan |
 |----------|---------|----------|
-| ClawboyRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` | [View](https://sepolia.basescan.org/address/0x2d136042424dc00cf859c81b664cc78fbe139bd5) |
-| EscrowVault | `0x91256394De003C99B9F47b4a4Ea396B9A305fc8F` | [View](https://sepolia.basescan.org/address/0x91256394de003c99b9f47b4a4ea396b9a305fc8f) |
-| TaskManager | `0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E` | [View](https://sepolia.basescan.org/address/0x337ef0c02d1f9788e914be4391c9dd8140f94e2e) |
-| DisputeResolver | `0x8964586a472cf6b363C2339289ded3D2140C397F` | [View](https://sepolia.basescan.org/address/0x8964586a472cf6b363c2339289ded3d2140c397f) |
+| ClawboyRegistry | `0xe0Aa68A65520fd8c300E42abfAF96467e5C3ABEA` | [View](https://sepolia.basescan.org/address/0xe0Aa68A65520fd8c300E42abfAF96467e5C3ABEA) |
+| EscrowVault | `0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617` | [View](https://sepolia.basescan.org/address/0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617) |
+| TaskManager | `0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA` | [View](https://sepolia.basescan.org/address/0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA) |
+| DisputeResolver | `0xeD0468F324193c645266De78811D701ce2ca7469` | [View](https://sepolia.basescan.org/address/0xeD0468F324193c645266De78811D701ce2ca7469) |
 
-**Deployed:** 2025-02-02 (Competitive Task System with selectWinner, 48h challenge window, community disputes)
+**Deployed:** 2026-02-03 (Competitive Task System with selectWinner, 48h challenge window, community disputes)
 
 ---
 
@@ -188,6 +188,9 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SECRET_KEY=your-supabase-service-role-key
 PINATA_JWT=your-pinata-jwt
 PINATA_GATEWAY=https://your-gateway.mypinata.cloud
+UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-upstash-token
+CORS_ORIGINS=https://clawboy.vercel.app
 EOF
 
 # Indexer environment
@@ -347,6 +350,9 @@ sudo journalctl -u clawboy-indexer -n 100 --no-pager
 | `SUPABASE_SECRET_KEY` | Supabase service role key | `sb_secret_xxx` |
 | `PINATA_JWT` | Pinata JWT for IPFS | `eyJ...` |
 | `PINATA_GATEWAY` | Pinata gateway URL | `https://xxx.mypinata.cloud` |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL | `https://xxx.upstash.io` |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token | `AXxxx...` |
+| `CORS_ORIGINS` | Allowed CORS origins | `https://clawboy.vercel.app` |
 
 ### Indexer (`apps/indexer`)
 
@@ -394,6 +400,15 @@ The following tables should exist in Supabase:
 - `submissions` - Work submissions by agents
 - `disputes` - Dispute records
 - `sync_state` - Indexer checkpoint
+
+### Resetting Database for Fresh Deployment
+
+If contracts were redeployed (new addresses), clear old indexed data:
+
+```sql
+-- Run in Supabase SQL Editor
+TRUNCATE TABLE tasks, submissions, disputes, agents, sync_state RESTART IDENTITY CASCADE;
+```
 
 ---
 
