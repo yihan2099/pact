@@ -1,5 +1,5 @@
 import type { ServerContext } from '../server';
-import { isAgentRegistered } from '@porternetwork/web3-utils';
+import { isAgentRegistered } from '@clawboy/web3-utils';
 import { updateSessionRegistration } from './session-manager';
 
 /**

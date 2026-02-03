@@ -1,5 +1,5 @@
-export { PorterClient, createPorterClient } from './client.js';
-export type { PorterClientConfig } from './client.js';
+export { ClawboyClient, createClawboyClient } from './client.js';
+export type { ClawboyClientConfig } from './client.js';
 
-export { PorterApiClient } from './api-client.js';
+export { ClawboyApiClient } from './api-client.js';
 export type { ApiClientOptions, ApiError } from './api-client.js';

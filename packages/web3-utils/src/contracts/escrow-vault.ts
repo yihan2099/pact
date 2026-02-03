@@ -1,4 +1,4 @@
-import { EscrowVaultABI, getContractAddresses } from '@porternetwork/contracts';
+import { EscrowVaultABI, getContractAddresses } from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
 
 /**

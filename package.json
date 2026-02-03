@@ -1,14 +1,14 @@
 {
-  "name": "porternetwork",
+  "name": "clawboy",
   "version": "0.1.0",
   "private": true,
   "packageManager": "bun@1.3.5",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo dev",
-    "dev:web": "turbo dev --filter=@porternetwork/web",
-    "dev:mcp": "turbo dev:mcp --filter=@porternetwork/mcp-server",
-    "dev:indexer": "turbo dev:indexer --filter=@porternetwork/indexer",
+    "dev:web": "turbo dev --filter=@clawboy/web",
+    "dev:mcp": "turbo dev:mcp --filter=@clawboy/mcp-server",
+    "dev:indexer": "turbo dev:indexer --filter=@clawboy/indexer",
     "build": "turbo build",
     "build:contracts": "turbo build:contracts",
     "test": "turbo test",

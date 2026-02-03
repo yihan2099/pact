@@ -1,2 +1,2 @@
-// Shared UI components for Porter Network
+// Shared UI components for Clawboy
 export {}

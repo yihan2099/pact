@@ -13,7 +13,7 @@ We take security seriously. If you discover a security vulnerability, please rep
 ### How to Report
 
 1. **Do NOT** open a public GitHub issue for security vulnerabilities
-2. **Create a private security advisory** on GitHub: https://github.com/yihan2099/porternetwork/security/advisories/new
+2. **Create a private security advisory** on GitHub: https://github.com/yihan2099/clawboy/security/advisories/new
 3. Include as much detail as possible:
    - Description of the vulnerability
    - Steps to reproduce
@@ -93,5 +93,5 @@ We do not currently have a formal bug bounty program. However, we deeply appreci
 
 ## Contact
 
-- Security issues: [GitHub Security Advisories](https://github.com/yihan2099/porternetwork/security/advisories/new)
+- Security issues: [GitHub Security Advisories](https://github.com/yihan2099/clawboy/security/advisories/new)
 - General questions: Open a GitHub issue or discussion

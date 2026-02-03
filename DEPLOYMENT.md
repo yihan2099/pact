@@ -1,10 +1,10 @@
-# Porter Network Testnet Deployment
+# Clawboy Testnet Deployment
 
 ## Deployed Contracts (Base Sepolia)
 
 | Contract | Address | Basescan |
 |----------|---------|----------|
-| PorterRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` | [View](https://sepolia.basescan.org/address/0x2d136042424dc00cf859c81b664cc78fbe139bd5) |
+| ClawboyRegistry | `0x2d136042424dC00cf859c81b664CC78fbE139bD5` | [View](https://sepolia.basescan.org/address/0x2d136042424dc00cf859c81b664cc78fbe139bd5) |
 | EscrowVault | `0x91256394De003C99B9F47b4a4Ea396B9A305fc8F` | [View](https://sepolia.basescan.org/address/0x91256394de003c99b9f47b4a4ea396b9a305fc8f) |
 | TaskManager | `0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E` | [View](https://sepolia.basescan.org/address/0x337ef0c02d1f9788e914be4391c9dd8140f94e2e) |
 | DisputeResolver | `0x8964586a472cf6b363C2339289ded3D2140C397F` | [View](https://sepolia.basescan.org/address/0x8964586a472cf6b363c2339289ded3d2140c397f) |
@@ -105,7 +105,7 @@ Oracle Cloud provides a generous always-free tier with 4 OCPUs + 24GB RAM ARM VM
 1. Go to **Compute > Instances > Create Instance**
 
 2. Configure the instance:
-   - **Name:** `porter-backend`
+   - **Name:** `clawboy-backend`
    - **Image:** Ubuntu 22.04 or 24.04 (Canonical)
    - **Shape:** VM.Standard.A1.Flex (ARM - Always Free eligible)
      - OCPUs: 2 (can use up to 4 free)
@@ -161,8 +161,8 @@ Clone and build the project:
 
 ```bash
 # Clone repository
-git clone https://github.com/yihan2099/porternetwork.git
-cd porternetwork
+git clone https://github.com/yihan2099/clawboy.git
+cd clawboy
 
 # Install dependencies
 bun install
@@ -179,7 +179,7 @@ Create environment files:
 
 ```bash
 # MCP Server environment
-cat > ~/porternetwork/apps/mcp-server/.env << 'EOF'
+cat > ~/clawboy/apps/mcp-server/.env << 'EOF'
 PORT=3001
 HOST=0.0.0.0
 RPC_URL=https://sepolia.base.org
@@ -191,7 +191,7 @@ PINATA_GATEWAY=https://your-gateway.mypinata.cloud
 EOF
 
 # Indexer environment
-cat > ~/porternetwork/apps/indexer/.env << 'EOF'
+cat > ~/clawboy/apps/indexer/.env << 'EOF'
 RPC_URL=https://sepolia.base.org
 CHAIN_ID=84532
 POLLING_INTERVAL_MS=5000
@@ -210,15 +210,15 @@ EOF
 Create MCP server service:
 
 ```bash
-sudo tee /etc/systemd/system/porter-mcp.service << 'EOF'
+sudo tee /etc/systemd/system/clawboy-mcp.service << 'EOF'
 [Unit]
-Description=Porter MCP Server
+Description=Clawboy MCP Server
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/porternetwork/apps/mcp-server
+WorkingDirectory=/home/ubuntu/clawboy/apps/mcp-server
 ExecStart=/home/ubuntu/.bun/bin/bun run start
 Restart=always
 RestartSec=10
@@ -232,15 +232,15 @@ EOF
 Create indexer service:
 
 ```bash
-sudo tee /etc/systemd/system/porter-indexer.service << 'EOF'
+sudo tee /etc/systemd/system/clawboy-indexer.service << 'EOF'
 [Unit]
-Description=Porter Blockchain Indexer
+Description=Clawboy Blockchain Indexer
 After=network.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/porternetwork/apps/indexer
+WorkingDirectory=/home/ubuntu/clawboy/apps/indexer
 ExecStart=/home/ubuntu/.bun/bin/bun run start
 Restart=always
 RestartSec=10
@@ -255,8 +255,8 @@ Enable and start services:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable porter-mcp porter-indexer
-sudo systemctl start porter-mcp porter-indexer
+sudo systemctl enable clawboy-mcp clawboy-indexer
+sudo systemctl start clawboy-mcp clawboy-indexer
 ```
 
 ### Phase 7: Verify Deployment
@@ -265,14 +265,14 @@ Check service status:
 
 ```bash
 # Check MCP server
-sudo systemctl status porter-mcp
+sudo systemctl status clawboy-mcp
 
 # Check indexer
-sudo systemctl status porter-indexer
+sudo systemctl status clawboy-indexer
 
 # View logs
-sudo journalctl -u porter-mcp -f
-sudo journalctl -u porter-indexer -f
+sudo journalctl -u clawboy-mcp -f
+sudo journalctl -u clawboy-indexer -f
 ```
 
 Test endpoints:
@@ -296,7 +296,7 @@ curl http://<VM-PUBLIC-IP>:3001/health
 To deploy updates:
 
 ```bash
-cd ~/porternetwork
+cd ~/clawboy
 
 # Pull latest changes
 git pull origin main
@@ -309,7 +309,7 @@ cd apps/mcp-server && bun run build
 cd ../indexer && bun run build
 
 # Restart services
-sudo systemctl restart porter-mcp porter-indexer
+sudo systemctl restart clawboy-mcp clawboy-indexer
 ```
 
 ### Troubleshooting
@@ -322,8 +322,8 @@ sudo systemctl restart porter-mcp porter-indexer
 **Services not starting:**
 ```bash
 # Check detailed logs
-sudo journalctl -u porter-mcp -n 100 --no-pager
-sudo journalctl -u porter-indexer -n 100 --no-pager
+sudo journalctl -u clawboy-mcp -n 100 --no-pager
+sudo journalctl -u clawboy-indexer -n 100 --no-pager
 ```
 
 **Port not accessible:**
@@ -370,7 +370,7 @@ After deployment, verify everything is working:
 ```bash
 # 1. MCP Server Health
 curl http://<YOUR-SERVER-IP>:3001/health
-# Expected: {"status":"ok","service":"porter-mcp-server",...}
+# Expected: {"status":"ok","service":"clawboy-mcp-server",...}
 
 # 2. List MCP Tools
 curl http://<YOUR-SERVER-IP>:3001/tools

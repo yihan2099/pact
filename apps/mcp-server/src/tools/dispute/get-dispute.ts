@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getDisputeByChainId, getDisputeVotes } from '@porternetwork/database';
-import type { DisputeStatus } from '@porternetwork/shared-types';
+import { getDisputeByChainId, getDisputeVotes } from '@clawboy/database';
+import type { DisputeStatus } from '@clawboy/shared-types';
 
 export const getDisputeSchema = z.object({
   disputeId: z.string().min(1),

@@ -4,7 +4,7 @@ import {
   updateDispute,
   updateAgent,
   getAgentByAddress
-} from '@porternetwork/database';
+} from '@clawboy/database';
 
 /**
  * Handle DisputeResolved event

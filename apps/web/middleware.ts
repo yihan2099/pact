@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createWaitlistLimiter } from "@porternetwork/rate-limit";
+import { createWaitlistLimiter } from "@clawboy/rate-limit";
 
 // Get the cached rate limiter from the shared package
 const ratelimit = createWaitlistLimiter();

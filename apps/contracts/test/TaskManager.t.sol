@@ -4,15 +4,15 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {TaskManager} from "../src/TaskManager.sol";
 import {EscrowVault} from "../src/EscrowVault.sol";
-import {PorterRegistry} from "../src/PorterRegistry.sol";
+import {ClawboyRegistry} from "../src/ClawboyRegistry.sol";
 import {DisputeResolver} from "../src/DisputeResolver.sol";
 import {ITaskManager} from "../src/interfaces/ITaskManager.sol";
-import {IPorterRegistry} from "../src/interfaces/IPorterRegistry.sol";
+import {IClawboyRegistry} from "../src/interfaces/IClawboyRegistry.sol";
 
 contract TaskManagerTest is Test {
     TaskManager public taskManager;
     EscrowVault public escrowVault;
-    PorterRegistry public porterRegistry;
+    ClawboyRegistry public clawboyRegistry;
     DisputeResolver public disputeResolver;
 
     address public creator = address(0x1);
@@ -23,23 +23,23 @@ contract TaskManagerTest is Test {
     uint256 public constant BOUNTY_AMOUNT = 1 ether;
 
     function setUp() public {
-        // Deploy PorterRegistry first
-        porterRegistry = new PorterRegistry();
+        // Deploy ClawboyRegistry first
+        clawboyRegistry = new ClawboyRegistry();
 
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
         escrowVault = new EscrowVault(predictedTaskManager);
 
         // Deploy TaskManager
-        taskManager = new TaskManager(address(escrowVault), address(porterRegistry));
+        taskManager = new TaskManager(address(escrowVault), address(clawboyRegistry));
 
         // Deploy DisputeResolver
-        disputeResolver = new DisputeResolver(address(taskManager), address(porterRegistry));
+        disputeResolver = new DisputeResolver(address(taskManager), address(clawboyRegistry));
 
         // Configure access control
         taskManager.setDisputeResolver(address(disputeResolver));
-        porterRegistry.setTaskManager(address(taskManager));
-        porterRegistry.setDisputeResolver(address(disputeResolver));
+        clawboyRegistry.setTaskManager(address(taskManager));
+        clawboyRegistry.setDisputeResolver(address(disputeResolver));
 
         // Give accounts some ETH
         vm.deal(creator, 10 ether);
@@ -49,13 +49,13 @@ contract TaskManagerTest is Test {
 
         // Register agents
         vm.prank(agent1);
-        porterRegistry.register("agent1-profile-cid");
+        clawboyRegistry.register("agent1-profile-cid");
 
         vm.prank(agent2);
-        porterRegistry.register("agent2-profile-cid");
+        clawboyRegistry.register("agent2-profile-cid");
 
         vm.prank(agent3);
-        porterRegistry.register("agent3-profile-cid");
+        clawboyRegistry.register("agent3-profile-cid");
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -417,7 +417,7 @@ contract TaskManagerTest is Test {
         assertEq(agent1.balance, agent1BalanceBefore + BOUNTY_AMOUNT);
 
         // Verify reputation updated
-        IPorterRegistry.Agent memory agentData = porterRegistry.getAgent(agent1);
+        IClawboyRegistry.Agent memory agentData = clawboyRegistry.getAgent(agent1);
         assertEq(agentData.tasksWon, 1);
         assertEq(agentData.reputation, 10); // +10 for winning
     }

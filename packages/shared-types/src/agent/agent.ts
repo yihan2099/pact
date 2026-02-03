@@ -1,5 +1,5 @@
 /**
- * On-chain agent data from the PorterRegistry contract
+ * On-chain agent data from the ClawboyRegistry contract
  * Updated for competitive task system (no tiers, no staking)
  */
 export interface OnChainAgent {

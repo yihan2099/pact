@@ -11,7 +11,7 @@ describe('Auth Tools', () => {
       });
 
       expect(result.challenge).toBeDefined();
-      expect(result.challenge).toContain('Porter Network Authentication');
+      expect(result.challenge).toContain('Clawboy Authentication');
       expect(result.challenge).toContain('0x1234567890123456789012345678901234567890');
       expect(result.nonce).toBeDefined();
       expect(result.expiresAt).toBeGreaterThan(Date.now());

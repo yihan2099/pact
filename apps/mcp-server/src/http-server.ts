@@ -1,5 +1,5 @@
 /**
- * HTTP Server for Porter Network MCP
+ * HTTP Server for Clawboy MCP
  *
  * Exposes MCP tools over HTTP for remote clients (like the mcp-client package)
  * while the stdio transport handles local MCP connections.
@@ -7,7 +7,7 @@
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { createMcpRateLimitMiddleware } from '@porternetwork/rate-limit/middleware/hono';
+import { createMcpRateLimitMiddleware } from '@clawboy/rate-limit/middleware/hono';
 import type { ServerContext } from './server';
 import { getSession } from './auth/session-manager';
 import { checkAccessWithRegistrationRefresh } from './auth/access-control';
@@ -121,7 +121,7 @@ app.use('/tools/*', createMcpRateLimitMiddleware());
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'porter-mcp-server',
+    service: 'clawboy-mcp-server',
     timestamp: new Date().toISOString(),
   });
 });

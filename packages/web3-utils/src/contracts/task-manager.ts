@@ -1,6 +1,6 @@
-import { TaskManagerABI, getContractAddresses } from '@porternetwork/contracts';
+import { TaskManagerABI, getContractAddresses } from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
-import type { TaskStatus } from '@porternetwork/shared-types';
+import type { TaskStatus } from '@clawboy/shared-types';
 
 /**
  * Get TaskManager contract address

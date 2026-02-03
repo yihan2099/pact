@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { uploadAgentProfile, fetchAgentProfile } from '@porternetwork/ipfs-utils';
-import { getAgentData } from '@porternetwork/web3-utils';
-import type { AgentProfile } from '@porternetwork/shared-types';
+import { uploadAgentProfile, fetchAgentProfile } from '@clawboy/ipfs-utils';
+import { getAgentData } from '@clawboy/web3-utils';
+import type { AgentProfile } from '@clawboy/shared-types';
 import { webhookUrlSchema } from '../../utils/webhook-validation';
 
 export const updateProfileSchema = z.object({
@@ -125,7 +125,7 @@ export const updateProfileTool = {
       newProfileCid: uploadResult.cid,
       callerAddress: context.callerAddress,
       updatedFields: Object.keys(input),
-      nextStep: 'Call the PorterRegistry contract\'s updateProfile(profileCid) function to update on-chain',
+      nextStep: 'Call the ClawboyRegistry contract\'s updateProfile(profileCid) function to update on-chain',
       contractFunction: 'updateProfile(string profileCid)',
       contractArgs: {
         profileCid: uploadResult.cid,

@@ -216,7 +216,7 @@ float botChar(vec2 p, float variant) {
 // PORTERNETWORK logo text (spans 13 cells horizontally)
 // Each letter is 3x5, with 1 pixel spacing = 4 pixels per letter
 // Total width: 13 letters * 4 - 1 = 51 pixels, height: 5 pixels
-float porternetworkLogo(vec2 p, int letterIndex) {
+float clawboyLogo(vec2 p, int letterIndex) {
     float px = p.x * 3.0;
     float py = (1.0 - p.y) * 5.0;
     int ix = int(floor(px));
@@ -422,7 +422,7 @@ float digit(vec2 p){
 
     if (isLogo) {
         // Render PORTERNETWORK letter
-        float logoVal = porternetworkLogo(p, letterIndex);
+        float logoVal = clawboyLogo(p, letterIndex);
         brightness = logoVal * 0.85;
     } else if (isBot && intensity > 0.1) {
         // Render bot character (brighter, more prominent) with random variant

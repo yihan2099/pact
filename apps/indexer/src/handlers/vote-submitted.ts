@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { getDisputeByChainId, createDisputeVote } from '@porternetwork/database';
+import { getDisputeByChainId, createDisputeVote } from '@clawboy/database';
 
 /**
  * Handle VoteSubmitted event

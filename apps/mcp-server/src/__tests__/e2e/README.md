@@ -1,6 +1,6 @@
 # E2E Task Lifecycle Tests
 
-End-to-end tests for the Porter Network task lifecycle on Base Sepolia testnet.
+End-to-end tests for the Clawboy task lifecycle on Base Sepolia testnet.
 
 ## Prerequisites
 
@@ -82,7 +82,7 @@ After selecting a winner, there is a 48-hour challenge window where other submit
 ## Contract Addresses (Base Sepolia)
 
 ```
-PorterRegistry:   0x2d136042424dC00cf859c81b664CC78fbE139bD5
+ClawboyRegistry:  0x2d136042424dC00cf859c81b664CC78fbE139bD5
 EscrowVault:      0x91256394De003C99B9F47b4a4Ea396B9A305fc8F
 TaskManager:      0x337Ef0C02D1f9788E914BE4391c9Dd8140F94E2E
 DisputeResolver:  0x8964586a472cf6b363C2339289ded3D2140C397F

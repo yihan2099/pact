@@ -1,5 +1,5 @@
 /**
- * Porter Network Event Indexer
+ * Clawboy Event Indexer
  *
  * Syncs blockchain events to the Supabase database for fast querying.
  */
@@ -8,7 +8,7 @@ import { createEventListener } from './listener';
 import { processEvent } from './processor';
 
 async function main() {
-  console.log('Starting Porter Network Indexer...');
+  console.log('Starting Clawboy Indexer...');
 
   const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
   const pollingIntervalMs = parseInt(process.env.POLLING_INTERVAL_MS || '5000', 10);

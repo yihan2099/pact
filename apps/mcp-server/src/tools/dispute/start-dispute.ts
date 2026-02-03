@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@porternetwork/contracts';
-import { getPublicClient } from '@porternetwork/web3-utils';
+import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@clawboy/contracts';
+import { getPublicClient } from '@clawboy/web3-utils';
 import { formatEther } from 'viem';
 import type { ServerContext } from '../../server';
 

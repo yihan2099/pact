@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { getTaskByChainId, updateTask, updateAgent, getAgentByAddress, markSubmissionAsWinner } from '@porternetwork/database';
+import { getTaskByChainId, updateTask, updateAgent, getAgentByAddress, markSubmissionAsWinner } from '@clawboy/database';
 
 /**
  * Handle TaskCompleted event

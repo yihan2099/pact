@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { listActiveDisputes, getDisputesReadyForResolution } from '@porternetwork/database';
-import { getSupabaseClient } from '@porternetwork/database';
-import type { DisputeStatus } from '@porternetwork/shared-types';
+import { listActiveDisputes, getDisputesReadyForResolution } from '@clawboy/database';
+import { getSupabaseClient } from '@clawboy/database';
+import type { DisputeStatus } from '@clawboy/shared-types';
 
 export const listDisputesSchema = z.object({
   status: z.enum(['active', 'resolved', 'all']).optional().default('active'),

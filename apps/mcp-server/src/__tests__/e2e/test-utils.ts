@@ -27,13 +27,13 @@ import {
   resetPublicClient,
   getBalance,
   waitForTransaction,
-} from '@porternetwork/web3-utils';
+} from '@clawboy/web3-utils';
 import {
   TaskManagerABI,
-  PorterRegistryABI,
+  ClawboyRegistryABI,
   getContractAddresses,
-} from '@porternetwork/contracts';
-import { getTaskByChainId } from '@porternetwork/database';
+} from '@clawboy/contracts';
+import { getTaskByChainId } from '@clawboy/database';
 
 // Contract addresses on Base Sepolia
 const CHAIN_ID = 84532;
@@ -166,8 +166,8 @@ export async function registerAgentOnChain(
   profileCid: string
 ): Promise<`0x${string}`> {
   const hash = await wallet.walletClient.writeContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'register',
     args: [profileCid],
   });
@@ -189,8 +189,8 @@ export async function checkAgentRegistered(
   const publicClient = getPublicClient(CHAIN_ID);
 
   return publicClient.readContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'isRegistered',
     args: [address],
   }) as Promise<boolean>;

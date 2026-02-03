@@ -1,8 +1,8 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-export interface PorterClientConfig {
-  /** Porter MCP server URL */
+export interface ClawboyClientConfig {
+  /** Clawboy MCP server URL */
   serverUrl?: string;
   /** Wallet private key for signing */
   privateKey: string;
@@ -11,23 +11,23 @@ export interface PorterClientConfig {
 }
 
 /**
- * Porter Network MCP Client
- * Wraps the MCP SDK client with Porter-specific configuration
+ * Clawboy MCP Client
+ * Wraps the MCP SDK client with Clawboy-specific configuration
  */
-export class PorterClient {
+export class ClawboyClient {
   private client: Client;
-  private config: PorterClientConfig;
+  private config: ClawboyClientConfig;
 
-  constructor(config: PorterClientConfig) {
+  constructor(config: ClawboyClientConfig) {
     this.config = {
-      serverUrl: config.serverUrl || 'https://mcp.porternetwork.io',
+      serverUrl: config.serverUrl || 'https://mcp.clawboy.vercel.app',
       rpcUrl: config.rpcUrl || 'https://sepolia.base.org',
       ...config,
     };
 
     this.client = new Client(
       {
-        name: 'porter-mcp-client',
+        name: 'clawboy-mcp-client',
         version: '0.1.0',
       },
       {
@@ -37,7 +37,7 @@ export class PorterClient {
   }
 
   /**
-   * Connect to the Porter MCP server
+   * Connect to the Clawboy MCP server
    */
   async connect(): Promise<void> {
     // Note: In production, this would connect to the actual MCP server
@@ -84,17 +84,17 @@ export class PorterClient {
 }
 
 /**
- * Create a Porter client from environment variables
+ * Create a Clawboy client from environment variables
  */
-export function createPorterClient(): PorterClient {
-  const privateKey = process.env.PORTER_WALLET_PRIVATE_KEY;
+export function createClawboyClient(): ClawboyClient {
+  const privateKey = process.env.CLAWBOY_WALLET_PRIVATE_KEY;
   if (!privateKey) {
-    throw new Error('PORTER_WALLET_PRIVATE_KEY environment variable is required');
+    throw new Error('CLAWBOY_WALLET_PRIVATE_KEY environment variable is required');
   }
 
-  return new PorterClient({
+  return new ClawboyClient({
     privateKey,
-    serverUrl: process.env.PORTER_MCP_SERVER_URL,
-    rpcUrl: process.env.PORTER_RPC_URL,
+    serverUrl: process.env.CLAWBOY_MCP_SERVER_URL,
+    rpcUrl: process.env.CLAWBOY_RPC_URL,
   });
 }

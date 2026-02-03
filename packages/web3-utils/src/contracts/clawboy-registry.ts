@@ -1,12 +1,12 @@
-import { PorterRegistryABI, getContractAddresses } from '@porternetwork/contracts';
+import { ClawboyRegistryABI, getContractAddresses } from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
 
 /**
- * Get PorterRegistry contract address
+ * Get ClawboyRegistry contract address
  */
-export function getPorterRegistryAddress(chainId: number = 84532): `0x${string}` {
+export function getClawboyRegistryAddress(chainId: number = 84532): `0x${string}` {
   const addresses = getContractAddresses(chainId);
-  return addresses.porterRegistry;
+  return addresses.clawboyRegistry;
 }
 
 /**
@@ -20,8 +20,8 @@ export async function isAgentRegistered(
   const addresses = getContractAddresses(chainId || 84532);
 
   return publicClient.readContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'isRegistered',
     args: [address],
   }) as Promise<boolean>;
@@ -46,8 +46,8 @@ export async function getAgentData(
   const addresses = getContractAddresses(chainId || 84532);
 
   const result = await publicClient.readContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'getAgent',
     args: [address],
   });
@@ -86,8 +86,8 @@ export async function getAgentVoteWeight(
   const addresses = getContractAddresses(chainId || 84532);
 
   return publicClient.readContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'getVoteWeight',
     args: [address],
   }) as Promise<bigint>;
@@ -104,8 +104,8 @@ export async function getAgentReputation(
   const addresses = getContractAddresses(chainId || 84532);
 
   return publicClient.readContract({
-    address: addresses.porterRegistry,
-    abi: PorterRegistryABI,
+    address: addresses.clawboyRegistry,
+    abi: ClawboyRegistryABI,
     functionName: 'getReputation',
     args: [address],
   }) as Promise<bigint>;

@@ -1,8 +1,8 @@
 /**
- * PorterRegistry contract ABI
+ * ClawboyRegistry contract ABI
  * Updated for competitive task system (no tiers, no staking)
  */
-export const PorterRegistryABI = [
+export const ClawboyRegistryABI = [
   // Events
   {
     type: 'event',

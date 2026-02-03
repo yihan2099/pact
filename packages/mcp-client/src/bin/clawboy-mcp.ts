@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Porter Network MCP CLI entry point
+ * Clawboy MCP CLI entry point
  *
- * This script starts an MCP server that connects to Porter Network,
+ * This script starts an MCP server that connects to Clawboy,
  * allowing MCP clients (like Claude Desktop) to interact with the
  * agent economy platform.
  *
  * Authentication flow:
- * 1. On startup, requests a challenge from the Porter MCP server
+ * 1. On startup, requests a challenge from the Clawboy MCP server
  * 2. Signs the challenge with the wallet
  * 3. Verifies signature to obtain a sessionId
  * 4. Includes sessionId in all subsequent tool calls
@@ -23,7 +23,7 @@ import {
 import { createWalletClient, http, type WalletClient } from 'viem';
 import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts';
 import { baseSepolia } from 'viem/chains';
-import { PorterApiClient } from '../api-client.js';
+import { ClawboyApiClient } from '../api-client.js';
 
 // Session state for authentication
 interface AuthState {
@@ -297,15 +297,15 @@ const TOOLS = [
 ];
 
 /**
- * Authenticate with the Porter Network MCP server
+ * Authenticate with the Clawboy MCP server
  * Signs a challenge message with the wallet to obtain a session
  */
 async function authenticate(
   account: PrivateKeyAccount,
-  apiClient: PorterApiClient
+  apiClient: ClawboyApiClient
 ): Promise<AuthState | null> {
   try {
-    console.error('Authenticating with Porter Network...');
+    console.error('Authenticating with Clawboy...');
 
     // Step 1: Get challenge from server
     const challengeResponse = await apiClient.callTool<{
@@ -356,29 +356,29 @@ async function authenticate(
 
 async function main() {
   // Validate environment
-  const privateKey = process.env.PORTER_WALLET_PRIVATE_KEY;
+  const privateKey = process.env.CLAWBOY_WALLET_PRIVATE_KEY;
   if (!privateKey) {
-    console.error('Error: PORTER_WALLET_PRIVATE_KEY environment variable is required');
+    console.error('Error: CLAWBOY_WALLET_PRIVATE_KEY environment variable is required');
     process.exit(1);
   }
 
   // Get server URL from environment
-  const serverUrl = process.env.PORTER_SERVER_URL || 'http://localhost:3001';
-  console.error(`Connecting to Porter MCP Server at ${serverUrl}...`);
+  const serverUrl = process.env.CLAWBOY_SERVER_URL || 'http://localhost:3001';
+  console.error(`Connecting to Clawboy MCP Server at ${serverUrl}...`);
 
   // Initialize API client
-  const apiClient = new PorterApiClient({ baseUrl: serverUrl });
+  const apiClient = new ClawboyApiClient({ baseUrl: serverUrl });
 
   // Check server health
   const isHealthy = await apiClient.healthCheck();
   if (!isHealthy) {
-    console.error(`Warning: Porter MCP Server at ${serverUrl} is not responding`);
+    console.error(`Warning: Clawboy MCP Server at ${serverUrl} is not responding`);
     console.error('Some tools may not work until the server is available');
   }
 
   // Create wallet client
   const account = privateKeyToAccount(privateKey as `0x${string}`);
-  const rpcUrl = process.env.PORTER_RPC_URL || 'https://sepolia.base.org';
+  const rpcUrl = process.env.CLAWBOY_RPC_URL || 'https://sepolia.base.org';
 
   const walletClient = createWalletClient({
     account,
@@ -392,7 +392,7 @@ async function main() {
   // Create MCP server
   const server = new Server(
     {
-      name: 'porter-network',
+      name: 'clawboy',
       version: '0.1.0',
     },
     {
@@ -473,7 +473,7 @@ async function main() {
         };
       }
 
-      // All other tools are forwarded to the Porter MCP Server
+      // All other tools are forwarded to the Clawboy MCP Server
       const result = await apiClient.callTool(name, typedArgs);
 
       // Special handling for auth_verify - update local auth state
@@ -524,7 +524,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('Porter Network MCP client started');
+  console.error('Clawboy MCP client started');
   console.error(`Server: ${serverUrl}`);
   console.error(`Wallet: ${account.address}`);
   console.error(`RPC: ${rpcUrl}`);

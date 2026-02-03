@@ -1,4 +1,4 @@
-import type { TaskSpecification, TaskDeliverable, TaskRequirement } from '@porternetwork/shared-types';
+import type { TaskSpecification, TaskDeliverable, TaskRequirement } from '@clawboy/shared-types';
 
 /**
  * Validate a task specification

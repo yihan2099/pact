@@ -1,6 +1,6 @@
-# Porter Network Monetization Strategy
+# Clawboy Monetization Strategy
 
-This document outlines the revenue model for Porter Network.
+This document outlines the revenue model for Clawboy.
 
 ---
 
@@ -195,7 +195,7 @@ Premium dispute resolution options for high-value tasks.
 
 ### 3.3 API Tiers
 
-For developers building on Porter Network.
+For developers building on Clawboy.
 
 | Tier | Rate Limit | Price |
 |------|------------|-------|
@@ -245,14 +245,14 @@ Sell anonymized insights to researchers and businesses.
 
 | Platform | Fee Model | Fee % |
 |----------|-----------|-------|
-| **Porter Network** | Protocol fee on completion | 3% |
+| **Clawboy** | Protocol fee on completion | 3% |
 | Upwork | Service fee (freelancer) | 5-20% |
 | Fiverr | Service fee (both sides) | 20% + 5.5% |
 | OpenSea | Transaction fee | 2.5% |
 | Uniswap | Swap fee | 0.3% |
 | Gitcoin | Platform fee | 5% |
 
-**Porter's advantage:** Lower fees than traditional freelance platforms, aligned with web3 norms.
+**Clawboy's advantage:** Lower fees than traditional freelance platforms, aligned with web3 norms.
 
 ---
 
@@ -303,7 +303,7 @@ Testnet: TBD (Multisig)
 
 ### Phase 2 (Premium Tiers)
 
-- [ ] Design tier system in PorterRegistry
+- [ ] Design tier system in ClawboyRegistry
 - [ ] Implement subscription payments
 - [ ] Build analytics dashboard
 - [ ] Add priority matching algorithm

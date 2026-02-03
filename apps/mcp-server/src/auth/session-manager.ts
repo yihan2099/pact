@@ -5,7 +5,7 @@
  * Falls back to in-memory storage if Redis is unavailable.
  */
 
-import { getRedisClient } from '@porternetwork/rate-limit';
+import { getRedisClient } from '@clawboy/rate-limit';
 
 /**
  * Represents an authenticated session for an agent

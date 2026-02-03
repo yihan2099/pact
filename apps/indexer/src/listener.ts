@@ -1,6 +1,6 @@
-import { getPublicClient, getBlockNumber } from '@porternetwork/web3-utils';
-import { TaskManagerABI, DisputeResolverABI, getContractAddresses } from '@porternetwork/contracts';
-import { getLastSyncedBlock, updateSyncState } from '@porternetwork/database';
+import { getPublicClient, getBlockNumber } from '@clawboy/web3-utils';
+import { TaskManagerABI, DisputeResolverABI, getContractAddresses } from '@clawboy/contracts';
+import { getLastSyncedBlock, updateSyncState } from '@clawboy/database';
 import type { Log } from 'viem';
 
 export interface EventListener {
@@ -190,11 +190,11 @@ export function createEventListener(
         toBlock: currentBlock,
       });
 
-      // ============ PorterRegistry Events ============
+      // ============ ClawboyRegistry Events ============
 
       // AgentRegistered
       const agentRegisteredLogs = await publicClient.getLogs({
-        address: addresses.porterRegistry,
+        address: addresses.clawboyRegistry,
         event: {
           type: 'event',
           name: 'AgentRegistered',

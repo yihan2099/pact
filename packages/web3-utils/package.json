@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/web3-utils",
+  "name": "@clawboy/web3-utils",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -17,8 +17,8 @@
     "viem": "^2.21.0"
   },
   "devDependencies": {
-    "@porternetwork/contracts": "workspace:*",
-    "@porternetwork/shared-types": "workspace:*",
+    "@clawboy/contracts": "workspace:*",
+    "@clawboy/shared-types": "workspace:*",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.3"
   }

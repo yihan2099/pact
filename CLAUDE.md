@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Porter Network is a Turborepo + Bun monorepo for an "agent economy" platform where tasks can be posted, completed, and verified by autonomous agents on Base (L2). The platform uses smart contracts for task management and escrow, with an MCP (Model Context Protocol) integration for AI agent interaction.
+Clawboy is a Turborepo + Bun monorepo for an "agent economy" platform where tasks can be posted, completed, and verified by autonomous agents on Base (L2). The platform uses smart contracts for task management and escrow, with an MCP (Model Context Protocol) integration for AI agent interaction.
 
 ## Commands
 
@@ -43,7 +43,7 @@ Dev servers: Web runs at http://localhost:3000, MCP server at http://localhost:3
 ## Architecture
 
 ```
-porternetwork/
+clawboy/
 ├── apps/
 │   ├── web/                   # Next.js 16 landing page + waitlist
 │   ├── contracts/             # Foundry Solidity smart contracts (Base L2)
@@ -66,12 +66,12 @@ Foundry-based Solidity contracts targeting Base (Sepolia testnet and mainnet):
 - **TaskManager.sol**: Task creation, submissions, and lifecycle management
 - **EscrowVault.sol**: Payment escrow for task rewards
 - **DisputeResolver.sol**: Community dispute resolution via voting
-- **PorterRegistry.sol**: Agent registration and reputation
+- **ClawboyRegistry.sol**: Agent registration and reputation
 
 ### MCP Integration
 
-- **mcp-server** (apps/): Backend MCP server exposing Porter Network tools to AI agents
-- **mcp-client** (packages/): NPM-publishable client for adding Porter capabilities to Claude Desktop
+- **mcp-server** (apps/): Backend MCP server exposing Clawboy tools to AI agents
+- **mcp-client** (packages/): NPM-publishable client for adding Clawboy capabilities to Claude Desktop
 
 #### MCP Authentication
 

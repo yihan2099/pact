@@ -1,4 +1,4 @@
--- Porter Network Initial Schema
+-- Clawboy Initial Schema
 -- Run with: supabase db push
 
 -- Note: Using gen_random_uuid() which is built into PostgreSQL 13+ and Supabase

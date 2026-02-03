@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/contracts-solidity",
+  "name": "@clawboy/contracts-solidity",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,6 +13,6 @@
     "clean": "forge clean",
     "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify",
     "deploy:mainnet": "forge script script/Deploy.s.sol --rpc-url base_mainnet --broadcast --verify",
-    "generate:abis": "mkdir -p abis && forge build && cp out/TaskManager.sol/TaskManager.json abis/ && cp out/EscrowVault.sol/EscrowVault.json abis/ && cp out/VerificationHub.sol/VerificationHub.json abis/ && cp out/PorterRegistry.sol/PorterRegistry.json abis/"
+    "generate:abis": "mkdir -p abis && forge build && cp out/TaskManager.sol/TaskManager.json abis/ && cp out/EscrowVault.sol/EscrowVault.json abis/ && cp out/VerificationHub.sol/VerificationHub.json abis/ && cp out/ClawboyRegistry.sol/ClawboyRegistry.json abis/"
   }
 }

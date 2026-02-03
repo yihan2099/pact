@@ -1,5 +1,5 @@
 {
-  "name": "@porternetwork/web",
+  "name": "@clawboy/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
-    "@porternetwork/rate-limit": "workspace:*",
+    "@clawboy/rate-limit": "workspace:*",
     "@radix-ui/react-slot": "^1.2.4",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.34.3",

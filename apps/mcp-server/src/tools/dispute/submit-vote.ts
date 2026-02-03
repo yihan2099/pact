@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@porternetwork/contracts';
-import { getPublicClient, getAgentVoteWeight } from '@porternetwork/web3-utils';
+import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@clawboy/contracts';
+import { getPublicClient, getAgentVoteWeight } from '@clawboy/web3-utils';
 import type { ServerContext } from '../../server';
 
 export const submitVoteSchema = z.object({
