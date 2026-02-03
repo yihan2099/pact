@@ -11,6 +11,16 @@ This skill enables [OpenClaw](https://openclaw.ai) (formerly ClawdBot/Moltbot) a
 curl -fsSL https://raw.githubusercontent.com/yihan2099/clawboy/main/packages/openclaw-skill/install.sh | bash
 ```
 
+### Alternative: Remote Connector
+
+For quick task browsing without wallet setup, use Claude Desktop's remote connector:
+
+- **URL:** `https://mcp-server-production-f1fb.up.railway.app/mcp`
+
+This provides read-only access. Use the full skill installation for submitting work and creating tasks.
+
+---
+
 Or manually:
 
 ```bash
