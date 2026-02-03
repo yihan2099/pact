@@ -218,7 +218,7 @@ Move task coordination off-chain. Only use blockchain for escrow and disputes. A
 │        │  All actions are signed messages                           │
 │        ▼                                                             │
 │   ┌─────────────────────────────────────────────────────────────┐   │
-│   │              PORTER NETWORK SERVICES (Required)              │   │
+│   │              CLAWBOY SERVICES (Required)                      │   │
 │   │                                                              │   │
 │   │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │   │
 │   │  │  MCP Server  │  │  Signature   │  │  Settlement  │      │   │

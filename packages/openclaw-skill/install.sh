@@ -20,10 +20,14 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}"
 echo "  ____            _              _   _      _                      _    "
-echo " |  _ \ ___  _ __| |_ ___ _ __  | \ | | ___| |___      _____  _ __| | __"
-echo " | |_) / _ \| '__| __/ _ \ '__| |  \| |/ _ \ __\ \ /\ / / _ \| '__| |/ /"
-echo " |  __/ (_) | |  | ||  __/ |    | |\  |  __/ |_ \ V  V / (_) | |  |   < "
-echo " |_|   \___/|_|   \__\___|_|    |_| \_|\___|\__| \_/\_/ \___/|_|  |_|\_\\"
+echo "   _____ _                _                 "
+echo "  / ____| |              | |                "
+echo " | |    | | __ ___      _| |__   ___  _   _ "
+echo " | |    | |/ _\` \ \ /\ / / '_ \ / _ \| | | |"
+echo " | |____| | (_| |\ V  V /| |_) | (_) | |_| |"
+echo "  \_____|_|\__,_| \_/\_/ |_.__/ \___/ \__, |"
+echo "                                       __/ |"
+echo "                                      |___/ "
 echo -e "${NC}"
 echo ""
 echo "Clawboy Skill Installer for OpenClaw"
@@ -97,7 +101,7 @@ echo ""
 echo -e "${YELLOW}Installing Clawboy skill...${NC}"
 
 # Create skill directory
-CLAWBOY_SKILL_DIR="$SKILLS_DIR/porter-network"
+CLAWBOY_SKILL_DIR="$SKILLS_DIR/clawboy"
 mkdir -p "$CLAWBOY_SKILL_DIR"
 
 # Install the package
@@ -105,7 +109,7 @@ cd "$CLAWBOY_SKILL_DIR"
 
 # Initialize package.json if needed
 if [ ! -f "package.json" ]; then
-    echo '{"name": "porter-network-skill", "type": "module"}' > package.json
+    echo '{"name": "clawboy-skill", "type": "module"}' > package.json
 fi
 
 # Install Clawboy packages
@@ -145,7 +149,7 @@ echo ""
 echo -e "${BLUE}{"
 echo '  "skills": {'
 echo '    "entries": {'
-echo '      "porter-network": {'
+echo '      "clawboy": {'
 echo '        "enabled": true,'
 echo '        "env": {'
 echo '          "CLAWBOY_WALLET_PRIVATE_KEY": "0x...",'
@@ -170,7 +174,7 @@ echo -e "${GREEN}Setup complete! Restart OpenClaw to load the skill.${NC}"
 echo ""
 echo "Quick start:"
 echo "  1. Tell your agent: \"List open tasks on Clawboy\""
-echo "  2. Or use CLI: porter list-tasks --status open"
+echo "  2. Or use CLI: clawboy list-tasks --status open"
 echo ""
 echo "Documentation: https://docs.clawboy.io"
 echo "Support: https://github.com/clawboy/clawboy/issues"
