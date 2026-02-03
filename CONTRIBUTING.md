@@ -147,9 +147,11 @@ clawboy/
 │   ├── database/      # Supabase client
 │   ├── shared-types/  # TypeScript types
 │   ├── mcp-client/    # MCP client for Claude Desktop
+│   ├── openclaw-skill/# OpenClaw/ClawdBot skill integration
 │   ├── web3-utils/    # Viem utilities
 │   ├── ipfs-utils/    # Pinata/IPFS utilities
-│   └── rate-limit/    # Rate limiting utilities
+│   ├── rate-limit/    # Rate limiting utilities
+│   └── ui-components/ # Shared React UI components
 ```
 
 ## Areas for Contribution
