@@ -31,12 +31,28 @@ export {
   authToolDefs,
 } from './auth';
 
-// Import auth tool definitions
+// Discovery tools
+export {
+  getCapabilitiesTool,
+  getCapabilitiesHandler,
+  getWorkflowGuideTool,
+  getWorkflowGuideHandler,
+  discoveryToolDefs,
+  enhancedToolDefinitions,
+} from './discovery';
+
+// Types
+export type { EnhancedToolDefinition, ToolCategory, ToolAvailability } from './types';
+
+// Import tool definitions
 import { authToolDefs } from './auth';
 import { disputeToolDefs } from './dispute';
+import { discoveryToolDefs } from './discovery';
 
-// All tools registry
+// All tools registry (for MCP listing)
 export const allTools = [
+  // Discovery tools (first for easy discovery)
+  ...discoveryToolDefs,
   // Auth tools
   ...authToolDefs,
   // Dispute tools

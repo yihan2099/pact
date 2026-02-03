@@ -30,7 +30,15 @@ describe('Access Control', () => {
   });
 
   describe('Public tools', () => {
-    const publicTools = ['list_tasks', 'get_task', 'auth_get_challenge', 'auth_verify', 'auth_session'];
+    const publicTools = [
+      'list_tasks',
+      'get_task',
+      'auth_get_challenge',
+      'auth_verify',
+      'auth_session',
+      'get_capabilities',
+      'get_workflow_guide',
+    ];
 
     test.each(publicTools)('%s should be accessible without authentication', (tool) => {
       const context = createUnauthenticatedContext();

@@ -5,6 +5,8 @@ import {
   ListToolsRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { allTools } from './tools';
 import { listTasksTool } from './tools/task/list-tasks';
@@ -27,9 +29,14 @@ import {
   verifySignatureHandler,
   getSessionHandler,
 } from './tools/auth';
+import {
+  getCapabilitiesHandler,
+  getWorkflowGuideHandler,
+} from './tools/discovery';
 import { getSession } from './auth/session-manager';
-import { checkAccessWithRegistrationRefresh, toolAccessRequirements } from './auth/access-control';
+import { checkAccessWithRegistrationRefresh } from './auth/access-control';
 import { allPrompts, getPromptContent } from './prompts';
+import { allResources, getResourceContent, resourceExists } from './resources';
 
 export interface ServerContext {
   callerAddress: `0x${string}`;
@@ -51,6 +58,7 @@ export function createMcpServer() {
       capabilities: {
         tools: {},
         prompts: {},
+        resources: {},
       },
     }
   );
@@ -83,6 +91,35 @@ export function createMcpServer() {
             type: 'text',
             text: content,
           },
+        },
+      ],
+    };
+  });
+
+  // Handle resource listing
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    return { resources: allResources };
+  });
+
+  // Handle resource reading
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const { uri } = request.params;
+
+    if (!resourceExists(uri)) {
+      throw new Error(`Unknown resource: ${uri}`);
+    }
+
+    const content = getResourceContent(uri);
+    if (!content) {
+      throw new Error(`Resource content not found: ${uri}`);
+    }
+
+    return {
+      contents: [
+        {
+          uri,
+          mimeType: 'text/markdown',
+          text: content,
         },
       ],
     };
@@ -142,6 +179,14 @@ export function createMcpServer() {
       let result: unknown;
 
       switch (name) {
+        // Discovery tools
+        case 'get_capabilities':
+          result = await getCapabilitiesHandler(args, context);
+          break;
+        case 'get_workflow_guide':
+          result = await getWorkflowGuideHandler(args);
+          break;
+
         // Auth tools
         case 'auth_get_challenge':
           result = await getChallengeHandler(args);
