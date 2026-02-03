@@ -1,4 +1,6 @@
 import { getSupabaseClient } from '../client';
+import type { TaskRow } from '../schema/tasks';
+import type { SubmissionRow } from '../schema/submissions';
 
 export interface PlatformStatistics {
   totalTasks: number;
@@ -66,4 +68,60 @@ export async function getPlatformStatistics(): Promise<PlatformStatistics> {
     registeredAgents: agentsResult.count ?? 0,
     totalSubmissions: submissionsResult.count ?? 0,
   };
+}
+
+/**
+ * Get recent open tasks for display on the landing page.
+ */
+export async function getRecentOpenTasks(limit = 5): Promise<TaskRow[]> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('status', 'open')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to get recent open tasks: ${error.message}`);
+  }
+
+  return (data ?? []) as TaskRow[];
+}
+
+/**
+ * Submission with associated task information
+ */
+export interface SubmissionWithTask extends SubmissionRow {
+  task: Pick<TaskRow, 'title' | 'bounty_amount'> | null;
+}
+
+/**
+ * Get recent submissions with task info for display on the landing page.
+ */
+export async function getRecentSubmissions(
+  limit = 5
+): Promise<SubmissionWithTask[]> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('submissions')
+    .select(
+      `
+      *,
+      task:tasks!task_id (
+        title,
+        bounty_amount
+      )
+    `
+    )
+    .order('submitted_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to get recent submissions: ${error.message}`);
+  }
+
+  return (data ?? []) as SubmissionWithTask[];
 }
