@@ -1,10 +1,13 @@
 import { getPinataClient } from '../client/pinata-client';
+import { IpfsUploadError } from './upload-json';
 
 export interface UploadFileOptions {
   /** Metadata name for the file */
   name?: string;
   /** Key-value metadata */
   keyvalues?: Record<string, string>;
+  /** Timeout in milliseconds (default: 60000 for files) */
+  timeoutMs?: number;
 }
 
 export interface FileUploadResult {
@@ -21,28 +24,61 @@ export interface FileUploadResult {
 }
 
 /**
- * Upload a file to IPFS via Pinata
+ * Upload a file to IPFS via Pinata with error handling
  */
 export async function uploadFile(
   file: File,
   options: UploadFileOptions = {}
 ): Promise<FileUploadResult> {
-  const pinata = getPinataClient();
+  const { timeoutMs = 60000, ...pinataOptions } = options;
 
-  const upload = await pinata.upload.file(file, {
-    metadata: {
-      name: options.name || file.name,
-      keyvalues: options.keyvalues,
-    },
-  });
+  try {
+    const pinata = getPinataClient();
 
-  return {
-    cid: upload.cid,
-    size: upload.size,
-    name: file.name,
-    mimeType: file.type || 'application/octet-stream',
-    timestamp: new Date().toISOString(),
-  };
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const upload = await pinata.upload.file(file, {
+        metadata: {
+          name: pinataOptions.name || file.name,
+          keyvalues: pinataOptions.keyvalues,
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      return {
+        cid: upload.cid,
+        size: upload.size,
+        name: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Check if timeout
+      if (controller.signal.aborted) {
+        throw new IpfsUploadError(`IPFS file upload timed out after ${timeoutMs}ms`);
+      }
+
+      throw error;
+    }
+  } catch (error) {
+    // Already an IpfsUploadError
+    if (error instanceof IpfsUploadError) {
+      throw error;
+    }
+
+    // Wrap other errors
+    const message = error instanceof Error ? error.message : String(error);
+    throw new IpfsUploadError(
+      `Failed to upload file to IPFS: ${message}`,
+      error instanceof Error ? error : undefined
+    );
+  }
 }
 
 /**

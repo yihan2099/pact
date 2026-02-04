@@ -5,6 +5,8 @@ export interface UploadJsonOptions {
   name?: string;
   /** Key-value metadata */
   keyvalues?: Record<string, string>;
+  /** Timeout in milliseconds (default: 30000) */
+  timeoutMs?: number;
 }
 
 export interface UploadResult {
@@ -17,26 +19,72 @@ export interface UploadResult {
 }
 
 /**
- * Upload JSON data to IPFS via Pinata
+ * Custom error class for IPFS upload failures
+ */
+export class IpfsUploadError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
+    super(message);
+    this.name = 'IpfsUploadError';
+  }
+}
+
+/**
+ * Upload JSON data to IPFS via Pinata with error handling
  */
 export async function uploadJson(
   data: Record<string, unknown>,
   options: UploadJsonOptions = {}
 ): Promise<UploadResult> {
-  const pinata = getPinataClient();
+  const { timeoutMs = 30000, ...pinataOptions } = options;
 
-  const upload = await pinata.upload.json(data, {
-    metadata: {
-      name: options.name || 'clawboy-data.json',
-      keyvalues: options.keyvalues,
-    },
-  });
+  try {
+    const pinata = getPinataClient();
 
-  return {
-    cid: upload.cid,
-    size: upload.size,
-    timestamp: new Date().toISOString(),
-  };
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const upload = await pinata.upload.json(data, {
+        metadata: {
+          name: pinataOptions.name || 'clawboy-data.json',
+          keyvalues: pinataOptions.keyvalues,
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      return {
+        cid: upload.cid,
+        size: upload.size,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Check if timeout
+      if (controller.signal.aborted) {
+        throw new IpfsUploadError(`IPFS upload timed out after ${timeoutMs}ms`);
+      }
+
+      throw error;
+    }
+  } catch (error) {
+    // Already an IpfsUploadError
+    if (error instanceof IpfsUploadError) {
+      throw error;
+    }
+
+    // Wrap other errors
+    const message = error instanceof Error ? error.message : String(error);
+    throw new IpfsUploadError(
+      `Failed to upload JSON to IPFS: ${message}`,
+      error instanceof Error ? error : undefined
+    );
+  }
 }
 
 /**
