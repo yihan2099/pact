@@ -1,6 +1,6 @@
 import { verifyChallengeSignature } from '../../auth/wallet-signature';
 import { createSession } from '../../auth/session-manager';
-import { isAgentRegistered, isValidAddress } from '@clawboy/web3-utils';
+import { isAgentRegistered, getAgentId, isValidAddress } from '@clawboy/web3-utils';
 
 /**
  * Input for auth_verify tool
@@ -18,6 +18,7 @@ export interface VerifySignatureOutput {
   success: boolean;
   sessionId?: string;
   walletAddress?: string;
+  agentId?: string;
   isRegistered?: boolean;
   expiresAt?: number;
   error?: string;
@@ -82,23 +83,32 @@ export async function verifySignatureHandler(args: unknown): Promise<VerifySigna
     };
   }
 
-  // Check on-chain registration status
+  // Check on-chain registration status and get agentId
   let isRegistered = false;
+  let agentId: string | undefined;
 
   try {
     isRegistered = await isAgentRegistered(walletAddress);
+    if (isRegistered) {
+      // Get the ERC-8004 agent ID (NFT token ID)
+      const agentIdBigInt = await getAgentId(walletAddress);
+      if (agentIdBigInt > 0n) {
+        agentId = agentIdBigInt.toString();
+      }
+    }
   } catch (error) {
     // If chain query fails, continue with unregistered status
     console.error('Failed to check on-chain registration:', error);
   }
 
-  // Create session
-  const { sessionId, session } = await createSession(walletAddress, isRegistered);
+  // Create session with agentId
+  const { sessionId, session } = await createSession(walletAddress, isRegistered, agentId);
 
   return {
     success: true,
     sessionId,
     walletAddress: session.walletAddress,
+    agentId: session.agentId,
     isRegistered: session.isRegistered,
     expiresAt: session.expiresAt,
   };

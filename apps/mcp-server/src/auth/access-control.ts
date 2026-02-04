@@ -1,5 +1,5 @@
 import type { ServerContext } from '../server';
-import { isAgentRegistered } from '@clawboy/web3-utils';
+import { isAgentRegistered, getAgentId } from '@clawboy/web3-utils';
 import { updateSessionRegistration } from './session-manager';
 
 /**
@@ -26,6 +26,8 @@ export const toolAccessRequirements: Record<string, AccessLevel> = {
   // Requires authentication (valid session, may not be registered)
   get_my_submissions: 'authenticated',
   register_agent: 'authenticated',
+  get_reputation: 'public',
+  get_feedback_history: 'public',
 
   // Requires registration (must be registered on-chain)
   create_task: 'registered',
@@ -144,8 +146,12 @@ export async function checkAccessWithRegistrationRefresh(
     const isNowRegistered = await isAgentRegistered(context.callerAddress, chainId);
 
     if (isNowRegistered && context.sessionId) {
-      // Update the session to reflect new registration status
-      await updateSessionRegistration(context.sessionId, true);
+      // Get the ERC-8004 agentId for the wallet
+      const agentIdBigInt = await getAgentId(context.callerAddress, chainId);
+      const agentId = agentIdBigInt > 0n ? agentIdBigInt.toString() : undefined;
+
+      // Update the session to reflect new registration status and agentId
+      await updateSessionRegistration(context.sessionId, true, agentId);
 
       return {
         allowed: true,

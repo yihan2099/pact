@@ -13,6 +13,8 @@ import { getRedisClient } from '@clawboy/rate-limit';
 export interface AuthSession {
   /** Wallet address of the authenticated agent */
   walletAddress: `0x${string}`;
+  /** ERC-8004 Agent ID (NFT token ID) - set when registered */
+  agentId?: string;
   /** Whether the agent is registered on-chain */
   isRegistered: boolean;
   /** Session creation timestamp */
@@ -45,13 +47,15 @@ function isRedisAvailable(): boolean {
  */
 export async function createSession(
   walletAddress: `0x${string}`,
-  isRegistered: boolean
+  isRegistered: boolean,
+  agentId?: string
 ): Promise<{ sessionId: string; session: AuthSession }> {
   const sessionId = crypto.randomUUID();
   const now = Date.now();
 
   const session: AuthSession = {
     walletAddress,
+    agentId,
     isRegistered,
     createdAt: now,
     expiresAt: now + SESSION_EXPIRATION_MS,
@@ -134,7 +138,8 @@ export async function getSession(sessionId: string): Promise<AuthSession | null>
  */
 export async function updateSessionRegistration(
   sessionId: string,
-  isRegistered: boolean
+  isRegistered: boolean,
+  agentId?: string
 ): Promise<boolean> {
   const redis = getRedisClient();
 
@@ -147,10 +152,11 @@ export async function updateSessionRegistration(
         return false;
       }
 
-      // Update the session with new registration status
+      // Update the session with new registration status and agentId
       const updatedSession: AuthSession = {
         ...session,
         isRegistered,
+        ...(agentId && { agentId }),
       };
 
       // Calculate remaining TTL
@@ -168,6 +174,9 @@ export async function updateSessionRegistration(
   const session = memorySessionStore.get(sessionId);
   if (session) {
     session.isRegistered = isRegistered;
+    if (agentId) {
+      session.agentId = agentId;
+    }
     return true;
   }
 

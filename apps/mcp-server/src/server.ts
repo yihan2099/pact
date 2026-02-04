@@ -17,6 +17,8 @@ import { submitWorkTool } from './tools/agent/submit-work';
 import { getMySubmissionsTool } from './tools/agent/get-my-submissions';
 import { registerAgentTool } from './tools/agent/register-agent';
 import { updateProfileTool } from './tools/agent/update-profile';
+import { getReputationTool } from './tools/agent/get-reputation';
+import { getFeedbackHistoryTool } from './tools/agent/get-feedback-history';
 import {
   getDisputeTool,
   listDisputesTool,
@@ -215,6 +217,12 @@ export function createMcpServer() {
           break;
         case 'update_profile':
           result = await updateProfileTool.handler(args, context);
+          break;
+        case 'get_reputation':
+          result = await getReputationTool.handler(args, context);
+          break;
+        case 'get_feedback_history':
+          result = await getFeedbackHistoryTool.handler(args, context);
           break;
 
         // Dispute tools

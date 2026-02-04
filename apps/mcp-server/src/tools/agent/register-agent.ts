@@ -1,7 +1,32 @@
 import { z } from 'zod';
-import { uploadAgentProfile } from '@clawboy/ipfs-utils';
-import type { AgentProfile } from '@clawboy/shared-types';
+import { uploadJson } from '@clawboy/ipfs-utils';
 import { webhookUrlSchema } from '../../utils/webhook-validation';
+
+/**
+ * ERC-8004 compliant agent URI structure
+ * @see https://eips.ethereum.org/EIPS/eip-8004#registration-v1
+ */
+interface ERC8004AgentURI {
+  type: 'https://eips.ethereum.org/EIPS/eip-8004#registration-v1';
+  name: string;
+  description?: string;
+  services: Array<{
+    name: string;
+    endpoint?: string;
+    version: string;
+  }>;
+  active: boolean;
+  registrations: string[];
+  // Clawboy-specific extensions
+  skills?: string[];
+  preferredTaskTypes?: string[];
+  links?: {
+    github?: string;
+    twitter?: string;
+    website?: string;
+  };
+  webhookUrl?: string;
+}
 
 export const registerAgentSchema = z.object({
   name: z.string().min(1).max(100),
@@ -23,7 +48,7 @@ export type RegisterAgentInput = z.infer<typeof registerAgentSchema>;
 export const registerAgentTool = {
   name: 'register_agent',
   description:
-    'Register as an agent on Clawboy. Creates your profile on IPFS and returns the CID for on-chain registration.',
+    'Register as an agent on Clawboy using ERC-8004 Trustless Agents standard. Creates your agent profile on IPFS and returns the URI for on-chain registration.',
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -64,30 +89,44 @@ export const registerAgentTool = {
   handler: async (args: unknown, context: { callerAddress: `0x${string}` }) => {
     const input = registerAgentSchema.parse(args);
 
-    // Create agent profile for IPFS
-    const profile: AgentProfile = {
-      version: '1.0',
+    // Create ERC-8004 compliant agent URI structure
+    const agentURI: ERC8004AgentURI = {
+      type: 'https://eips.ethereum.org/EIPS/eip-8004#registration-v1',
       name: input.name,
       description: input.description,
+      services: [
+        {
+          name: 'clawboy-task-agent',
+          version: '1.0',
+        },
+      ],
+      active: true,
+      registrations: [],
+      // Clawboy-specific extensions
       skills: input.skills,
       preferredTaskTypes: input.preferredTaskTypes,
       links: input.links,
       webhookUrl: input.webhookUrl,
     };
 
-    // Upload profile to IPFS
-    const uploadResult = await uploadAgentProfile(profile);
+    // Upload ERC-8004 agent URI to IPFS
+    const uploadResult = await uploadJson(agentURI as unknown as Record<string, unknown>, { name: `agent-${context.callerAddress}.json` });
+
+    // Construct the IPFS URI (ipfs://CID format)
+    const ipfsURI = `ipfs://${uploadResult.cid}`;
 
     return {
-      message: 'Agent profile created and uploaded to IPFS',
+      message: 'ERC-8004 agent profile created and uploaded to IPFS',
+      agentURI: ipfsURI,
       profileCid: uploadResult.cid,
       callerAddress: context.callerAddress,
       nextStep:
-        "Call the ClawboyRegistry contract's register(profileCid) function to complete on-chain registration",
-      contractFunction: 'register(string profileCid)',
+        "Call the ClawboyAgentAdapter contract's register(agentURI) function to complete on-chain registration. This will mint an ERC-721 NFT representing your agent identity.",
+      contractFunction: 'register(string agentURI)',
       contractArgs: {
-        profileCid: uploadResult.cid,
+        agentURI: ipfsURI,
       },
+      note: 'Your agent identity will be an ERC-721 NFT on the ERC-8004 Identity Registry. Reputation is tracked via the ERC-8004 Reputation Registry using feedback tags.',
     };
   },
 };

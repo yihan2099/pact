@@ -347,6 +347,74 @@ export const enhancedToolDefinitions: EnhancedToolDefinition[] = [
       },
     ],
   },
+  {
+    name: 'get_reputation',
+    description:
+      'Get reputation summary for an agent from the ERC-8004 reputation registry. Returns task wins, dispute wins/losses, and total reputation.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        walletAddress: {
+          type: 'string',
+          description: 'Wallet address to query (defaults to your own if authenticated)',
+        },
+        tag1: {
+          type: 'string',
+          description: 'Primary tag to filter by (e.g., "task", "dispute")',
+        },
+        tag2: {
+          type: 'string',
+          description: 'Secondary tag to filter by (e.g., "win", "loss")',
+        },
+      },
+    },
+    accessLevel: 'public',
+    category: 'agent',
+    examples: [
+      {
+        description: 'Get your reputation',
+        input: {},
+      },
+      {
+        description: 'Get task wins only',
+        input: { tag1: 'task', tag2: 'win' },
+      },
+      {
+        description: 'Get another agent reputation',
+        input: { walletAddress: '0x1234...abcd' },
+      },
+    ],
+  },
+  {
+    name: 'get_feedback_history',
+    description:
+      'Get all feedback history for an agent from the ERC-8004 reputation registry. Returns individual feedback entries with tags, values, and client information.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        walletAddress: {
+          type: 'string',
+          description: 'Wallet address to query (defaults to your own if authenticated)',
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of feedback entries to return (default: 50, max: 100)',
+        },
+      },
+    },
+    accessLevel: 'public',
+    category: 'agent',
+    examples: [
+      {
+        description: 'Get your feedback history',
+        input: {},
+      },
+      {
+        description: 'Get limited feedback history',
+        input: { limit: 10 },
+      },
+    ],
+  },
 
   // === Dispute Tools ===
   {

@@ -21,7 +21,7 @@ import { createWalletClient, createPublicClient, http, formatEther } from 'viem'
 import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts';
 import { baseSepolia } from 'viem/chains';
 import { ClawboyApiClient } from '../api-client.js';
-import { ClawboyRegistryABI, getContractAddresses } from '@clawboy/contracts';
+import { ClawboyAgentAdapterABI, getContractAddresses } from '@clawboy/contracts';
 
 // Session state for authentication
 interface AuthState {
@@ -633,10 +633,10 @@ async function main() {
         const addresses = getContractAddresses(baseSepolia.id);
         const targetAddress = (typedArgs.address as `0x${string}`) || account.address;
 
-        // Check if registered
+        // Check if registered using ERC-8004 adapter
         const isRegistered = (await publicClient.readContract({
-          address: addresses.clawboyRegistry,
-          abi: ClawboyRegistryABI,
+          address: addresses.agentAdapter,
+          abi: ClawboyAgentAdapterABI,
           functionName: 'isRegistered',
           args: [targetAddress],
         })) as boolean;
@@ -656,23 +656,23 @@ async function main() {
           };
         }
 
-        // Get agent data from contract
-        const agentData = (await publicClient.readContract({
-          address: addresses.clawboyRegistry,
-          abi: ClawboyRegistryABI,
-          functionName: 'getAgent',
+        // Get agent ID from ERC-8004 adapter
+        const agentId = (await publicClient.readContract({
+          address: addresses.agentAdapter,
+          abi: ClawboyAgentAdapterABI,
+          functionName: 'getAgentId',
           args: [targetAddress],
-        })) as unknown as readonly [bigint, bigint, bigint, bigint, string, bigint, boolean];
+        })) as bigint;
 
-        const [
-          reputation,
-          tasksWon,
-          disputesWon,
-          disputesLost,
-          profileCid,
-          registeredAt,
-          isActive,
-        ] = agentData;
+        // Get reputation summary from ERC-8004 adapter
+        const reputationSummary = (await publicClient.readContract({
+          address: addresses.agentAdapter,
+          abi: ClawboyAgentAdapterABI,
+          functionName: 'getReputationSummary',
+          args: [targetAddress],
+        })) as readonly [bigint, bigint, bigint, bigint];
+
+        const [taskWins, disputeWins, disputeLosses, totalReputation] = reputationSummary;
 
         return {
           content: [
@@ -681,14 +681,12 @@ async function main() {
               text: JSON.stringify({
                 address: targetAddress,
                 isRegistered: true,
-                isActive,
-                reputation: reputation.toString(),
-                tasksWon: Number(tasksWon),
-                disputesWon: Number(disputesWon),
-                disputesLost: Number(disputesLost),
-                profileCid,
-                registeredAt: Number(registeredAt),
-                registeredAtDate: new Date(Number(registeredAt) * 1000).toISOString(),
+                agentId: agentId.toString(),
+                reputation: totalReputation.toString(),
+                taskWins: Number(taskWins),
+                disputeWins: Number(disputeWins),
+                disputeLosses: Number(disputeLosses),
+                note: 'Agent identity is ERC-721 NFT on ERC-8004 Identity Registry',
               }),
             },
           ],

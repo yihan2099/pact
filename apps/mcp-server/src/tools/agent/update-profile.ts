@@ -1,8 +1,32 @@
 import { z } from 'zod';
-import { uploadAgentProfile, fetchAgentProfile } from '@clawboy/ipfs-utils';
-import { getAgentData } from '@clawboy/web3-utils';
-import type { AgentProfile } from '@clawboy/shared-types';
+import { uploadJson, fetchJson } from '@clawboy/ipfs-utils';
+import { getAgentURI } from '@clawboy/web3-utils';
 import { webhookUrlSchema } from '../../utils/webhook-validation';
+
+/**
+ * ERC-8004 compliant agent URI structure
+ */
+interface ERC8004AgentURI {
+  type: string;
+  name: string;
+  description?: string;
+  services: Array<{
+    name: string;
+    endpoint?: string;
+    version: string;
+  }>;
+  active: boolean;
+  registrations: string[];
+  // Clawboy-specific extensions
+  skills?: string[];
+  preferredTaskTypes?: string[];
+  links?: {
+    github?: string;
+    twitter?: string;
+    website?: string;
+  };
+  webhookUrl?: string;
+}
 
 export const updateProfileSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -21,10 +45,24 @@ export const updateProfileSchema = z.object({
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
+/**
+ * Extract CID from an IPFS URI (ipfs://CID format)
+ */
+function extractCidFromURI(uri: string): string | null {
+  if (uri.startsWith('ipfs://')) {
+    return uri.slice(7);
+  }
+  // Also handle direct CID
+  if (uri.startsWith('Qm') || uri.startsWith('bafy')) {
+    return uri;
+  }
+  return null;
+}
+
 export const updateProfileTool = {
   name: 'update_profile',
   description:
-    'Update your agent profile. Fetches current profile from IPFS, merges updates, and uploads new profile. Returns the new CID for on-chain update.',
+    'Update your ERC-8004 agent profile. Fetches current profile from IPFS, merges updates, and uploads new profile. Returns the new URI for on-chain update.',
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -70,18 +108,24 @@ export const updateProfileTool = {
       throw new Error('At least one field must be provided to update');
     }
 
-    // Fetch current profile from IPFS via on-chain CID
+    // Get the current agent URI from ERC-8004 Identity Registry
     const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
-    const agentData = await getAgentData(context.callerAddress, chainId);
+    const currentURI = await getAgentURI(context.callerAddress, chainId);
 
-    if (!agentData.profileCid) {
+    if (!currentURI) {
       throw new Error('No existing profile found. Use register_agent instead.');
     }
 
+    // Extract CID from IPFS URI
+    const cid = extractCidFromURI(currentURI);
+    if (!cid) {
+      throw new Error(`Invalid profile URI format: ${currentURI}`);
+    }
+
     // Fetch current profile from IPFS
-    let currentProfile: AgentProfile;
+    let currentProfile: ERC8004AgentURI;
     try {
-      currentProfile = await fetchAgentProfile(agentData.profileCid);
+      currentProfile = await fetchJson<ERC8004AgentURI>(cid);
     } catch (error) {
       throw new Error(
         `Failed to fetch current profile: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -89,9 +133,8 @@ export const updateProfileTool = {
     }
 
     // Merge updates into current profile
-    const updatedProfile: AgentProfile = {
+    const updatedProfile: ERC8004AgentURI = {
       ...currentProfile,
-      version: '1.0',
     };
 
     if (input.name !== undefined) {
@@ -123,19 +166,23 @@ export const updateProfileTool = {
     }
 
     // Upload updated profile to IPFS
-    const uploadResult = await uploadAgentProfile(updatedProfile);
+    const uploadResult = await uploadJson(updatedProfile as unknown as Record<string, unknown>, { name: `agent-${context.callerAddress}.json` });
+
+    // Construct the new IPFS URI
+    const newURI = `ipfs://${uploadResult.cid}`;
 
     return {
-      message: 'Profile updated and uploaded to IPFS',
-      previousCid: agentData.profileCid,
+      message: 'ERC-8004 agent profile updated and uploaded to IPFS',
+      previousURI: currentURI,
+      newAgentURI: newURI,
       newProfileCid: uploadResult.cid,
       callerAddress: context.callerAddress,
       updatedFields: Object.keys(input),
       nextStep:
-        "Call the ClawboyRegistry contract's updateProfile(profileCid) function to update on-chain",
-      contractFunction: 'updateProfile(string profileCid)',
+        "Call the ClawboyAgentAdapter contract's updateProfile(newURI) function to update on-chain",
+      contractFunction: 'updateProfile(string newURI)',
       contractArgs: {
-        profileCid: uploadResult.cid,
+        newURI: newURI,
       },
     };
   },
