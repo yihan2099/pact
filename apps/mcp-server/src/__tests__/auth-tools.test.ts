@@ -6,13 +6,15 @@ import { createSession } from '../auth/session-manager';
 describe('Auth Tools', () => {
   describe('auth_get_challenge', () => {
     test('should generate a challenge for valid wallet address', async () => {
-      const result = await getChallengeHandler({
-        walletAddress: '0x1234567890123456789012345678901234567890',
-      });
+      // Use unique address per test run to avoid challenge rate limit
+      const randomHex = Math.random().toString(16).slice(2, 10);
+      const walletAddress = `0x${randomHex}${'b'.repeat(32)}`;
+
+      const result = await getChallengeHandler({ walletAddress });
 
       expect(result.challenge).toBeDefined();
       expect(result.challenge).toContain('Clawboy Authentication');
-      expect(result.challenge).toContain('0x1234567890123456789012345678901234567890');
+      expect(result.challenge).toContain(walletAddress);
       expect(result.nonce).toBeDefined();
       expect(result.expiresAt).toBeGreaterThan(Date.now());
       expect(result.message).toContain('Sign this challenge');
@@ -26,17 +28,17 @@ describe('Auth Tools', () => {
 
     test('should reject wallet address with wrong length', async () => {
       await expect(getChallengeHandler({ walletAddress: '0x1234' })).rejects.toThrow(
-        'Invalid wallet address length'
+        'Invalid wallet address format'
       );
     });
 
     test('should generate unique nonces for same wallet', async () => {
-      const result1 = await getChallengeHandler({
-        walletAddress: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      });
-      const result2 = await getChallengeHandler({
-        walletAddress: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      });
+      // Use unique address per test run to avoid challenge rate limit
+      const randomHex = Math.random().toString(16).slice(2, 10);
+      const walletAddress = `0x${randomHex}${'a'.repeat(32)}`;
+
+      const result1 = await getChallengeHandler({ walletAddress });
+      const result2 = await getChallengeHandler({ walletAddress });
 
       expect(result1.nonce).not.toBe(result2.nonce);
     });

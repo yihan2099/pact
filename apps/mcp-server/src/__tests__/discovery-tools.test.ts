@@ -140,9 +140,10 @@ describe('Discovery Tools', () => {
       const result = await getCapabilitiesHandler({}, context);
 
       const discoveryTools = result.tools.filter((t) => t.category === 'discovery');
-      expect(discoveryTools.length).toBe(2);
+      expect(discoveryTools.length).toBe(3);
       expect(discoveryTools.some((t) => t.name === 'get_capabilities')).toBe(true);
       expect(discoveryTools.some((t) => t.name === 'get_workflow_guide')).toBe(true);
+      expect(discoveryTools.some((t) => t.name === 'get_supported_tokens')).toBe(true);
     });
   });
 
