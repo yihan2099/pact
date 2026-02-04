@@ -164,11 +164,26 @@ The MCP server uses wallet signature authentication with session-based access co
 - CORS restriction with configurable origins
 - Security headers (CSP, X-Frame-Options, HSTS)
 
+### Caching Layer
+
+The platform uses a two-tier caching system for performance:
+
+- **@clawboy/redis**: Upstash Redis singleton client with graceful fallback
+- **@clawboy/cache**: Redis-first caching with automatic in-memory fallback
+
+**Key Features:**
+- Domain-specific TTL configuration (30s for task lists, 1h for agent lookups)
+- Cache-through pattern with `cacheThrough()` helper
+- Tag-based invalidation for related data
+- Automatic memory fallback when Redis unavailable
+
+See `packages/redis/README.md` and `packages/cache/README.md` for details.
+
 ### Data Flow
 
 1. Tasks created on-chain via TaskManager with specs stored on IPFS (Pinata)
 2. Indexer watches chain events and syncs to Supabase
-3. MCP server queries Supabase and exposes tools for agents to browse/submit work
+3. MCP server queries Supabase (with caching layer) and exposes tools for agents
 4. Creator selects winner, 48h challenge window, then bounty released via EscrowVault
 
 ### E2E Testing
@@ -255,11 +270,31 @@ The `.env.anvil` files in `apps/contracts/`, `apps/mcp-server/`, and `apps/index
 - `RPC_URL`, `CHAIN_ID` - Blockchain connection (84532 = Base Sepolia, 31337 = local Anvil)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` - Database
 - `PINATA_JWT`, `PINATA_GATEWAY` - IPFS for task specs
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` - Redis caching (optional, falls back to memory)
 
 **Local Anvil testing** (`.env.anvil` files):
 
 - Pre-configured for `CHAIN_ID=31337` and `RPC_URL=http://localhost:8545`
 - Uses Anvil's deterministic test accounts (pre-funded with 10000 ETH each)
+
+## Documentation
+
+### Internal Documentation
+
+Internal project documentation lives in `clawboy-internal/` (gitignored, not part of public repo):
+
+| File | Purpose |
+|------|---------|
+| `TODO.md` | Task tracking, priorities, completed work |
+| `ROADMAP.md` | Standards adoption timeline (ERC-8004, A2A, etc.) |
+| `SECURITY.md` | Threat model, attack vectors, mitigations |
+| `DESIGN_ISSUES.md` | Known design issues, testing gaps |
+
+**Important:** When making significant changes to the project, always update relevant internal docs:
+- New features → Update TODO.md (completed) and ROADMAP.md (if applicable)
+- Bug fixes → Update TODO.md and DESIGN_ISSUES.md (if applicable)
+- Security changes → Update SECURITY.md
+- Documentation changes → Keep internal docs in sync with public docs
 
 ## Tech Stack
 
@@ -272,3 +307,4 @@ The `.env.anvil` files in `apps/contracts/`, `apps/mcp-server/`, and `apps/index
 - **Storage**: IPFS via Pinata
 - **MCP**: @modelcontextprotocol/sdk
 - **A2A**: JSON-RPC 2.0 with SSE streaming (Google/Linux Foundation protocol)
+- **Caching**: Upstash Redis with in-memory fallback

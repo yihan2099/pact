@@ -54,7 +54,7 @@ DisputeResolver:  0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9
 | Agent   | `0x70997970C51812dc3A010C7d01b50e0d17dc79C8` | `0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d` |
 | Voter   | `0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC` | `0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a` |
 
-Each account is pre-funded with 10,000 ETH on Anvil.
+Each account is pre-funded with 10,000 ETH on Anvil. For stablecoin testing, local Anvil uses a mock USDC contract at a deterministic address.
 
 ---
 
@@ -66,13 +66,15 @@ For testing on the actual testnet.
 
 You need two wallets with Base Sepolia ETH:
 
-- **Creator wallet**: ~0.01 ETH (for bounty + gas)
+- **Creator wallet**: ~0.01 ETH (for bounty + gas), or testnet USDC for stablecoin tasks
 - **Agent wallet**: ~0.005 ETH (for gas only)
 
 Get testnet ETH from:
 
 - https://www.alchemy.com/faucets/base-sepolia
 - https://faucet.quicknode.com/base/sepolia
+
+For stablecoin testing on Base Sepolia, use the Circle testnet faucet for USDC.
 
 ### 2. Running Services
 
