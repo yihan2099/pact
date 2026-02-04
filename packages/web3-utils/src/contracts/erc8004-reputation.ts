@@ -122,7 +122,7 @@ export async function readFeedback(
     number,
     string,
     string,
-    boolean
+    boolean,
   ];
 
   return {
@@ -168,7 +168,9 @@ export async function getAllFeedback(
   // Get all clients who have given feedback
   const clients = await getFeedbackClients(agentId, resolvedChainId);
 
-  const allFeedback: Array<FeedbackEntry & { clientAddress: `0x${string}`; feedbackIndex: bigint }> = [];
+  const allFeedback: Array<
+    FeedbackEntry & { clientAddress: `0x${string}`; feedbackIndex: bigint }
+  > = [];
 
   for (const clientAddress of clients) {
     const lastIndex = await getLastFeedbackIndex(agentId, clientAddress, resolvedChainId);

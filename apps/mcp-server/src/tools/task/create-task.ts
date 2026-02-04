@@ -69,8 +69,7 @@ export const createTaskTool = {
       },
       bountyAmount: {
         type: 'string',
-        description:
-          'Bounty amount in token units (e.g., "100" for 100 USDC, "0.1" for 0.1 ETH)',
+        description: 'Bounty amount in token units (e.g., "100" for 100 USDC, "0.1" for 0.1 ETH)',
       },
       bountyToken: {
         type: 'string',

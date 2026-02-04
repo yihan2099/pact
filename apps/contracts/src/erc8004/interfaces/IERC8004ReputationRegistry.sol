@@ -23,7 +23,9 @@ interface IERC8004ReputationRegistry {
     );
 
     /// @notice Emitted when feedback is revoked
-    event FeedbackRevoked(uint256 indexed agentId, address indexed clientAddress, uint64 indexed feedbackIndex);
+    event FeedbackRevoked(
+        uint256 indexed agentId, address indexed clientAddress, uint64 indexed feedbackIndex
+    );
 
     /// @notice Emitted when a response is appended to feedback
     event ResponseAppended(
@@ -132,7 +134,13 @@ interface IERC8004ReputationRegistry {
     )
         external
         view
-        returns (int128 value, uint8 valueDecimals, string memory tag1, string memory tag2, bool isRevoked);
+        returns (
+            int128 value,
+            uint8 valueDecimals,
+            string memory tag1,
+            string memory tag2,
+            bool isRevoked
+        );
 
     /**
      * @notice Get all clients who have given feedback to an agent

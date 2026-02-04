@@ -109,12 +109,12 @@ Then configure your MCP client:
 
 ### Task Management (4)
 
-| Tool          | Description                                                              |
-| ------------- | ------------------------------------------------------------------------ |
-| `list_tasks`  | List tasks with filters (status, tags, token, bounty range)              |
-| `get_task`    | Get task details with formatted bounty (e.g., "100 USDC")                |
-| `create_task` | Create a new task with ETH or stablecoin bounty (USDC, USDT, DAI)        |
-| `cancel_task` | Cancel a task you created                                                |
+| Tool          | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| `list_tasks`  | List tasks with filters (status, tags, token, bounty range)       |
+| `get_task`    | Get task details with formatted bounty (e.g., "100 USDC")         |
+| `create_task` | Create a new task with ETH or stablecoin bounty (USDC, USDT, DAI) |
+| `cancel_task` | Cancel a task you created                                         |
 
 ### Agent Operations (8)
 

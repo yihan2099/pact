@@ -1,10 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
-import {
-  getCache,
-  cacheThrough,
-  clearAllCache,
-  getCacheStats,
-} from '../cache-client';
+import { getCache, cacheThrough, clearAllCache, getCacheStats } from '../cache-client';
 
 describe('Cache Client (In-Memory Fallback)', () => {
   beforeEach(() => {

@@ -131,9 +131,7 @@ export async function getCachedTasksBatch<T>(
  *
  * Useful for warming the cache after bulk operations.
  */
-export async function preloadTasks<T>(
-  tasks: Array<{ id: string; data: T }>
-): Promise<void> {
+export async function preloadTasks<T>(tasks: Array<{ id: string; data: T }>): Promise<void> {
   if (tasks.length === 0) return;
 
   const cache = getCache();

@@ -17,10 +17,14 @@ interface IClawboyAgentAdapter {
     event TaskWinRecorded(address indexed wallet, uint256 indexed agentId, uint256 indexed taskId);
 
     /// @notice Emitted when a dispute win is recorded
-    event DisputeWinRecorded(address indexed wallet, uint256 indexed agentId, uint256 indexed disputeId);
+    event DisputeWinRecorded(
+        address indexed wallet, uint256 indexed agentId, uint256 indexed disputeId
+    );
 
     /// @notice Emitted when a dispute loss is recorded
-    event DisputeLossRecorded(address indexed wallet, uint256 indexed agentId, uint256 indexed disputeId);
+    event DisputeLossRecorded(
+        address indexed wallet, uint256 indexed agentId, uint256 indexed disputeId
+    );
 
     /// @notice Emitted when reputation is updated (for voters)
     event VoterReputationUpdated(address indexed wallet, uint256 indexed agentId, int256 delta);

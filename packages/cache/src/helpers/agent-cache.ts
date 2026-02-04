@@ -5,12 +5,7 @@
  */
 
 import { cacheThrough, getCache } from '../cache-client';
-import {
-  agentByAddressKey,
-  agentKey,
-  agentListKey,
-  type AgentListKeyParams,
-} from '../key-builder';
+import { agentByAddressKey, agentKey, agentListKey, type AgentListKeyParams } from '../key-builder';
 import { TTL_CONFIG } from '../ttl-config';
 import type { CacheOptions, CacheResult } from '../types';
 
@@ -163,9 +158,7 @@ export async function getCachedAgentsBatch<T>(
  *
  * Useful for warming the cache after bulk operations.
  */
-export async function preloadAgents<T>(
-  agents: Array<{ address: string; data: T }>
-): Promise<void> {
+export async function preloadAgents<T>(agents: Array<{ address: string; data: T }>): Promise<void> {
   if (agents.length === 0) return;
 
   const cache = getCache();

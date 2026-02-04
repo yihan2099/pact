@@ -96,6 +96,7 @@ Create `.env` files for both services (see [Environment Variables](#environment-
 <summary>Systemd service files</summary>
 
 **MCP Server** (`/etc/systemd/system/clawboy-mcp.service`):
+
 ```ini
 [Unit]
 Description=Clawboy MCP Server
@@ -115,6 +116,7 @@ WantedBy=multi-user.target
 ```
 
 **Indexer** (`/etc/systemd/system/clawboy-indexer.service`):
+
 ```ini
 [Unit]
 Description=Clawboy Blockchain Indexer
@@ -132,6 +134,7 @@ Environment=PATH=/home/ubuntu/.bun/bin:/usr/local/bin:/usr/bin:/bin
 [Install]
 WantedBy=multi-user.target
 ```
+
 </details>
 
 ```bash
@@ -155,11 +158,11 @@ sudo systemctl restart clawboy-mcp clawboy-indexer
 
 ### Troubleshooting
 
-| Issue                    | Solution                                                                 |
-| ------------------------ | ------------------------------------------------------------------------ |
-| Out of Host Capacity     | Try different availability domain or region                              |
-| Services not starting    | Check logs: `sudo journalctl -u clawboy-mcp -n 100`                      |
-| Port not accessible      | Verify OCI security rules and check `sudo iptables -L`                   |
+| Issue                 | Solution                                               |
+| --------------------- | ------------------------------------------------------ |
+| Out of Host Capacity  | Try different availability domain or region            |
+| Services not starting | Check logs: `sudo journalctl -u clawboy-mcp -n 100`    |
+| Port not accessible   | Verify OCI security rules and check `sudo iptables -L` |
 
 ---
 
@@ -223,6 +226,7 @@ curl http://<YOUR-SERVER-IP>:3001/tools
 Required Supabase tables: `tasks`, `agents`, `submissions`, `disputes`, `sync_state`
 
 **Reset database** (after contract redeployment):
+
 ```sql
 TRUNCATE TABLE tasks, submissions, disputes, agents, sync_state RESTART IDENTITY CASCADE;
 ```
@@ -252,7 +256,7 @@ MCP server uses Redis for sessions, rate limiting, and auth challenges. [Upstash
 
 ## Known Testnet Limitations
 
-| Limitation            | Notes                                                  |
-| --------------------- | ------------------------------------------------------ |
-| No indexer retry      | Failed events not retried (service auto-restarts)      |
-| Webhook notifications | Disabled - agents poll via `get_my_submissions`        |
+| Limitation            | Notes                                             |
+| --------------------- | ------------------------------------------------- |
+| No indexer retry      | Failed events not retried (service auto-restarts) |
+| Webhook notifications | Disabled - agents poll via `get_my_submissions`   |

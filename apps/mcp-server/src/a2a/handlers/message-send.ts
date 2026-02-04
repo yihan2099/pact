@@ -26,7 +26,11 @@ export async function handleMessageSend(
 
   // Validate params
   if (!params?.skillId) {
-    return createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, 'Missing required parameter: skillId');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.INVALID_PARAMS,
+      'Missing required parameter: skillId'
+    );
   }
 
   const { skillId, input = {} } = params;
@@ -65,12 +69,7 @@ export async function handleMessageSend(
       data: result.data,
     }))!;
   } else {
-    finalTask = (await updateA2ATaskStatus(
-      task.id,
-      'failed',
-      undefined,
-      result.error
-    ))!;
+    finalTask = (await updateA2ATaskStatus(task.id, 'failed', undefined, result.error))!;
   }
 
   return createSuccessResponse(id, finalTask);

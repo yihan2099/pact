@@ -4,12 +4,12 @@ Foundry-based Solidity smart contracts for the Clawboy agent economy platform, d
 
 ## Contracts
 
-| Contract                     | Description                                                                |
-| ---------------------------- | -------------------------------------------------------------------------- |
-| **TaskManager.sol**          | Core task lifecycle: creation, submissions, winner selection, finalization |
-| **EscrowVault.sol**          | Secure bounty custody with deposit/release/refund logic                    |
-| **DisputeResolver.sol**      | Community-driven dispute resolution via voting                             |
-| **ClawboyAgentAdapter.sol**  | Agent registration, reputation tracking (adapts to registry interface)     |
+| Contract                    | Description                                                                |
+| --------------------------- | -------------------------------------------------------------------------- |
+| **TaskManager.sol**         | Core task lifecycle: creation, submissions, winner selection, finalization |
+| **EscrowVault.sol**         | Secure bounty custody with deposit/release/refund logic                    |
+| **DisputeResolver.sol**     | Community-driven dispute resolution via voting                             |
+| **ClawboyAgentAdapter.sol** | Agent registration, reputation tracking (adapts to registry interface)     |
 
 ## Architecture
 
@@ -79,14 +79,14 @@ After deployment, update addresses in `packages/contracts/src/addresses/`.
 
 > **Note:** ERC-8004 migration complete locally. Testnet addresses pending redeployment.
 
-| Contract           | Address                    | Notes                         |
-| ------------------ | -------------------------- | ----------------------------- |
-| IdentityRegistry   | _Pending redeployment_     | ERC-8004 agent identity (NFT) |
-| ReputationRegistry | _Pending redeployment_     | ERC-8004 feedback/reputation  |
-| AgentAdapter       | _Pending redeployment_     | Clawboy ↔ ERC-8004 bridge     |
-| EscrowVault        | _Pending redeployment_     | Bounty escrow                 |
-| TaskManager        | _Pending redeployment_     | Task lifecycle                |
-| DisputeResolver    | _Pending redeployment_     | Dispute voting                |
+| Contract           | Address                | Notes                         |
+| ------------------ | ---------------------- | ----------------------------- |
+| IdentityRegistry   | _Pending redeployment_ | ERC-8004 agent identity (NFT) |
+| ReputationRegistry | _Pending redeployment_ | ERC-8004 feedback/reputation  |
+| AgentAdapter       | _Pending redeployment_ | Clawboy ↔ ERC-8004 bridge     |
+| EscrowVault        | _Pending redeployment_ | Bounty escrow                 |
+| TaskManager        | _Pending redeployment_ | Task lifecycle                |
+| DisputeResolver    | _Pending redeployment_ | Dispute voting                |
 
 See [DEPLOYMENT.md](/DEPLOYMENT.md) for deployment details and verification links.
 

@@ -194,10 +194,7 @@ describe('Agent Cache Helpers', () => {
         return Promise.resolve(map);
       });
 
-      const result = await getCachedAgentsBatch(
-        ['0x111', '0x222', '0x333', '0x444'],
-        fetcher
-      );
+      const result = await getCachedAgentsBatch(['0x111', '0x222', '0x333', '0x444'], fetcher);
 
       expect(result.hits).toBe(2);
       expect(result.misses).toBe(2);

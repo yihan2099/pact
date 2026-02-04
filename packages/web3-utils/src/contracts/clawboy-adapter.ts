@@ -1,4 +1,8 @@
-import { ClawboyAgentAdapterABI, ERC8004IdentityRegistryABI, getContractAddresses } from '@clawboy/contracts';
+import {
+  ClawboyAgentAdapterABI,
+  ERC8004IdentityRegistryABI,
+  getContractAddresses,
+} from '@clawboy/contracts';
 import { getPublicClient } from '../client/public-client';
 
 /**
@@ -38,10 +42,7 @@ export async function isAgentRegistered(
 /**
  * Get agent ID for a wallet address
  */
-export async function getAgentId(
-  address: `0x${string}`,
-  chainId?: number
-): Promise<bigint> {
+export async function getAgentId(address: `0x${string}`, chainId?: number): Promise<bigint> {
   const resolvedChainId = chainId || getDefaultChainId();
   const publicClient = getPublicClient(resolvedChainId);
   const addresses = getContractAddresses(resolvedChainId);
@@ -102,7 +103,7 @@ export async function getAgentReputationSummary(
     bigint,
     bigint,
     bigint,
-    bigint
+    bigint,
   ];
 
   return {
@@ -116,9 +117,7 @@ export async function getAgentReputationSummary(
 /**
  * Get the ERC-8004 Identity Registry address
  */
-export async function getIdentityRegistryAddress(
-  chainId?: number
-): Promise<`0x${string}`> {
+export async function getIdentityRegistryAddress(chainId?: number): Promise<`0x${string}`> {
   const resolvedChainId = chainId || getDefaultChainId();
   const publicClient = getPublicClient(resolvedChainId);
   const addresses = getContractAddresses(resolvedChainId);
@@ -134,9 +133,7 @@ export async function getIdentityRegistryAddress(
 /**
  * Get the ERC-8004 Reputation Registry address
  */
-export async function getReputationRegistryAddress(
-  chainId?: number
-): Promise<`0x${string}`> {
+export async function getReputationRegistryAddress(chainId?: number): Promise<`0x${string}`> {
   const resolvedChainId = chainId || getDefaultChainId();
   const publicClient = getPublicClient(resolvedChainId);
   const addresses = getContractAddresses(resolvedChainId);
@@ -162,24 +159,24 @@ export async function getAgentURI(
   const addresses = getContractAddresses(resolvedChainId);
 
   // First get the agent ID
-  const agentId = await publicClient.readContract({
+  const agentId = (await publicClient.readContract({
     address: addresses.agentAdapter,
     abi: ClawboyAgentAdapterABI,
     functionName: 'getAgentId',
     args: [address],
-  }) as bigint;
+  })) as bigint;
 
   if (agentId === 0n) {
     return null;
   }
 
   // Then get the agent URI from the identity registry
-  const agentURI = await publicClient.readContract({
+  const agentURI = (await publicClient.readContract({
     address: addresses.identityRegistry,
     abi: ERC8004IdentityRegistryABI,
     functionName: 'getAgentURI',
     args: [agentId],
-  }) as string;
+  })) as string;
 
   return agentURI || null;
 }

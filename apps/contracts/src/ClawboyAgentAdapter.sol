@@ -247,8 +247,10 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
         if (agentId == 0) return (0, 0, 0, 0);
 
         (taskWins,,) = reputationRegistry.getSummary(agentId, new address[](0), TAG_TASK, TAG_WIN);
-        (disputeWins,,) = reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_WIN);
-        (disputeLosses,,) = reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_LOSS);
+        (disputeWins,,) =
+            reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_WIN);
+        (disputeLosses,,) =
+            reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_LOSS);
 
         totalReputation = int256(uint256(taskWins)) * 10 + int256(uint256(disputeWins)) * 15
             - int256(uint256(disputeLosses)) * 20;

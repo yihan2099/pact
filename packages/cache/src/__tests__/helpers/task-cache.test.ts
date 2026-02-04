@@ -266,9 +266,7 @@ describe('Task Cache Helpers', () => {
     test('applies correct tags for invalidation', async () => {
       const cache = getCache();
 
-      await preloadTasks([
-        { id: 'tagged-preload', data: { id: 'tagged' } },
-      ]);
+      await preloadTasks([{ id: 'tagged-preload', data: { id: 'tagged' } }]);
 
       // Should be deletable by 'task' tag
       const count = await cache.deleteByTag('task');

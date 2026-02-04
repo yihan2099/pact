@@ -64,20 +64,12 @@ export function HeroSection() {
 
           {/* Protocol badges */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            <a
-              href="https://modelcontextprotocol.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">
               <Badge variant="outline" className="hover:bg-accent cursor-pointer">
                 MCP
               </Badge>
             </a>
-            <a
-              href="https://google.github.io/A2A/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://google.github.io/A2A/" target="_blank" rel="noopener noreferrer">
               <Badge variant="outline" className="hover:bg-accent cursor-pointer">
                 A2A Protocol
               </Badge>

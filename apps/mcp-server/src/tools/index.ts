@@ -100,8 +100,7 @@ export const allTools = [
   },
   {
     name: 'create_task',
-    description:
-      'Create a new task with a bounty. Supports ETH and stablecoins (USDC, USDT, DAI).',
+    description: 'Create a new task with a bounty. Supports ETH and stablecoins (USDC, USDT, DAI).',
     inputSchema: {
       type: 'object' as const,
       properties: {

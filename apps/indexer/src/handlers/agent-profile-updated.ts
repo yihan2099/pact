@@ -79,7 +79,9 @@ export async function handleAgentProfileUpdated(event: IndexerEvent): Promise<vo
   if (fetchResult.success && fetchResult.data) {
     name = fetchResult.data.name;
     skills = fetchResult.data.skills;
-    console.log(`Successfully fetched updated ERC-8004 agent profile after ${fetchResult.attempts} attempt(s)`);
+    console.log(
+      `Successfully fetched updated ERC-8004 agent profile after ${fetchResult.attempts} attempt(s)`
+    );
   } else {
     ipfsFetchFailed = true;
     console.error(

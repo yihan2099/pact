@@ -10,14 +10,8 @@ export type { GetCapabilitiesInput, GetCapabilitiesOutput } from './get-capabili
 export { getWorkflowGuideTool, getWorkflowGuideHandler } from './get-workflow-guide';
 export type { GetWorkflowGuideInput, GetWorkflowGuideOutput } from './get-workflow-guide';
 
-export {
-  getSupportedTokensTool,
-  getSupportedTokensHandler,
-} from './get-supported-tokens';
-export type {
-  GetSupportedTokensInput,
-  GetSupportedTokensOutput,
-} from './get-supported-tokens';
+export { getSupportedTokensTool, getSupportedTokensHandler } from './get-supported-tokens';
+export type { GetSupportedTokensInput, GetSupportedTokensOutput } from './get-supported-tokens';
 
 export {
   discoveryToolDefs,

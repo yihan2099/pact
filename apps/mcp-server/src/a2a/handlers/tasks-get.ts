@@ -22,7 +22,11 @@ export async function handleTasksGet(
 
   // Validate params
   if (!params?.taskId) {
-    return createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, 'Missing required parameter: taskId');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.INVALID_PARAMS,
+      'Missing required parameter: taskId'
+    );
   }
 
   const { taskId } = params;
@@ -41,7 +45,11 @@ export async function handleTasksGet(
   if (!isAnonymousTask && task.sessionId !== sessionId) {
     // If authenticated but different session, still allow access (same user may have multiple sessions)
     // For now, we require exact session match for security
-    return createErrorResponse(id, A2A_ERROR_CODES.ACCESS_DENIED, 'Access denied: task belongs to a different session');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.ACCESS_DENIED,
+      'Access denied: task belongs to a different session'
+    );
   }
 
   return createSuccessResponse(id, task);

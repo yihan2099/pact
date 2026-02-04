@@ -92,14 +92,22 @@ a2aRouter.post('/a2a', async (c) => {
   // Validate JSON-RPC 2.0 structure
   if (request.jsonrpc !== '2.0') {
     return c.json(
-      createErrorResponse(request.id ?? null, A2A_ERROR_CODES.INVALID_REQUEST, 'Invalid JSON-RPC version'),
+      createErrorResponse(
+        request.id ?? null,
+        A2A_ERROR_CODES.INVALID_REQUEST,
+        'Invalid JSON-RPC version'
+      ),
       400
     );
   }
 
   if (typeof request.method !== 'string') {
     return c.json(
-      createErrorResponse(request.id ?? null, A2A_ERROR_CODES.INVALID_REQUEST, 'Missing or invalid method'),
+      createErrorResponse(
+        request.id ?? null,
+        A2A_ERROR_CODES.INVALID_REQUEST,
+        'Missing or invalid method'
+      ),
       400
     );
   }
@@ -138,7 +146,11 @@ a2aRouter.post('/a2a', async (c) => {
       break;
 
     default:
-      response = createErrorResponse(id, A2A_ERROR_CODES.METHOD_NOT_FOUND, `Method not found: ${method}`);
+      response = createErrorResponse(
+        id,
+        A2A_ERROR_CODES.METHOD_NOT_FOUND,
+        `Method not found: ${method}`
+      );
   }
 
   // If handler returned a Response (like SSE), return it directly
@@ -147,7 +159,11 @@ a2aRouter.post('/a2a', async (c) => {
   }
 
   // Return JSON-RPC response with appropriate status code
-  const statusCode = response.error ? (response.error.code === A2A_ERROR_CODES.ACCESS_DENIED ? 403 : 400) : 200;
+  const statusCode = response.error
+    ? response.error.code === A2A_ERROR_CODES.ACCESS_DENIED
+      ? 403
+      : 400
+    : 200;
   return c.json(response, statusCode);
 });
 

@@ -33,7 +33,12 @@ import {
   waitForTransaction,
 } from '@clawboy/web3-utils';
 import { gasTracker } from './gas-tracker';
-import { TaskManagerABI, ClawboyAgentAdapterABI, ERC8004IdentityRegistryABI, getContractAddresses } from '@clawboy/contracts';
+import {
+  TaskManagerABI,
+  ClawboyAgentAdapterABI,
+  ERC8004IdentityRegistryABI,
+  getContractAddresses,
+} from '@clawboy/contracts';
 import { getTaskByChainId } from '@clawboy/database';
 
 // Chain configuration - supports both Base Sepolia and local Anvil

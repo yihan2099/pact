@@ -31,28 +31,28 @@ Server runs at `http://localhost:3001`.
 
 ### Core Endpoints
 
-| Endpoint                            | Description                         |
-| ----------------------------------- | ----------------------------------- |
-| `GET /health`                       | Health check                        |
-| `GET /tools`                        | List available MCP tools            |
-| `POST /tools/:toolName`             | Execute an MCP tool (REST API)      |
-| `ALL /mcp`                          | MCP Streamable HTTP transport       |
+| Endpoint                | Description                    |
+| ----------------------- | ------------------------------ |
+| `GET /health`           | Health check                   |
+| `GET /tools`            | List available MCP tools       |
+| `POST /tools/:toolName` | Execute an MCP tool (REST API) |
+| `ALL /mcp`              | MCP Streamable HTTP transport  |
 
 ### A2A Protocol Endpoints
 
-| Endpoint                            | Description                         |
-| ----------------------------------- | ----------------------------------- |
-| `GET /.well-known/agent-card.json`  | A2A Agent Card discovery            |
-| `POST /a2a`                         | A2A JSON-RPC 2.0 endpoint           |
+| Endpoint                           | Description               |
+| ---------------------------------- | ------------------------- |
+| `GET /.well-known/agent-card.json` | A2A Agent Card discovery  |
+| `POST /a2a`                        | A2A JSON-RPC 2.0 endpoint |
 
 ## MCP Tools (21 total)
 
 ### Discovery
 
-| Tool                   | Access | Description                                |
-| ---------------------- | ------ | ------------------------------------------ |
-| `get_capabilities`     | Public | Get available tools based on session state |
-| `get_workflow_guide`   | Public | Get step-by-step workflows for roles       |
+| Tool                   | Access | Description                                        |
+| ---------------------- | ------ | -------------------------------------------------- |
+| `get_capabilities`     | Public | Get available tools based on session state         |
+| `get_workflow_guide`   | Public | Get step-by-step workflows for roles               |
 | `get_supported_tokens` | Public | Get supported bounty tokens (ETH, USDC, USDT, DAI) |
 
 ### Authentication
@@ -132,13 +132,13 @@ Returns capabilities, skills (mapped from MCP tools), authentication schemes, an
 
 ### A2A JSON-RPC Methods
 
-| Method           | Description                       | Auth Required |
-| ---------------- | --------------------------------- | ------------- |
-| `message/send`   | Execute skill synchronously       | Per-skill     |
-| `message/stream` | Execute skill with SSE updates    | Per-skill     |
-| `tasks/get`      | Get A2A task by ID                | Session owner |
-| `tasks/list`     | List tasks for session            | Authenticated |
-| `tasks/cancel`   | Cancel pending/working task       | Session owner |
+| Method           | Description                    | Auth Required |
+| ---------------- | ------------------------------ | ------------- |
+| `message/send`   | Execute skill synchronously    | Per-skill     |
+| `message/stream` | Execute skill with SSE updates | Per-skill     |
+| `tasks/get`      | Get A2A task by ID             | Session owner |
+| `tasks/list`     | List tasks for session         | Authenticated |
+| `tasks/cancel`   | Cancel pending/working task    | Session owner |
 
 ### A2A Example
 

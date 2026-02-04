@@ -68,7 +68,9 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
             bytes32 keyHash = keccak256(bytes(metadata[i].metadataKey));
             _metadata[agentId][keyHash] = metadata[i].metadataValue;
 
-            emit MetadataSet(agentId, metadata[i].metadataKey, metadata[i].metadataKey, metadata[i].metadataValue);
+            emit MetadataSet(
+                agentId, metadata[i].metadataKey, metadata[i].metadataKey, metadata[i].metadataValue
+            );
         }
     }
 
@@ -79,7 +81,13 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
      * @param agentURI The URI pointing to agent metadata
      * @return agentId The ID of the newly registered agent
      */
-    function registerFor(address owner, string calldata agentURI) external returns (uint256 agentId) {
+    function registerFor(
+        address owner,
+        string calldata agentURI
+    )
+        external
+        returns (uint256 agentId)
+    {
         return _register(owner, agentURI);
     }
 
@@ -147,7 +155,13 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
     /**
      * @notice Set metadata for an agent
      */
-    function setMetadata(uint256 agentId, string calldata metadataKey, bytes calldata metadataValue) external {
+    function setMetadata(
+        uint256 agentId,
+        string calldata metadataKey,
+        bytes calldata metadataValue
+    )
+        external
+    {
         if (!_exists(agentId)) revert AgentNotFound();
         if (ownerOf(agentId) != msg.sender) revert NotAgentOwner();
 
@@ -160,7 +174,14 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
     /**
      * @notice Get metadata for an agent
      */
-    function getMetadata(uint256 agentId, string calldata metadataKey) external view returns (bytes memory) {
+    function getMetadata(
+        uint256 agentId,
+        string calldata metadataKey
+    )
+        external
+        view
+        returns (bytes memory)
+    {
         if (!_exists(agentId)) revert AgentNotFound();
 
         bytes32 keyHash = keccak256(bytes(metadataKey));
@@ -185,7 +206,8 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
         if (_walletToAgent[newWallet] != 0) revert WalletAlreadyLinked();
 
         // Verify signature from new wallet
-        bytes32 message = keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(this)));
+        bytes32 message =
+            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(this)));
         bytes32 ethSignedMessage = message.toEthSignedMessageHash();
         address signer = ethSignedMessage.recover(signature);
 
@@ -252,7 +274,11 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
     /**
      * @dev Override _update to handle wallet unlinking on transfer
      */
-    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override
+        returns (address)
+    {
         address from = super._update(to, tokenId, auth);
 
         // When transferring, unlink the wallet from the agent
@@ -267,5 +293,4 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
 
         return from;
     }
-
 }

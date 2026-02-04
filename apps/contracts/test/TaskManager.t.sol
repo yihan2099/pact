@@ -35,7 +35,8 @@ contract TaskManagerTest is Test {
         reputationRegistry.initialize(address(identityRegistry));
 
         // Deploy ClawboyAgentAdapter
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager =

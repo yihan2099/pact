@@ -176,10 +176,7 @@ export async function getCachedOnly<K, V>(
  * @param keyBuilder Function to build cache key from an ID
  * @returns Number of items deleted
  */
-export async function deleteBatch<K>(
-  ids: K[],
-  keyBuilder: (id: K) => string
-): Promise<number> {
+export async function deleteBatch<K>(ids: K[], keyBuilder: (id: K) => string): Promise<number> {
   if (ids.length === 0) return 0;
 
   const cache = getCache();

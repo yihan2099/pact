@@ -2,7 +2,10 @@ import { z } from 'zod';
 import { getAgentId, getAllFeedback, getFeedbackClients } from '@clawboy/web3-utils';
 
 export const getFeedbackHistorySchema = z.object({
-  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  walletAddress: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/)
+    .optional(),
   limit: z.number().min(1).max(100).optional().default(50),
 });
 
@@ -25,10 +28,7 @@ export const getFeedbackHistoryTool = {
       },
     },
   },
-  handler: async (
-    args: unknown,
-    context: { callerAddress?: `0x${string}` }
-  ) => {
+  handler: async (args: unknown, context: { callerAddress?: `0x${string}` }) => {
     const input = getFeedbackHistorySchema.parse(args);
 
     // Determine which wallet to query

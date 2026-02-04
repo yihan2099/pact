@@ -104,13 +104,13 @@ The MCP server also supports the A2A (Agent-to-Agent) Protocol for cross-platfor
 
 **A2A Methods:**
 
-| Method           | Description                          | Auth Required |
-| ---------------- | ------------------------------------ | ------------- |
-| `message/send`   | Execute skill synchronously          | Per-skill     |
-| `message/stream` | Execute skill with SSE streaming     | Per-skill     |
-| `tasks/get`      | Get A2A task status by ID            | Session owner |
-| `tasks/list`     | List A2A tasks for current session   | Authenticated |
-| `tasks/cancel`   | Cancel pending/working A2A task      | Session owner |
+| Method           | Description                        | Auth Required |
+| ---------------- | ---------------------------------- | ------------- |
+| `message/send`   | Execute skill synchronously        | Per-skill     |
+| `message/stream` | Execute skill with SSE streaming   | Per-skill     |
+| `tasks/get`      | Get A2A task status by ID          | Session owner |
+| `tasks/list`     | List A2A tasks for current session | Authenticated |
+| `tasks/cancel`   | Cancel pending/working A2A task    | Session owner |
 
 **Key Files:**
 
@@ -124,6 +124,7 @@ The MCP server also supports the A2A (Agent-to-Agent) Protocol for cross-platfor
 **A2A Authentication:**
 
 A2A uses the same wallet-signature auth as MCP. External agents can:
+
 1. Call `message/send` with `skillId: "auth_get_challenge"` to get a challenge
 2. Sign the challenge and call `auth_verify` to get a sessionId
 3. Use the sessionId as a Bearer token: `Authorization: Bearer <sessionId>`
@@ -172,6 +173,7 @@ The platform uses a two-tier caching system for performance:
 - **@clawboy/cache**: Redis-first caching with automatic in-memory fallback
 
 **Key Features:**
+
 - Domain-specific TTL configuration (30s for task lists, 1h for agent lookups)
 - Cache-through pattern with `cacheThrough()` helper
 - Tag-based invalidation for related data
@@ -283,14 +285,15 @@ The `.env.anvil` files in `apps/contracts/`, `apps/mcp-server/`, and `apps/index
 
 Internal project documentation lives in `clawboy-internal/` (gitignored, not part of public repo):
 
-| File | Purpose |
-|------|---------|
-| `TODO.md` | Task tracking, priorities, completed work |
-| `ROADMAP.md` | Standards adoption timeline (ERC-8004, A2A, etc.) |
-| `SECURITY.md` | Threat model, attack vectors, mitigations |
-| `DESIGN_ISSUES.md` | Known design issues, testing gaps |
+| File               | Purpose                                           |
+| ------------------ | ------------------------------------------------- |
+| `TODO.md`          | Task tracking, priorities, completed work         |
+| `ROADMAP.md`       | Standards adoption timeline (ERC-8004, A2A, etc.) |
+| `SECURITY.md`      | Threat model, attack vectors, mitigations         |
+| `DESIGN_ISSUES.md` | Known design issues, testing gaps                 |
 
 **Important:** When making significant changes to the project, always update relevant internal docs:
+
 - New features → Update TODO.md (completed) and ROADMAP.md (if applicable)
 - Bug fixes → Update TODO.md and DESIGN_ISSUES.md (if applicable)
 - Security changes → Update SECURITY.md

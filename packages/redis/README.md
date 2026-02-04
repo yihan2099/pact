@@ -10,10 +10,10 @@ bun add @clawboy/redis
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `UPSTASH_REDIS_REST_URL` | Yes | Upstash Redis REST API URL |
-| `UPSTASH_REDIS_REST_TOKEN` | Yes | Upstash Redis REST API token |
+| Variable                   | Required | Description                  |
+| -------------------------- | -------- | ---------------------------- |
+| `UPSTASH_REDIS_REST_URL`   | Yes      | Upstash Redis REST API URL   |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes      | Upstash Redis REST API token |
 
 If either variable is missing, Redis is disabled and `getRedisClient()` returns `null`.
 
@@ -63,6 +63,7 @@ afterEach(() => {
 ## Fallback Behavior
 
 When Redis is not configured:
+
 - A warning is logged once at startup
 - `getRedisClient()` returns `null`
 - Consumers should implement their own fallback (e.g., in-memory storage)

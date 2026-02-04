@@ -237,10 +237,7 @@ describe('Batch Cache Utilities', () => {
       await cache.set(keyBuilder('exists-1'), { id: 'exists-1' });
       await cache.set(keyBuilder('exists-2'), { id: 'exists-2' });
 
-      const result = await getCachedOnly(
-        ['exists-1', 'missing', 'exists-2'],
-        keyBuilder
-      );
+      const result = await getCachedOnly(['exists-1', 'missing', 'exists-2'], keyBuilder);
 
       expect(result.size).toBe(2);
       expect(result.get('exists-1')).toEqual({ id: 'exists-1' });
@@ -300,10 +297,7 @@ describe('Batch Cache Utilities', () => {
       await cache.set(keyBuilder('count-1'), { id: 1 });
       await cache.set(keyBuilder('count-2'), { id: 2 });
 
-      const count = await deleteBatch(
-        ['count-1', 'count-2', 'nonexistent'],
-        keyBuilder
-      );
+      const count = await deleteBatch(['count-1', 'count-2', 'nonexistent'], keyBuilder);
 
       expect(count).toBe(2);
     });
@@ -314,10 +308,7 @@ describe('Batch Cache Utilities', () => {
     });
 
     test('returns 0 when no items exist', async () => {
-      const count = await deleteBatch(
-        ['nonexistent-1', 'nonexistent-2'],
-        keyBuilder
-      );
+      const count = await deleteBatch(['nonexistent-1', 'nonexistent-2'], keyBuilder);
       expect(count).toBe(0);
     });
 
@@ -326,10 +317,7 @@ describe('Batch Cache Utilities', () => {
       await cache.set(keyBuilder('mixed-1'), { id: 1 });
       await cache.set(keyBuilder('mixed-3'), { id: 3 });
 
-      const count = await deleteBatch(
-        ['mixed-1', 'mixed-2', 'mixed-3', 'mixed-4'],
-        keyBuilder
-      );
+      const count = await deleteBatch(['mixed-1', 'mixed-2', 'mixed-3', 'mixed-4'], keyBuilder);
 
       expect(count).toBe(2);
     });

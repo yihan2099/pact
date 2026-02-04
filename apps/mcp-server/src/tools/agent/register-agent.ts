@@ -110,7 +110,9 @@ export const registerAgentTool = {
     };
 
     // Upload ERC-8004 agent URI to IPFS
-    const uploadResult = await uploadJson(agentURI as unknown as Record<string, unknown>, { name: `agent-${context.callerAddress}.json` });
+    const uploadResult = await uploadJson(agentURI as unknown as Record<string, unknown>, {
+      name: `agent-${context.callerAddress}.json`,
+    });
 
     // Construct the IPFS URI (ipfs://CID format)
     const ipfsURI = `ipfs://${uploadResult.cid}`;

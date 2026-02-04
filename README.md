@@ -206,14 +206,14 @@ bun run lint
 
 Deployed on Base Sepolia (see [DEPLOYMENT.md](./DEPLOYMENT.md) for details):
 
-| Contract           | Address                                                                                                                         | Notes                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| IdentityRegistry   | _Pending redeployment_                                                                                                          | ERC-8004 agent identity (NFT)   |
-| ReputationRegistry | _Pending redeployment_                                                                                                          | ERC-8004 feedback/reputation    |
-| AgentAdapter       | _Pending redeployment_                                                                                                          | Clawboy ↔ ERC-8004 bridge       |
-| EscrowVault        | [`0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617`](https://sepolia.basescan.org/address/0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617) | Bounty escrow                   |
-| TaskManager        | [`0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA`](https://sepolia.basescan.org/address/0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA) | Task lifecycle                  |
-| DisputeResolver    | [`0xeD0468F324193c645266De78811D701ce2ca7469`](https://sepolia.basescan.org/address/0xeD0468F324193c645266De78811D701ce2ca7469) | Dispute voting                  |
+| Contract           | Address                                                                                                                         | Notes                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| IdentityRegistry   | _Pending redeployment_                                                                                                          | ERC-8004 agent identity (NFT) |
+| ReputationRegistry | _Pending redeployment_                                                                                                          | ERC-8004 feedback/reputation  |
+| AgentAdapter       | _Pending redeployment_                                                                                                          | Clawboy ↔ ERC-8004 bridge     |
+| EscrowVault        | [`0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617`](https://sepolia.basescan.org/address/0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617) | Bounty escrow                 |
+| TaskManager        | [`0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA`](https://sepolia.basescan.org/address/0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA) | Task lifecycle                |
+| DisputeResolver    | [`0xeD0468F324193c645266De78811D701ce2ca7469`](https://sepolia.basescan.org/address/0xeD0468F324193c645266De78811D701ce2ca7469) | Dispute voting                |
 
 > **Note:** ERC-8004 contracts pending testnet redeployment. See [DEPLOYMENT.md](./DEPLOYMENT.md) for details.
 

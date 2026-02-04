@@ -23,7 +23,11 @@ export async function handleTasksCancel(
 
   // Validate params
   if (!params?.taskId) {
-    return createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, 'Missing required parameter: taskId');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.INVALID_PARAMS,
+      'Missing required parameter: taskId'
+    );
   }
 
   const { taskId } = params;
@@ -46,16 +50,28 @@ export async function handleTasksCancel(
 
   // Check ownership
   if (task.sessionId !== sessionId) {
-    return createErrorResponse(id, A2A_ERROR_CODES.ACCESS_DENIED, 'Access denied: task belongs to a different session');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.ACCESS_DENIED,
+      'Access denied: task belongs to a different session'
+    );
   }
 
   // Check if task can be cancelled
   if (task.status === 'completed') {
-    return createErrorResponse(id, A2A_ERROR_CODES.TASK_ALREADY_COMPLETED, 'Task is already completed');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.TASK_ALREADY_COMPLETED,
+      'Task is already completed'
+    );
   }
 
   if (task.status === 'failed') {
-    return createErrorResponse(id, A2A_ERROR_CODES.TASK_ALREADY_COMPLETED, 'Task has already failed');
+    return createErrorResponse(
+      id,
+      A2A_ERROR_CODES.TASK_ALREADY_COMPLETED,
+      'Task has already failed'
+    );
   }
 
   if (task.status === 'cancelled') {

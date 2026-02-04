@@ -72,7 +72,8 @@ export async function handleMessageStream(
         id,
         error: {
           code: A2A_ERROR_CODES.SESSION_REQUIRED,
-          message: 'This skill requires authentication. Use wallet-signature auth flow to get a session.',
+          message:
+            'This skill requires authentication. Use wallet-signature auth flow to get a session.',
         },
       },
       401
@@ -122,12 +123,7 @@ export async function handleMessageStream(
         id: `${task.id}-completed`,
       });
     } else {
-      finalTask = (await updateA2ATaskStatus(
-        task.id,
-        'failed',
-        undefined,
-        result.error
-      ))!;
+      finalTask = (await updateA2ATaskStatus(task.id, 'failed', undefined, result.error))!;
 
       // Send task.failed event
       await stream.writeSSE({

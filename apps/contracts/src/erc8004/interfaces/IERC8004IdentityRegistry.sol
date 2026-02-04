@@ -96,7 +96,12 @@ interface IERC8004IdentityRegistry {
      * @param metadataKey The metadata key
      * @param metadataValue The metadata value
      */
-    function setMetadata(uint256 agentId, string calldata metadataKey, bytes calldata metadataValue) external;
+    function setMetadata(
+        uint256 agentId,
+        string calldata metadataKey,
+        bytes calldata metadataValue
+    )
+        external;
 
     /**
      * @notice Get metadata for an agent
@@ -104,7 +109,13 @@ interface IERC8004IdentityRegistry {
      * @param metadataKey The metadata key
      * @return The metadata value
      */
-    function getMetadata(uint256 agentId, string calldata metadataKey) external view returns (bytes memory);
+    function getMetadata(
+        uint256 agentId,
+        string calldata metadataKey
+    )
+        external
+        view
+        returns (bytes memory);
 
     /**
      * @notice Set an agent's wallet address with signature verification

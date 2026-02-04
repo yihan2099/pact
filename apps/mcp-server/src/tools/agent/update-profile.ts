@@ -166,7 +166,9 @@ export const updateProfileTool = {
     }
 
     // Upload updated profile to IPFS
-    const uploadResult = await uploadJson(updatedProfile as unknown as Record<string, unknown>, { name: `agent-${context.callerAddress}.json` });
+    const uploadResult = await uploadJson(updatedProfile as unknown as Record<string, unknown>, {
+      name: `agent-${context.callerAddress}.json`,
+    });
 
     // Construct the new IPFS URI
     const newURI = `ipfs://${uploadResult.cid}`;

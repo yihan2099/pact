@@ -2,7 +2,10 @@ import { z } from 'zod';
 import { getAgentId, getAgentReputationSummary, getFeedbackSummary } from '@clawboy/web3-utils';
 
 export const getReputationSchema = z.object({
-  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  walletAddress: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{40}$/)
+    .optional(),
   tag1: z.string().optional(),
   tag2: z.string().optional(),
 });
@@ -30,10 +33,7 @@ export const getReputationTool = {
       },
     },
   },
-  handler: async (
-    args: unknown,
-    context: { callerAddress?: `0x${string}` }
-  ) => {
+  handler: async (args: unknown, context: { callerAddress?: `0x${string}` }) => {
     const input = getReputationSchema.parse(args);
 
     // Determine which wallet to query

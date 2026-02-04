@@ -57,11 +57,10 @@ Cache-through pattern: check cache first, fetch and cache on miss.
 ```typescript
 import { cacheThrough } from '@clawboy/cache';
 
-const { data, hit } = await cacheThrough(
-  'task:123',
-  async () => fetchTaskFromDatabase('123'),
-  { ttl: 300, tags: ['task'] }
-);
+const { data, hit } = await cacheThrough('task:123', async () => fetchTaskFromDatabase('123'), {
+  ttl: 300,
+  tags: ['task'],
+});
 
 console.log(hit); // true = cache hit, false = fetched fresh
 ```
@@ -78,17 +77,17 @@ Returns cache statistics for monitoring.
 
 Pre-configured TTL values for different data types:
 
-| Key | TTL | Description |
-|-----|-----|-------------|
-| `TASK_LIST` | 30s | Task lists (frequent submission updates) |
-| `TASK_DETAIL` | 5min | Individual task details |
-| `AGENT_BY_ADDRESS` | 1hr | Agent lookup by address |
-| `AGENT_LIST` | 5min | Agent list queries |
-| `SUBMISSION` | 5min | Submission data |
-| `PLATFORM_STATS` | 15min | Platform statistics |
-| `TOP_AGENTS` | 15min | Top agents leaderboard |
-| `DISPUTE` | 1min | Dispute data (votes change quickly) |
-| `DEFAULT` | 5min | Fallback TTL |
+| Key                | TTL   | Description                              |
+| ------------------ | ----- | ---------------------------------------- |
+| `TASK_LIST`        | 30s   | Task lists (frequent submission updates) |
+| `TASK_DETAIL`      | 5min  | Individual task details                  |
+| `AGENT_BY_ADDRESS` | 1hr   | Agent lookup by address                  |
+| `AGENT_LIST`       | 5min  | Agent list queries                       |
+| `SUBMISSION`       | 5min  | Submission data                          |
+| `PLATFORM_STATS`   | 15min | Platform statistics                      |
+| `TOP_AGENTS`       | 15min | Top agents leaderboard                   |
+| `DISPUTE`          | 1min  | Dispute data (votes change quickly)      |
+| `DEFAULT`          | 5min  | Fallback TTL                             |
 
 ```typescript
 import { TTL_CONFIG, getTTL } from '@clawboy/cache';
@@ -107,26 +106,26 @@ Generate consistent cache keys for all data types:
 ```typescript
 import { taskKey, taskListKey, agentByAddressKey } from '@clawboy/cache';
 
-taskKey('123');                    // 'task:123'
-taskListKey({ status: 'open' });   // 'tasks:s:open'
-agentByAddressKey('0x...');        // 'agent:addr:0x...'
+taskKey('123'); // 'task:123'
+taskListKey({ status: 'open' }); // 'tasks:s:open'
+agentByAddressKey('0x...'); // 'agent:addr:0x...'
 ```
 
 ### Available Key Builders
 
-| Function | Example Output |
-|----------|----------------|
-| `taskKey(id)` | `task:123` |
-| `taskListKey(params)` | `tasks:s:open:l:10` |
-| `agentKey(id)` | `agent:456` |
-| `agentByAddressKey(addr)` | `agent:addr:0x...` |
-| `agentListKey(params)` | `agents:l:10:o:0` |
+| Function                      | Example Output         |
+| ----------------------------- | ---------------------- |
+| `taskKey(id)`                 | `task:123`             |
+| `taskListKey(params)`         | `tasks:s:open:l:10`    |
+| `agentKey(id)`                | `agent:456`            |
+| `agentByAddressKey(addr)`     | `agent:addr:0x...`     |
+| `agentListKey(params)`        | `agents:l:10:o:0`      |
 | `submissionKey(taskId, addr)` | `submission:123:0x...` |
-| `submissionListKey(params)` | `submissions:t:123` |
-| `disputeKey(id)` | `dispute:789` |
-| `disputeListKey(params)` | `disputes:s:active` |
-| `platformStatsKey()` | `stats:platform` |
-| `topAgentsKey(limit)` | `stats:top_agents:10` |
+| `submissionListKey(params)`   | `submissions:t:123`    |
+| `disputeKey(id)`              | `dispute:789`          |
+| `disputeListKey(params)`      | `disputes:s:active`    |
+| `platformStatsKey()`          | `stats:platform`       |
+| `topAgentsKey(limit)`         | `stats:top_agents:10`  |
 
 ## Invalidation Helpers
 
@@ -165,9 +164,8 @@ High-level helpers for common caching patterns:
 import { getCachedTaskList, getCachedTask, preloadTasks } from '@clawboy/cache/helpers';
 
 // Get cached task list
-const { data, hit } = await getCachedTaskList(
-  { status: 'open', limit: 10 },
-  () => fetchTasksFromDB({ status: 'open', limit: 10 })
+const { data, hit } = await getCachedTaskList({ status: 'open', limit: 10 }, () =>
+  fetchTasksFromDB({ status: 'open', limit: 10 })
 );
 
 // Get single task
@@ -183,16 +181,10 @@ await preloadTasks(['task-1', 'task-2', 'task-3'], fetchTaskBatch);
 import { getCachedAgentByAddress, getCachedAgentList } from '@clawboy/cache/helpers';
 
 // Get agent by wallet address
-const { data: agent } = await getCachedAgentByAddress(
-  '0x...',
-  () => fetchAgentByAddress('0x...')
-);
+const { data: agent } = await getCachedAgentByAddress('0x...', () => fetchAgentByAddress('0x...'));
 
 // Get agent list
-const { data: agents } = await getCachedAgentList(
-  { limit: 10 },
-  () => fetchAgents({ limit: 10 })
-);
+const { data: agents } = await getCachedAgentList({ limit: 10 }, () => fetchAgents({ limit: 10 }));
 ```
 
 ### Statistics Caching
@@ -225,9 +217,9 @@ const cached = await getCachedOnly(['task:1', 'task:2', 'task:3']);
 
 ```typescript
 interface CacheOptions {
-  ttl?: number;        // Time-to-live in seconds (default: 300)
-  tags?: string[];     // Tags for grouped invalidation
-  skipRead?: boolean;  // Skip cache read (force fetch)
+  ttl?: number; // Time-to-live in seconds (default: 300)
+  tags?: string[]; // Tags for grouped invalidation
+  skipRead?: boolean; // Skip cache read (force fetch)
   skipWrite?: boolean; // Skip cache write (don't store result)
 }
 ```

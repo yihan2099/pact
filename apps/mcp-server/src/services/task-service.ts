@@ -48,7 +48,7 @@ export async function listTasksHandler(
 
   // Determine decimals for bounty filter conversion
   const filterDecimals = bountyTokenAddress
-    ? getTokenByAddress(chainId, bountyTokenAddress)?.decimals ?? 18
+    ? (getTokenByAddress(chainId, bountyTokenAddress)?.decimals ?? 18)
     : 18; // Default to ETH decimals
 
   if (input.minBounty) {

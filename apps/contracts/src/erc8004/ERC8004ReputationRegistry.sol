@@ -92,7 +92,9 @@ contract ERC8004ReputationRegistry is IERC8004ReputationRegistry {
         string calldata tag1,
         string calldata tag2,
         bytes32 feedbackHash
-    ) private {
+    )
+        private
+    {
         // Verify agent exists
         IERC8004IdentityRegistry registry = IERC8004IdentityRegistry(_identityRegistry);
         if (agentId > registry.totalAgents() || agentId == 0) revert AgentNotFound();
@@ -177,7 +179,9 @@ contract ERC8004ReputationRegistry is IERC8004ReputationRegistry {
         FeedbackEntry storage entry = _feedback[agentId][clientAddress][feedbackIndex];
         if (entry.timestamp == 0) revert FeedbackNotFound();
 
-        emit ResponseAppended(agentId, clientAddress, feedbackIndex, msg.sender, responseURI, responseHash);
+        emit ResponseAppended(
+            agentId, clientAddress, feedbackIndex, msg.sender, responseURI, responseHash
+        );
     }
 
     /**
@@ -199,7 +203,8 @@ contract ERC8004ReputationRegistry is IERC8004ReputationRegistry {
         bytes32 tag2Hash = bytes(tag2).length > 0 ? keccak256(bytes(tag2)) : bytes32(0);
 
         // If specific clients provided, use them; otherwise use all clients
-        uint256 numClients = clientAddresses.length > 0 ? clientAddresses.length : _clients[agentId].length;
+        uint256 numClients =
+            clientAddresses.length > 0 ? clientAddresses.length : _clients[agentId].length;
 
         for (uint256 i = 0; i < numClients; i++) {
             address client = clientAddresses.length > 0 ? clientAddresses[i] : _clients[agentId][i];
@@ -230,7 +235,13 @@ contract ERC8004ReputationRegistry is IERC8004ReputationRegistry {
     )
         external
         view
-        returns (int128 value, uint8 valueDecimals, string memory tag1, string memory tag2, bool isRevoked)
+        returns (
+            int128 value,
+            uint8 valueDecimals,
+            string memory tag1,
+            string memory tag2,
+            bool isRevoked
+        )
     {
         FeedbackEntry storage entry = _feedback[agentId][clientAddress][feedbackIndex];
         if (entry.timestamp == 0) revert FeedbackNotFound();

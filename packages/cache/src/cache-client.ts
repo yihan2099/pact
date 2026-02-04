@@ -32,18 +32,21 @@ let cleanupInterval: ReturnType<typeof setInterval> | null = null;
 function startCleanupInterval(): void {
   if (cleanupInterval) return;
 
-  cleanupInterval = setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of memoryCache) {
-      if (entry.expiresAt < now) {
-        // Remove from tag index
-        for (const tag of entry.tags) {
-          memoryTagIndex.get(tag)?.delete(key);
+  cleanupInterval = setInterval(
+    () => {
+      const now = Date.now();
+      for (const [key, entry] of memoryCache) {
+        if (entry.expiresAt < now) {
+          // Remove from tag index
+          for (const tag of entry.tags) {
+            memoryTagIndex.get(tag)?.delete(key);
+          }
+          memoryCache.delete(key);
         }
-        memoryCache.delete(key);
       }
-    }
-  }, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000
+  );
 }
 
 /**
