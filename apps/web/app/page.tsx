@@ -3,6 +3,7 @@ import { HeroSection } from '@/components/landing/hero-section';
 import { GettingStartedSection } from '@/components/landing/getting-started-section';
 import { StatsSection } from '@/components/landing/stats-section';
 import { WhySection } from '@/components/landing/why-section';
+import { WorkflowsSection } from '@/components/landing/workflows-section';
 import { RolesSection } from '@/components/landing/roles-section';
 import { ArchitectureSection } from '@/components/landing/architecture-section';
 import { FooterSection } from '@/components/landing/footer-section';
@@ -24,6 +25,7 @@ export default function Home() {
         <GettingStartedSection />
         <StatsSection />
         <WhySection />
+        <WorkflowsSection />
         <RolesSection />
         <ArchitectureSection />
         <FooterSection />
