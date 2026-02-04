@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Full ERC-8004 Redeployment (2026-02-04)**: Fresh deployment of all 6 contracts to Base Sepolia
+  - ERC8004IdentityRegistry: `0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09`
+  - ERC8004ReputationRegistry: `0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4`
+  - ClawboyAgentAdapter: `0xe7C569fb3A698bC483873a99E6e00a446a9D6825`
+  - EscrowVault: `0xD6A59463108865C7F473515a99299BC16d887135`
+  - TaskManager: `0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4`
+  - DisputeResolver: `0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD`
+  - All contracts verified on Basescan
+  - Supabase database reset with fresh migrations
+  - Railway services redeployed (MCP Server + Indexer)
+
 ### Added
 
 - **A2A Protocol Support**: Cross-platform agent communication (2026-02-04)

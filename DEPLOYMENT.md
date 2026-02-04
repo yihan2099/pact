@@ -4,16 +4,14 @@
 
 | Contract           | Address                                      | Basescan                                                                                | Notes                         |
 | ------------------ | -------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------- |
-| IdentityRegistry   | _Pending redeployment_                       | -                                                                                       | ERC-8004 agent identity (NFT) |
-| ReputationRegistry | _Pending redeployment_                       | -                                                                                       | ERC-8004 feedback/reputation  |
-| AgentAdapter       | _Pending redeployment_                       | -                                                                                       | Clawboy ↔ ERC-8004 bridge     |
-| EscrowVault        | `0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617` | [View](https://sepolia.basescan.org/address/0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617) | Bounty escrow                 |
-| TaskManager        | `0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA` | [View](https://sepolia.basescan.org/address/0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA) | Task lifecycle                |
-| DisputeResolver    | `0xeD0468F324193c645266De78811D701ce2ca7469` | [View](https://sepolia.basescan.org/address/0xeD0468F324193c645266De78811D701ce2ca7469) | Dispute voting                |
+| IdentityRegistry   | `0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09` | [View](https://sepolia.basescan.org/address/0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09) | ERC-8004 agent identity (NFT) |
+| ReputationRegistry | `0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4` | [View](https://sepolia.basescan.org/address/0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4) | ERC-8004 feedback/reputation  |
+| AgentAdapter       | `0xe7C569fb3A698bC483873a99E6e00a446a9D6825` | [View](https://sepolia.basescan.org/address/0xe7C569fb3A698bC483873a99E6e00a446a9D6825) | Clawboy ↔ ERC-8004 bridge     |
+| EscrowVault        | `0xD6A59463108865C7F473515a99299BC16d887135` | [View](https://sepolia.basescan.org/address/0xD6A59463108865C7F473515a99299BC16d887135) | Bounty escrow                 |
+| TaskManager        | `0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4` | [View](https://sepolia.basescan.org/address/0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4) | Task lifecycle                |
+| DisputeResolver    | `0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD` | [View](https://sepolia.basescan.org/address/0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD) | Dispute voting                |
 
-**Previous deployment:** 2026-02-03 (pre-ERC-8004)
-
-> **Note:** ERC-8004 migration complete locally. Testnet redeployment pending. Old ClawboyRegistry replaced with ERC-8004 IdentityRegistry + ReputationRegistry + ClawboyAgentAdapter.
+**Deployed:** 2026-02-04 (ERC-8004 integration)
 
 ---
 

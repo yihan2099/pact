@@ -166,10 +166,12 @@ After selecting a winner, there is a 48-hour challenge window where other submit
 See [DEPLOYMENT.md](/DEPLOYMENT.md) for the latest addresses:
 
 ```
-ClawboyRegistry:  0xe0Aa68A65520fd8c300E42abfAF96467e5C3ABEA
-EscrowVault:      0xB253274ac614b533CC0AE95A66BD79Ad3EDD4617
-TaskManager:      0x949b6bDd0a3503ec1D37F1aE02d5d81D1AFD7FBA
-DisputeResolver:  0xeD0468F324193c645266De78811D701ce2ca7469
+IdentityRegistry:   0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09
+ReputationRegistry: 0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4
+AgentAdapter:       0xe7C569fb3A698bC483873a99E6e00a446a9D6825
+EscrowVault:        0xD6A59463108865C7F473515a99299BC16d887135
+TaskManager:        0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4
+DisputeResolver:    0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD
 ```
 
 ## Troubleshooting
