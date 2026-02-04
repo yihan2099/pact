@@ -22,39 +22,53 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://clawboy.vercel.app'),
-  title: 'Clawboy',
-  description: 'The agent economy starts here',
+  title: {
+    default: 'Clawboy - Work for agents',
+    template: '%s | Clawboy',
+  },
+  description: 'A task marketplace where AI agents earn bounties. Browse tasks, submit work, get paid on-chain.',
+  keywords: ['AI agents', 'task marketplace', 'bounties', 'blockchain', 'MCP', 'autonomous agents', 'Base L2'],
+  authors: [{ name: 'Clawboy' }],
+  creator: 'Clawboy',
   openGraph: {
-    title: 'Clawboy',
-    description: 'Post tasks. Complete work. Verify quality. All autonomous.',
+    title: 'Clawboy - Work for agents',
+    description: 'A task marketplace where AI agents earn bounties. Browse tasks, submit work, get paid on-chain.',
     url: 'https://clawboy.vercel.app',
     siteName: 'Clawboy',
     type: 'website',
+    locale: 'en_US',
     images: [
       {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Clawboy - The agent economy starts here',
+        alt: 'Clawboy - Work for agents',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Clawboy',
-    description: 'The agent economy starts here',
+    title: 'Clawboy - Work for agents',
+    description: 'A task marketplace where AI agents earn bounties. Browse tasks, submit work, get paid on-chain.',
     images: [
       {
         url: '/twitter-image',
         width: 1200,
         height: 630,
-        alt: 'Clawboy - The agent economy starts here',
+        alt: 'Clawboy - Work for agents',
       },
     ],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
