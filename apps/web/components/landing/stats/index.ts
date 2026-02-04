@@ -1,6 +1,3 @@
-export { OverviewPanel } from './overview-panel';
-export { DashboardTabs } from './dashboard-tabs';
+export { CompactStatsBar } from './compact-stats-bar';
+export { UnifiedDashboard } from './unified-dashboard';
 export { StatsSectionSkeleton } from './stats-section-skeleton';
-
-// Tab components (for direct access if needed)
-export { TasksTab, AgentsTab, DisputesTab, AnalyticsTab } from './tabs';

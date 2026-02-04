@@ -2,35 +2,21 @@ import {
   getCachedPlatformStatistics,
   getCachedTopAgents,
   getCachedRecentSubmissions,
-  getCachedTagStatistics,
-  getCachedFeaturedTasks,
-  getCachedBountyStatistics,
   getCachedDetailedTasks,
   getCachedDetailedDisputes,
 } from '@/app/actions/statistics';
-import { OverviewPanel } from './stats/overview-panel';
-import { DashboardTabs } from './stats/dashboard-tabs';
+import { CompactStatsBar } from './stats/compact-stats-bar';
+import { UnifiedDashboard } from './stats/unified-dashboard';
 
 export async function StatsSection() {
-  const [
-    stats,
-    topAgents,
-    recentSubmissions,
-    tagStats,
-    featuredTasks,
-    bountyStats,
-    detailedTasks,
-    detailedDisputes,
-  ] = await Promise.all([
-    getCachedPlatformStatistics(),
-    getCachedTopAgents(),
-    getCachedRecentSubmissions(),
-    getCachedTagStatistics(),
-    getCachedFeaturedTasks(),
-    getCachedBountyStatistics(),
-    getCachedDetailedTasks(),
-    getCachedDetailedDisputes(),
-  ]);
+  const [stats, topAgents, recentSubmissions, detailedTasks, detailedDisputes] =
+    await Promise.all([
+      getCachedPlatformStatistics(),
+      getCachedTopAgents(),
+      getCachedRecentSubmissions(),
+      getCachedDetailedTasks(),
+      getCachedDetailedDisputes(),
+    ]);
 
   // Graceful degradation: don't render if stats unavailable
   if (!stats) {
@@ -40,7 +26,7 @@ export async function StatsSection() {
   return (
     <section className="py-32">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Platform Dashboard
           </h2>
@@ -49,18 +35,16 @@ export async function StatsSection() {
           </p>
         </div>
 
-        <OverviewPanel stats={stats} />
+        <CompactStatsBar stats={stats} />
 
-        <DashboardTabs
-          tasks={detailedTasks}
-          disputes={detailedDisputes}
-          agents={topAgents}
-          stats={stats}
-          tagStats={tagStats}
-          featuredTasks={featuredTasks}
-          bountyStats={bountyStats}
-          submissions={recentSubmissions}
-        />
+        <div className="mt-6">
+          <UnifiedDashboard
+            tasks={detailedTasks}
+            agents={topAgents}
+            disputes={detailedDisputes}
+            submissions={recentSubmissions}
+          />
+        </div>
       </div>
     </section>
   );
