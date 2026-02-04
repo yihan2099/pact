@@ -11,8 +11,10 @@ import {
   Hash,
   Clock,
   Send,
-  Gavel,
+  ListTodo,
   Users,
+  Gavel,
+  Activity,
 } from 'lucide-react';
 import type {
   DetailedTask,
@@ -35,7 +37,13 @@ import {
 // SHARED COMPONENTS
 // ============================================================================
 
-function SectionHeader({ title, page, totalPages, onPrev, onNext }: {
+function SectionHeader({
+  title,
+  page,
+  totalPages,
+  onPrev,
+  onNext,
+}: {
   title: string;
   page: number;
   totalPages: number;
@@ -72,7 +80,15 @@ function SectionHeader({ title, page, totalPages, onPrev, onNext }: {
   );
 }
 
-function IconLink({ href, title, children }: { href: string; title: string; children: React.ReactNode }) {
+function IconLink({
+  href,
+  title,
+  children,
+}: {
+  href: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <a
       href={href}
@@ -96,19 +112,30 @@ function StatusDot({ status }: { status: string }) {
     cancelled: 'bg-gray-500',
     active: 'bg-yellow-500',
     resolved: 'bg-blue-500',
+    pending: 'bg-yellow-500',
+    approved: 'bg-green-500',
+    rejected: 'bg-red-500',
   };
-  return <span className={`inline-block size-2 rounded-full ${colors[status] || 'bg-gray-500'}`} />;
+  return (
+    <span
+      className={`inline-block size-2 rounded-full ${colors[status] || 'bg-gray-500'}`}
+    />
+  );
 }
 
 function EmptyRow({ message }: { message: string }) {
   return (
-    <div className="py-8 text-center text-sm text-muted-foreground">{message}</div>
+    <div className="py-8 text-center text-sm text-muted-foreground">
+      {message}
+    </div>
   );
 }
 
 function SectionCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">{children}</div>
+    <div className="rounded-xl border border-border bg-card p-4 h-full">
+      {children}
+    </div>
   );
 }
 
@@ -124,13 +151,17 @@ function TaskRow({ task }: { task: DetailedTask }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-muted-foreground">#{task.chain_task_id}</span>
+            <span className="text-xs text-muted-foreground">
+              #{task.chain_task_id}
+            </span>
             <span className="font-medium text-foreground text-sm truncate">
               {truncateText(task.title || 'Untitled', 35)}
             </span>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">{formatBounty(task.bounty_amount)}</span>
+            <span className="font-medium text-foreground">
+              {formatBounty(task.bounty_amount)}
+            </span>
             <span className="flex items-center gap-1">
               <Send className="size-3" />
               {task.submission_count}
@@ -144,7 +175,9 @@ function TaskRow({ task }: { task: DetailedTask }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs">
             <StatusDot status={task.status} />
-            <span className="text-muted-foreground">{formatStatus(task.status)}</span>
+            <span className="text-muted-foreground">
+              {formatStatus(task.status)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <IconLink href={getBaseScanUrl(task.creator_address)} title="Creator">
@@ -194,6 +227,71 @@ function TaskList({ tasks }: { tasks: DetailedTask[] }) {
 }
 
 // ============================================================================
+// SUBMISSION LIST (formerly Activity Feed)
+// ============================================================================
+
+const SUBMISSIONS_PER_PAGE = 5;
+
+function SubmissionRow({ submission }: { submission: SubmissionWithTask }) {
+  // Derive status from is_winner flag
+  const status = submission.is_winner ? 'approved' : 'pending';
+
+  return (
+    <div className="py-2.5 border-b border-border last:border-0">
+      <div className="flex items-center gap-2">
+        <StatusDot status={status} />
+        <span className="text-sm font-medium text-foreground">
+          {truncateAddress(submission.agent_address)}
+        </span>
+        <span className="text-muted-foreground">→</span>
+        <span className="text-sm text-muted-foreground truncate flex-1">
+          {truncateText(submission.task?.title || 'Task', 25)}
+        </span>
+        <span className="text-xs text-muted-foreground shrink-0">
+          {formatTimeAgo(submission.submitted_at)}
+        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <IconLink href={getBaseScanUrl(submission.agent_address)} title="Agent">
+            <User className="size-3.5" />
+          </IconLink>
+          <IconLink href={getIpfsUrl(submission.submission_cid)} title="Submission">
+            <FileText className="size-3.5" />
+          </IconLink>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubmissionList({ submissions }: { submissions: SubmissionWithTask[] }) {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(submissions.length / SUBMISSIONS_PER_PAGE));
+  const startIdx = (page - 1) * SUBMISSIONS_PER_PAGE;
+  const visibleSubmissions = submissions.slice(startIdx, startIdx + SUBMISSIONS_PER_PAGE);
+
+  return (
+    <SectionCard>
+      <SectionHeader
+        title="Recent Submissions"
+        page={page}
+        totalPages={totalPages}
+        onPrev={() => setPage((p) => Math.max(1, p - 1))}
+        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+      />
+      {submissions.length === 0 ? (
+        <EmptyRow message="No submissions yet" />
+      ) : (
+        <div>
+          {visibleSubmissions.map((sub) => (
+            <SubmissionRow key={sub.id} submission={sub} />
+          ))}
+        </div>
+      )}
+    </SectionCard>
+  );
+}
+
+// ============================================================================
 // AGENT LIST
 // ============================================================================
 
@@ -208,7 +306,9 @@ function AgentRow({ agent, rank }: { agent: AgentRow; rank: number }) {
 
   return (
     <div className="py-2.5 border-b border-border last:border-0 flex items-center gap-3">
-      <span className={`w-5 text-sm font-bold ${rankColors[rank] || 'text-muted-foreground'}`}>
+      <span
+        className={`w-5 text-sm font-bold ${rankColors[rank] || 'text-muted-foreground'}`}
+      >
         {rank}
       </span>
       <div className="flex-1 min-w-0">
@@ -259,7 +359,7 @@ function AgentList({ agents }: { agents: AgentRow[] }) {
 // DISPUTE LIST
 // ============================================================================
 
-const DISPUTES_PER_PAGE = 3;
+const DISPUTES_PER_PAGE = 5;
 
 function DisputeRow({ dispute }: { dispute: DetailedDispute }) {
   const votesFor = parseInt(dispute.votes_for_disputer) || 0;
@@ -270,13 +370,17 @@ function DisputeRow({ dispute }: { dispute: DetailedDispute }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-muted-foreground">#{dispute.chain_dispute_id}</span>
+            <span className="text-xs text-muted-foreground">
+              #{dispute.chain_dispute_id}
+            </span>
             <span className="text-sm text-foreground truncate">
               {truncateText(dispute.task?.title || 'Unknown Task', 25)}
             </span>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">{formatBounty(dispute.dispute_stake)}</span>
+            <span className="font-medium text-foreground">
+              {formatBounty(dispute.dispute_stake)}
+            </span>
             <span className="text-green-500">{votesFor}↑</span>
             <span className="text-red-500">{votesAgainst}↓</span>
             {dispute.status === 'active' && (
@@ -290,10 +394,15 @@ function DisputeRow({ dispute }: { dispute: DetailedDispute }) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs">
             <StatusDot status={dispute.status} />
-            <span className="text-muted-foreground capitalize">{dispute.status}</span>
+            <span className="text-muted-foreground capitalize">
+              {dispute.status}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <IconLink href={getBaseScanUrl(dispute.disputer_address)} title="Disputer">
+            <IconLink
+              href={getBaseScanUrl(dispute.disputer_address)}
+              title="Disputer"
+            >
               <User className="size-3.5" />
             </IconLink>
             <IconLink href={getBaseScanTxUrl(dispute.tx_hash)} title="Transaction">
@@ -315,7 +424,7 @@ function DisputeList({ disputes }: { disputes: DetailedDispute[] }) {
   return (
     <SectionCard>
       <SectionHeader
-        title="Active Disputes"
+        title="Recent Disputes"
         page={page}
         totalPages={totalPages}
         onPrev={() => setPage((p) => Math.max(1, p - 1))}
@@ -335,41 +444,45 @@ function DisputeList({ disputes }: { disputes: DetailedDispute[] }) {
 }
 
 // ============================================================================
-// ACTIVITY FEED
+// TAB NAVIGATION (Mobile)
 // ============================================================================
 
-function ActivityFeed({ submissions }: { submissions: SubmissionWithTask[] }) {
+type TabId = 'tasks' | 'submissions' | 'agents' | 'disputes';
+
+interface Tab {
+  id: TabId;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const tabs: Tab[] = [
+  { id: 'tasks', label: 'Tasks', icon: <ListTodo className="size-4" /> },
+  { id: 'submissions', label: 'Submissions', icon: <Activity className="size-4" /> },
+  { id: 'agents', label: 'Agents', icon: <Users className="size-4" /> },
+  { id: 'disputes', label: 'Disputes', icon: <Gavel className="size-4" /> },
+];
+
+function TabButton({
+  tab,
+  isActive,
+  onClick,
+}: {
+  tab: Tab;
+  isActive: boolean;
+  onClick: () => void;
+}) {
   return (
-    <SectionCard>
-      <h3 className="font-semibold text-foreground text-sm mb-3">Activity Feed</h3>
-      {submissions.length === 0 ? (
-        <EmptyRow message="No recent activity" />
-      ) : (
-        <div className="space-y-2.5">
-          {submissions.slice(0, 6).map((sub) => (
-            <div key={sub.id} className="flex items-center gap-2 text-sm">
-              <span className="size-1.5 rounded-full bg-green-500 shrink-0" />
-              <span className="text-foreground font-medium">{truncateAddress(sub.agent_address)}</span>
-              <span className="text-muted-foreground">→</span>
-              <span className="text-muted-foreground truncate">
-                {truncateText(sub.task?.title || 'Task', 20)}
-              </span>
-              <span className="text-xs text-muted-foreground ml-auto shrink-0">
-                {formatTimeAgo(sub.submitted_at)}
-              </span>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <IconLink href={getBaseScanUrl(sub.agent_address)} title="Agent">
-                  <User className="size-3" />
-                </IconLink>
-                <IconLink href={getIpfsUrl(sub.submission_cid)} title="Submission">
-                  <FileText className="size-3" />
-                </IconLink>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </SectionCard>
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+      }`}
+    >
+      {tab.icon}
+      <span className="hidden sm:inline">{tab.label}</span>
+    </button>
   );
 }
 
@@ -384,25 +497,45 @@ interface UnifiedDashboardProps {
   submissions: SubmissionWithTask[];
 }
 
-export function UnifiedDashboard({ tasks, agents, disputes, submissions }: UnifiedDashboardProps) {
+export function UnifiedDashboard({
+  tasks,
+  agents,
+  disputes,
+  submissions,
+}: UnifiedDashboardProps) {
+  const [activeTab, setActiveTab] = useState<TabId>('tasks');
+
   return (
-    <div className="space-y-4">
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Tasks - spans 2 columns */}
-        <div className="lg:col-span-2">
-          <TaskList tasks={tasks} />
+    <>
+      {/* Mobile: Tab Navigation */}
+      <div className="lg:hidden">
+        <div className="flex items-center justify-center gap-1 mb-4 p-1 rounded-xl bg-muted/50">
+          {tabs.map((tab) => (
+            <TabButton
+              key={tab.id}
+              tab={tab}
+              isActive={activeTab === tab.id}
+              onClick={() => setActiveTab(tab.id)}
+            />
+          ))}
         </div>
 
-        {/* Right sidebar */}
-        <div className="space-y-4">
-          <AgentList agents={agents} />
-          <DisputeList disputes={disputes} />
+        {/* Mobile: Active Tab Content */}
+        <div>
+          {activeTab === 'tasks' && <TaskList tasks={tasks} />}
+          {activeTab === 'submissions' && <SubmissionList submissions={submissions} />}
+          {activeTab === 'agents' && <AgentList agents={agents} />}
+          {activeTab === 'disputes' && <DisputeList disputes={disputes} />}
         </div>
       </div>
 
-      {/* Activity Feed - full width */}
-      <ActivityFeed submissions={submissions} />
-    </div>
+      {/* Desktop: 2x2 Grid Layout */}
+      <div className="hidden lg:grid lg:grid-cols-2 gap-4">
+        <TaskList tasks={tasks} />
+        <SubmissionList submissions={submissions} />
+        <AgentList agents={agents} />
+        <DisputeList disputes={disputes} />
+      </div>
+    </>
   );
 }
