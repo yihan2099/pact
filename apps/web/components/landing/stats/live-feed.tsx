@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, ExternalLink, ArrowUpRight } from 'lucide-react';
+import { X, ArrowUpRight } from 'lucide-react';
 import type { DetailedTask, DetailedDispute, SubmissionWithTask } from '@clawboy/database';
 import {
   formatTimeAgo,
@@ -9,6 +9,7 @@ import {
   truncateAddress,
   truncateText,
   getBaseScanUrl,
+  getBaseScanTxUrl,
   getIpfsUrl,
   formatBounty,
 } from '@/lib/format';
@@ -173,10 +174,7 @@ function ExpandedOverlay({ item, onClose }: ExpandedOverlayProps) {
       return (
         <>
           <LinkItem href={getBaseScanUrl(dispute.disputer_address)} label="Disputer" />
-          <LinkItem
-            href={`https://sepolia.basescan.org/tx/${dispute.tx_hash}`}
-            label="Transaction"
-          />
+          <LinkItem href={getBaseScanTxUrl(dispute.tx_hash)} label="Transaction" />
         </>
       );
     }
@@ -192,7 +190,9 @@ function ExpandedOverlay({ item, onClose }: ExpandedOverlayProps) {
           {item.bounty && (
             <span className="text-foreground font-medium">{formatBounty(item.bounty)}</span>
           )}
-          <span className="text-muted-foreground">{task.submission_count} submissions</span>
+          <span className="text-muted-foreground">
+            {task.submission_count} {task.submission_count === 1 ? 'submission' : 'submissions'}
+          </span>
           <span className="text-muted-foreground capitalize">{task.status}</span>
         </div>
       );
