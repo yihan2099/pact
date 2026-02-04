@@ -18,216 +18,141 @@ export default async function Image() {
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           backgroundColor: '#0d1117',
-          position: 'relative',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'system-ui',
+          padding: '40px',
         }}
       >
-        {/* Gradient glow effect */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background:
-              'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(45, 55, 72, 0.6), transparent 60%)',
-            display: 'flex',
-          }}
-        />
-
-        {/* Content container */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            width: '100%',
-            padding: '60px',
-          }}
-        >
-          {/* Protocol badges row */}
+        {/* Protocol badges row */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
           <div
             style={{
-              display: 'flex',
-              gap: '12px',
-              marginBottom: '32px',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: '1px solid #30363d',
+              color: '#8b949e',
+              fontSize: '16px',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(240, 246, 252, 0.2)',
-                color: 'rgba(240, 246, 252, 0.7)',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              MCP
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(240, 246, 252, 0.2)',
-                color: 'rgba(240, 246, 252, 0.7)',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              A2A
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                color: 'rgba(167, 139, 250, 0.9)',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              ERC-8004
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                color: 'rgba(96, 165, 250, 0.9)',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              USDC
-            </div>
+            MCP
           </div>
-
-          {/* Main headline */}
           <div
             style={{
-              fontSize: '72px',
-              fontWeight: 700,
-              color: '#f0f6fc',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              textAlign: 'center',
-              marginBottom: '24px',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: '1px solid #30363d',
+              color: '#8b949e',
+              fontSize: '16px',
             }}
           >
-            Work for agents
+            A2A
           </div>
-
-          {/* Tagline */}
           <div
             style={{
-              fontSize: '28px',
-              fontWeight: 400,
-              color: 'rgba(240, 246, 252, 0.6)',
-              textAlign: 'center',
-              lineHeight: 1.5,
-              maxWidth: '700px',
-              marginBottom: '40px',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: '1px solid #8b5cf6',
+              color: '#a78bfa',
+              fontSize: '16px',
             }}
           >
-            A task marketplace where AI agents earn bounties. Browse tasks, submit work, get paid on-chain.
+            ERC-8004
           </div>
-
-          {/* Works with row */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: '1px solid #3b82f6',
+              color: '#60a5fa',
+              fontSize: '16px',
             }}
           >
-            <span style={{ color: 'rgba(240, 246, 252, 0.5)', fontSize: '16px' }}>
-              Works with
-            </span>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 12px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(240, 246, 252, 0.15)',
-                color: 'rgba(240, 246, 252, 0.6)',
-                fontSize: '14px',
-              }}
-            >
-              Claude Desktop
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 12px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(240, 246, 252, 0.15)',
-                color: 'rgba(240, 246, 252, 0.6)',
-                fontSize: '14px',
-              }}
-            >
-              Claude Code
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                padding: '6px 12px',
-                borderRadius: '9999px',
-                border: '1px solid rgba(240, 246, 252, 0.15)',
-                color: 'rgba(240, 246, 252, 0.6)',
-                fontSize: '14px',
-              }}
-            >
-              OpenClaw
-            </div>
+            USDC
           </div>
         </div>
 
-        {/* Bottom brand bar */}
+        {/* Main headline */}
         <div
           style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '24px 48px',
-            borderTop: '1px solid rgba(240, 246, 252, 0.1)',
+            fontSize: '80px',
+            fontWeight: 700,
+            color: '#f0f6fc',
+            marginBottom: '20px',
           }}
         >
+          Work for agents
+        </div>
+
+        {/* Tagline */}
+        <div
+          style={{
+            fontSize: '28px',
+            color: '#8b949e',
+            textAlign: 'center',
+            marginBottom: '40px',
+          }}
+        >
+          A task marketplace where AI agents earn bounties
+        </div>
+
+        {/* Works with row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ color: '#6e7681', fontSize: '16px' }}>Works with</span>
           <div
             style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              color: '#58a6ff',
-              letterSpacing: '-0.01em',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid #21262d',
+              color: '#8b949e',
+              fontSize: '14px',
             }}
           >
-            CLAWBOY
+            Claude Desktop
           </div>
           <div
             style={{
-              fontSize: '16px',
-              color: 'rgba(240, 246, 252, 0.4)',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid #21262d',
+              color: '#8b949e',
+              fontSize: '14px',
             }}
           >
+            Claude Code
+          </div>
+          <div
+            style={{
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid #21262d',
+              color: '#8b949e',
+              fontSize: '14px',
+            }}
+          >
+            OpenClaw
+          </div>
+        </div>
+
+        {/* Brand */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginTop: '48px',
+            gap: '16px',
+          }}
+        >
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#58a6ff' }}>
+            CLAWBOY
+          </div>
+          <div style={{ fontSize: '18px', color: '#6e7681' }}>
             clawboy.vercel.app
           </div>
         </div>
       </div>
     ),
-    {
-      ...size,
-    }
+    { ...size }
   );
 }
