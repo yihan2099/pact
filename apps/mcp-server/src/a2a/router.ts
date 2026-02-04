@@ -7,6 +7,7 @@
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { generateAgentCard } from './agent-card';
 import { a2aAuthMiddleware, getServerContext } from './a2a-auth';
 import {
@@ -19,6 +20,34 @@ import {
 import type { A2AJsonRpcRequest, A2AJsonRpcResponse } from './types';
 import { A2A_ERROR_CODES, createErrorResponse } from './types';
 import { logSecurityEvent } from '../services/security-logger';
+
+// SECURITY: Whether to trust proxy headers for client IP detection
+const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === 'true';
+
+// SECURITY: Simple IPv4/IPv6 validation pattern
+const IP_PATTERN = /^(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+)$/;
+
+/**
+ * SECURITY: Get client IP address with validation
+ */
+function getClientIp(c: Context): string {
+  if (TRUST_PROXY_HEADERS) {
+    const forwarded = c.req.header('x-forwarded-for');
+    if (forwarded) {
+      const clientIp = forwarded.split(',')[0]?.trim();
+      if (clientIp && IP_PATTERN.test(clientIp)) {
+        return clientIp;
+      }
+    }
+
+    const realIp = c.req.header('x-real-ip');
+    if (realIp && IP_PATTERN.test(realIp)) {
+      return realIp;
+    }
+  }
+
+  return 'unknown-client';
+}
 
 // Create A2A router
 const a2aRouter = new Hono();
@@ -50,10 +79,7 @@ a2aRouter.use('/a2a', a2aAuthMiddleware);
 // Request logging middleware for A2A
 a2aRouter.use('/a2a', async (c, next) => {
   const start = Date.now();
-  const ip =
-    c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ||
-    c.req.header('x-real-ip') ||
-    'unknown';
+  const ip = getClientIp(c);
 
   await next();
 

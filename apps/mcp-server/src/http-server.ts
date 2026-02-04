@@ -43,6 +43,14 @@ const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
   : ['*']; // Default to all for development
 
+// SECURITY WARNING: Log warning if wildcard CORS is used in production
+if (allowedOrigins.includes('*') && process.env.NODE_ENV === 'production') {
+  console.error(
+    'SECURITY WARNING: CORS_ORIGINS not set in production. Using wildcard (*) which allows any origin. ' +
+    'Set CORS_ORIGINS environment variable to restrict allowed origins.'
+  );
+}
+
 app.use(
   '/*',
   cors({
@@ -98,13 +106,43 @@ app.use('/*', async (c, next) => {
   }
 });
 
+// SECURITY: Whether to trust proxy headers for client IP detection
+// Only enable if behind a trusted reverse proxy that overwrites these headers
+const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === 'true';
+
+// SECURITY: Simple IPv4/IPv6 validation pattern
+const IP_PATTERN = /^(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+)$/;
+
+/**
+ * SECURITY: Get client IP address with validation
+ *
+ * WARNING: x-forwarded-for and x-real-ip headers can be spoofed by attackers
+ * unless behind a trusted reverse proxy that overwrites these headers.
+ */
+function getClientIp(c: { req: { header: (name: string) => string | undefined } }): string {
+  if (TRUST_PROXY_HEADERS) {
+    const forwarded = c.req.header('x-forwarded-for');
+    const realIp = c.req.header('x-real-ip');
+
+    if (forwarded) {
+      const clientIp = forwarded.split(',')[0]?.trim();
+      if (clientIp && IP_PATTERN.test(clientIp)) {
+        return clientIp;
+      }
+    }
+
+    if (realIp && IP_PATTERN.test(realIp)) {
+      return realIp;
+    }
+  }
+
+  return 'unknown-client';
+}
+
 // SECURITY: Request logging middleware
 app.use('/tools/*', async (c, next) => {
   const start = Date.now();
-  const ip =
-    c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ||
-    c.req.header('x-real-ip') ||
-    'unknown';
+  const ip = getClientIp(c);
   const toolName = c.req.path.replace('/tools/', '');
   const sessionId = c.req.header('X-Session-Id');
 
@@ -224,7 +262,7 @@ async function executeTool(
     case 'auth_verify':
       return await verifySignatureHandler(args);
     case 'auth_session':
-      return await getSessionHandler(args);
+      return await getSessionHandler(args, context);
 
     // Task tools
     case 'list_tasks':
@@ -283,11 +321,8 @@ app.post('/tools/:toolName', async (c) => {
     // Check access control (with on-chain registration refresh for registered tools)
     const accessCheck = await checkAccessWithRegistrationRefresh(toolName, context);
     if (!accessCheck.allowed) {
-      // SECURITY: Log access denial
-      const ip =
-        c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ||
-        c.req.header('x-real-ip') ||
-        'unknown';
+      // SECURITY: Log access denial with validated IP
+      const ip = getClientIp(c);
       logAccessDenied(ip, toolName, accessCheck.reason || 'Unknown', sessionId || undefined);
 
       return c.json(

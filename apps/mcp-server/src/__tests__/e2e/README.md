@@ -129,14 +129,16 @@ bun test src/__tests__/e2e/
 
 The test covers the competitive task lifecycle:
 
-| Step | Action         | MCP Tool                         | Contract Function            |
-| ---- | -------------- | -------------------------------- | ---------------------------- |
-| 1    | Auth           | auth_get_challenge + auth_verify | -                            |
-| 2    | Register Agent | register_agent                   | register(profileCid)         |
-| 3    | Create Task    | create_task                      | createTask(...)              |
-| 4    | Submit Work    | submit_work                      | submitWork(taskId, cid)      |
-| 5    | Select Winner  | select_winner                    | selectWinner(taskId, winner) |
-| 6    | Finalize       | finalize_task                    | finalizeTask(taskId)         |
+| Step | Action          | MCP Tool                         | Contract Function            | Environment |
+| ---- | --------------- | -------------------------------- | ---------------------------- | ----------- |
+| 1    | Auth            | auth_get_challenge + auth_verify | -                            | All         |
+| 2    | Register Agent  | register_agent                   | register(profileCid)         | All         |
+| 3    | Create Task     | create_task                      | createTask(...)              | All         |
+| 4    | Submit Work     | submit_work                      | submitWork(taskId, cid)      | All         |
+| 5    | Select Winner   | select_winner                    | selectWinner(taskId, winner) | All         |
+| 6    | Skip 48h window | - (evm_increaseTime)             | -                            | Anvil only  |
+| 7    | Finalize        | finalize_task                    | finalizeTask(taskId)         | Anvil only  |
+| 8    | Verify Payment  | - (balance check)                | -                            | Anvil only  |
 
 ### Discovery Tools
 
@@ -159,7 +161,10 @@ The following dispute tools are available but not covered in the basic E2E test:
 
 ### Note on Challenge Window
 
-After selecting a winner, there is a 48-hour challenge window where other submitters can dispute the decision. For testnet E2E tests, finalization is done after the challenge window passes or can be tested with a fresh task.
+After selecting a winner, there is a 48-hour challenge window where other submitters can dispute the decision.
+
+- **Local Anvil**: The finalization test uses `evm_increaseTime` to skip the 48-hour challenge window, allowing full lifecycle testing including payment verification.
+- **Base Sepolia**: Finalization tests are skipped because time manipulation is not available on testnet. You can manually test finalization after waiting 48 hours.
 
 ## Contract Addresses (Base Sepolia)
 

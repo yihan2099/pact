@@ -1,4 +1,5 @@
 import { getSession, invalidateSession } from '../../auth/session-manager';
+import type { ServerContext } from '../../server';
 
 /**
  * Input for auth_session tool
@@ -45,8 +46,14 @@ export const getSessionToolDef = {
 
 /**
  * Handler for auth_session tool
+ *
+ * SECURITY: Session invalidation requires authentication and ownership verification.
+ * Users can only invalidate their own sessions to prevent DoS attacks.
  */
-export async function getSessionHandler(args: unknown): Promise<GetSessionOutput> {
+export async function getSessionHandler(
+  args: unknown,
+  context?: ServerContext
+): Promise<GetSessionOutput> {
   const input = args as GetSessionInput;
 
   if (!input.sessionId) {
@@ -56,6 +63,32 @@ export async function getSessionHandler(args: unknown): Promise<GetSessionOutput
   const action = input.action || 'get';
 
   if (action === 'invalidate') {
+    // SECURITY: Invalidation requires authentication
+    if (!context?.isAuthenticated) {
+      return {
+        valid: false,
+        message: 'Authentication required to invalidate sessions',
+      };
+    }
+
+    // SECURITY: Users can only invalidate their own sessions
+    // Check if the session being invalidated belongs to the authenticated user
+    const targetSession = await getSession(input.sessionId);
+    if (!targetSession) {
+      return {
+        valid: false,
+        message: 'Session not found or already invalidated',
+      };
+    }
+
+    // Verify ownership: the caller's wallet must match the target session's wallet
+    if (targetSession.walletAddress.toLowerCase() !== context.callerAddress.toLowerCase()) {
+      return {
+        valid: false,
+        message: 'You can only invalidate your own sessions',
+      };
+    }
+
     const wasInvalidated = await invalidateSession(input.sessionId);
     return {
       valid: false,
@@ -65,7 +98,7 @@ export async function getSessionHandler(args: unknown): Promise<GetSessionOutput
     };
   }
 
-  // Get session info
+  // Get session info (public - no auth required for checking session status)
   const session = await getSession(input.sessionId);
 
   if (!session) {

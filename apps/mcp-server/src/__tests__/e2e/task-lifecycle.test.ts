@@ -25,7 +25,8 @@
  */
 
 import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
-import { formatEther } from 'viem';
+import { formatEther, parseEther } from 'viem';
+import { getBalance } from '@clawboy/web3-utils';
 import {
   createTestWallet,
   checkWalletBalance,
@@ -37,12 +38,16 @@ import {
   submitWorkOnChain,
   selectWinnerOnChain,
   cancelTaskOnChain,
+  finalizeTaskOnChain,
   getTaskChallengeDeadline,
   getTaskFromChain,
   waitForTaskInDB,
   waitForTaskStatus,
   sleep,
   resetClients,
+  isLocalAnvil,
+  getTestChainId,
+  skipPastChallengeWindow,
   TaskStatus,
   taskStatusToString,
   gasTracker,
@@ -189,7 +194,8 @@ describe.skipIf(shouldSkipTests)('E2E: Task Lifecycle on Base Sepolia', () => {
       console.log(`Agent registered on-chain: ${nowRegistered}`);
 
       expect(nowRegistered).toBe(true);
-      expect(agentProfileCid).toMatch(/^Qm|^baf/); // IPFS CID format (CIDv0: Qm, CIDv1: baf*)
+      // Profile CID can be raw CID (Qm.., baf..) or IPFS URI (ipfs://...)
+      expect(agentProfileCid).toMatch(/^(ipfs:\/\/)?(Qm|baf)/); // IPFS CID or URI format
     },
     TEST_TIMEOUT
   );
@@ -746,6 +752,203 @@ describe.skipIf(shouldSkipTests)('E2E: Task Cancellation on Base Sepolia', () =>
   });
   */
 });
+
+/**
+ * Task Finalization Tests (Anvil Only)
+ *
+ * These tests require time manipulation and only run on local Anvil.
+ * They verify the complete payment flow including:
+ * - Time skip past challenge window
+ * - Task finalization
+ * - Bounty payment to winner
+ */
+const shouldSkipFinalizationTests =
+  shouldSkipTests ||
+  !isLocalAnvil(); // Only run on Anvil where we can manipulate time
+
+describe.skipIf(shouldSkipFinalizationTests)(
+  'E2E: Task Finalization and Payment (Anvil Only)',
+  () => {
+    let creatorWallet: TestWallet;
+    let agentWallet: TestWallet;
+    let chainTaskId: bigint;
+
+    beforeAll(async () => {
+      console.log('\n========================================');
+      console.log('E2E Task Finalization Test - Local Anvil');
+      console.log('(Time manipulation enabled)');
+      console.log('========================================\n');
+
+      resetClients();
+
+      creatorWallet = createTestWallet(CREATOR_PRIVATE_KEY!);
+      agentWallet = createTestWallet(AGENT_PRIVATE_KEY!);
+
+      console.log(`Creator wallet: ${creatorWallet.address}`);
+      console.log(`Agent wallet: ${agentWallet.address}`);
+
+      // Ensure agent is registered
+      const isRegistered = await checkAgentRegistered(agentWallet.address);
+      if (!isRegistered) {
+        console.log('Registering agent...');
+        const profileResult = await registerAgentTool.handler(
+          {
+            name: `E2E Finalization Test Agent ${Date.now()}`,
+            description: 'Test agent for finalization tests',
+            skills: ['testing'],
+            preferredTaskTypes: ['code'],
+          },
+          { callerAddress: agentWallet.address }
+        );
+        await registerAgentOnChain(agentWallet, profileResult.agentURI);
+        console.log('Agent registered');
+      }
+    });
+
+    test(
+      'Complete lifecycle with finalization and payment verification',
+      async () => {
+        console.log('\n--- Complete Lifecycle with Payment ---\n');
+
+        const BOUNTY_ETH = '0.005'; // Use larger bounty to verify payment
+        const bountyWei = parseEther(BOUNTY_ETH);
+
+        // Step 1: Create task with bounty
+        console.log(`Creating task with ${BOUNTY_ETH} ETH bounty...`);
+        const taskResult = await createTaskTool.handler(
+          {
+            title: `E2E Finalization Test ${Date.now()}`,
+            description: 'Task to test complete payment flow with time manipulation',
+            deliverables: [
+              {
+                type: 'code' as const,
+                description: 'Test output',
+                format: 'text',
+              },
+            ],
+            bountyAmount: BOUNTY_ETH,
+            tags: ['test', 'finalization'],
+          },
+          { callerAddress: creatorWallet.address }
+        );
+
+        const { taskId } = await createTaskOnChain(
+          creatorWallet,
+          taskResult.specificationCid,
+          BOUNTY_ETH
+        );
+        chainTaskId = taskId;
+        console.log(`Task created: ${chainTaskId}`);
+
+        // Wait for indexer
+        await sleep(3000);
+        const dbTask = await waitForTaskInDB(
+          chainTaskId,
+          INDEXER_SYNC_WAIT_MS,
+          2000,
+          creatorWallet.address
+        );
+        console.log(`Database task: ${dbTask!.id}`);
+
+        // Step 2: Agent submits work
+        console.log('\nAgent submitting work...');
+        const submitResult = await submitWorkTool.handler(
+          {
+            taskId: dbTask!.id,
+            summary: 'Finalization test work',
+            description: 'Work submitted for finalization testing',
+            deliverables: [
+              {
+                type: 'code' as const,
+                description: 'Test output',
+                url: 'https://example.com/test-output',
+              },
+            ],
+          },
+          { callerAddress: agentWallet.address }
+        );
+
+        await submitWorkOnChain(agentWallet, chainTaskId, submitResult.submissionCid);
+        console.log('Work submitted on-chain');
+
+        // Step 3: Creator selects winner
+        console.log('\nCreator selecting winner...');
+        await selectWinnerOnChain(creatorWallet, chainTaskId, agentWallet.address);
+        console.log('Winner selected');
+
+        // Wait for state propagation
+        await sleep(2000);
+
+        // Verify task is in review
+        let task = await getTaskFromChain(chainTaskId);
+        console.log(`Task status: ${taskStatusToString(task.status)} (expected: InReview)`);
+        expect(task.status).toBe(TaskStatus.InReview);
+
+        // Step 4: Get agent balance before finalization
+        const chainId = getTestChainId();
+        const balanceBefore = await getBalance(agentWallet.address, chainId);
+        console.log(`\nAgent balance before: ${formatEther(balanceBefore)} ETH`);
+
+        // Step 5: Skip past challenge window (48h + 1s)
+        console.log('\nSkipping time past challenge window (48h + 1s)...');
+        await skipPastChallengeWindow();
+        console.log('Time advanced');
+
+        // Verify challenge deadline has passed
+        const deadline = await getTaskChallengeDeadline(chainTaskId);
+        console.log(`Challenge deadline passed: ${deadline.isPassed}`);
+        expect(deadline.isPassed).toBe(true);
+
+        // Step 6: Finalize task (anyone can call after challenge window)
+        console.log('\nFinalizing task...');
+        const finalizeTxHash = await finalizeTaskOnChain(creatorWallet, chainTaskId);
+        console.log(`Finalize tx: ${finalizeTxHash}`);
+
+        // Wait for state propagation
+        await sleep(2000);
+
+        // Step 7: Verify task is completed
+        task = await getTaskFromChain(chainTaskId);
+        console.log(`Task status: ${taskStatusToString(task.status)} (expected: Completed)`);
+        expect(task.status).toBe(TaskStatus.Completed);
+
+        // Step 8: Verify payment received
+        const balanceAfter = await getBalance(agentWallet.address, chainId);
+        console.log(`\nAgent balance after: ${formatEther(balanceAfter)} ETH`);
+
+        const balanceIncrease = balanceAfter - balanceBefore;
+        console.log(`Balance increase: ${formatEther(balanceIncrease)} ETH`);
+        console.log(`Expected bounty: ${formatEther(bountyWei)} ETH`);
+
+        // Agent should have received the full bounty
+        // (balance increase equals bounty since agent didn't pay gas for finalization)
+        expect(balanceIncrease).toBe(bountyWei);
+
+        // Step 9: Wait for indexer to sync completed status
+        console.log('\nWaiting for indexer to sync completed status...');
+        const completedTask = await waitForTaskStatus(
+          chainTaskId,
+          'completed',
+          INDEXER_SYNC_WAIT_MS,
+          2000,
+          creatorWallet.address
+        );
+        console.log(`Database status: ${completedTask!.status}`);
+        expect(completedTask!.status).toBe('completed');
+
+        console.log('\n========================================');
+        console.log('Finalization Test Complete!');
+        console.log(`Winner (${agentWallet.address.substring(0, 10)}...) received ${BOUNTY_ETH} ETH`);
+        console.log('========================================\n');
+      },
+      TEST_TIMEOUT * 2 // Double timeout for this comprehensive test
+    );
+
+    afterAll(() => {
+      gasTracker.printReport();
+    });
+  }
+);
 
 // Also export a standalone test runner for manual testing
 export async function runE2ETest(): Promise<void> {

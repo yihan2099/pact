@@ -65,7 +65,7 @@ describe('Auth Tools', () => {
       expect(result.message).toContain('not found');
     });
 
-    test('should invalidate session when action is invalidate', async () => {
+    test('should invalidate session when action is invalidate with proper auth', async () => {
       const wallet = '0xdddddddddddddddddddddddddddddddddddddddd' as `0x${string}`;
       const { sessionId } = await createSession(wallet, false);
 
@@ -73,17 +73,70 @@ describe('Auth Tools', () => {
       const beforeResult = await getSessionHandler({ sessionId });
       expect(beforeResult.valid).toBe(true);
 
-      // Invalidate
-      const invalidateResult = await getSessionHandler({
+      // Create authenticated context for the same wallet
+      const context = {
+        callerAddress: wallet,
+        isAuthenticated: true,
+        isRegistered: false,
         sessionId,
-        action: 'invalidate',
-      });
+      };
+
+      // Invalidate with proper auth
+      const invalidateResult = await getSessionHandler(
+        {
+          sessionId,
+          action: 'invalidate',
+        },
+        context
+      );
       expect(invalidateResult.valid).toBe(false);
       expect(invalidateResult.message).toContain('invalidated successfully');
 
       // Session no longer exists
       const afterResult = await getSessionHandler({ sessionId });
       expect(afterResult.valid).toBe(false);
+    });
+
+    test('should reject invalidation without authentication', async () => {
+      const wallet = '0xdddddddddddddddddddddddddddddddddddddddd' as `0x${string}`;
+      const { sessionId } = await createSession(wallet, false);
+
+      // Try to invalidate without context (no auth)
+      const invalidateResult = await getSessionHandler({
+        sessionId,
+        action: 'invalidate',
+      });
+      expect(invalidateResult.valid).toBe(false);
+      expect(invalidateResult.message).toContain('Authentication required');
+    });
+
+    test('should reject invalidation of another user session', async () => {
+      const wallet1 = '0xdddddddddddddddddddddddddddddddddddddddd' as `0x${string}`;
+      const wallet2 = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' as `0x${string}`;
+      const { sessionId: session1 } = await createSession(wallet1, false);
+      const { sessionId: session2 } = await createSession(wallet2, false);
+
+      // Try to invalidate wallet1's session using wallet2's auth
+      const context = {
+        callerAddress: wallet2,
+        isAuthenticated: true,
+        isRegistered: false,
+        sessionId: session2,
+      };
+
+      const invalidateResult = await getSessionHandler(
+        {
+          sessionId: session1,
+          action: 'invalidate',
+        },
+        context
+      );
+      expect(invalidateResult.valid).toBe(false);
+      expect(invalidateResult.message).toContain('only invalidate your own sessions');
+
+      // Session1 should still exist
+      const checkResult = await getSessionHandler({ sessionId: session1 });
+      expect(checkResult.valid).toBe(true);
     });
 
     test('should throw if sessionId is missing', async () => {

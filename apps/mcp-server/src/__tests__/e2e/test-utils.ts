@@ -750,3 +750,72 @@ export async function getAgentProfileCid(address: `0x${string}`): Promise<string
 
 // Re-export gasTracker for test files to print reports
 export { gasTracker } from './gas-tracker';
+
+// ============================================================================
+// Anvil Time Manipulation (for testing time-dependent logic)
+// ============================================================================
+
+/**
+ * Challenge window duration in seconds (48 hours)
+ * Matches TaskManager.CHALLENGE_WINDOW
+ */
+export const CHALLENGE_WINDOW_SECONDS = 48 * 60 * 60; // 48 hours = 172,800 seconds
+
+/**
+ * Skip time on local Anvil by the specified number of seconds
+ * Uses evm_increaseTime + evm_mine to advance blockchain time
+ *
+ * IMPORTANT: Only works on local Anvil (chainId 31337)
+ * Will throw an error if called on testnet
+ *
+ * @param seconds - Number of seconds to advance time
+ */
+export async function skipTime(seconds: number): Promise<void> {
+  if (!isLocalAnvil()) {
+    throw new Error('Time manipulation only supported on local Anvil (chainId 31337)');
+  }
+
+  const { rpcUrl } = getChainConfig();
+
+  // Advance time using raw RPC call (Anvil-specific method)
+  const increaseTimeResponse = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'evm_increaseTime',
+      params: [seconds],
+      id: 1,
+    }),
+  });
+
+  const increaseTimeResult = await increaseTimeResponse.json();
+  if (increaseTimeResult.error) {
+    throw new Error(`evm_increaseTime failed: ${JSON.stringify(increaseTimeResult.error)}`);
+  }
+
+  // Mine a block to apply the time change
+  const mineResponse = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'evm_mine',
+      params: [],
+      id: 2,
+    }),
+  });
+
+  const mineResult = await mineResponse.json();
+  if (mineResult.error) {
+    throw new Error(`evm_mine failed: ${JSON.stringify(mineResult.error)}`);
+  }
+}
+
+/**
+ * Skip past the challenge window (48 hours + 1 second)
+ * Convenience function for finalizing tasks in tests
+ */
+export async function skipPastChallengeWindow(): Promise<void> {
+  await skipTime(CHALLENGE_WINDOW_SECONDS + 1);
+}

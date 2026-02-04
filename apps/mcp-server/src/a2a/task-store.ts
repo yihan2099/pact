@@ -8,9 +8,14 @@
 import { getRedisClient } from '@clawboy/rate-limit';
 import type { A2ATask, A2ATaskStatus, A2ATaskOutput, A2ATaskError } from './types';
 
-// Task expiration: 7 days
+// Task expiration: 7 days for authenticated sessions
 const TASK_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000;
 const TASK_EXPIRATION_SECONDS = 7 * 24 * 60 * 60;
+
+// SECURITY: Reduced TTL for anonymous sessions to prevent task store flooding
+// Anonymous tasks expire in 1 hour instead of 7 days
+const ANONYMOUS_TASK_EXPIRATION_MS = 60 * 60 * 1000;
+const ANONYMOUS_TASK_EXPIRATION_SECONDS = 60 * 60;
 
 // Redis key prefixes
 const TASK_PREFIX = 'a2a:task:';
@@ -22,6 +27,9 @@ const memorySessionIndex = new Map<string, Set<string>>();
 
 /**
  * Create a new A2A task
+ *
+ * SECURITY: Anonymous sessions (starting with 'anonymous-') have reduced TTL
+ * to prevent task store flooding attacks.
  */
 export async function createA2ATask(
   skillId: string,
@@ -30,6 +38,10 @@ export async function createA2ATask(
 ): Promise<A2ATask> {
   const taskId = crypto.randomUUID();
   const now = Date.now();
+
+  // SECURITY: Detect anonymous sessions and apply reduced TTL
+  const isAnonymous = sessionId.startsWith('anonymous-');
+  const expirationSeconds = isAnonymous ? ANONYMOUS_TASK_EXPIRATION_SECONDS : TASK_EXPIRATION_SECONDS;
 
   const task: A2ATask = {
     id: taskId,
@@ -48,11 +60,11 @@ export async function createA2ATask(
       const taskKey = `${TASK_PREFIX}${taskId}`;
       const sessionKey = `${SESSION_TASKS_PREFIX}${sessionId}`;
 
-      // Use pipeline for atomic operations
+      // Use pipeline for atomic operations with appropriate TTL
       const pipeline = redis.pipeline();
-      pipeline.set(taskKey, JSON.stringify(task), { ex: TASK_EXPIRATION_SECONDS });
+      pipeline.set(taskKey, JSON.stringify(task), { ex: expirationSeconds });
       pipeline.zadd(sessionKey, { score: now, member: taskId });
-      pipeline.expire(sessionKey, TASK_EXPIRATION_SECONDS);
+      pipeline.expire(sessionKey, expirationSeconds);
       await pipeline.exec();
 
       return task;
@@ -95,7 +107,10 @@ export async function getA2ATask(taskId: string): Promise<A2ATask | null> {
   }
 
   // Check if task is expired (manual check for in-memory)
-  if (Date.now() - task.createdAt > TASK_EXPIRATION_MS) {
+  // SECURITY: Use reduced TTL for anonymous sessions
+  const isAnonymous = task.sessionId.startsWith('anonymous-');
+  const expirationMs = isAnonymous ? ANONYMOUS_TASK_EXPIRATION_MS : TASK_EXPIRATION_MS;
+  if (Date.now() - task.createdAt > expirationMs) {
     memoryTaskStore.delete(taskId);
     return null;
   }
@@ -265,7 +280,10 @@ export function cleanupExpiredA2ATasks(): number {
   let count = 0;
 
   for (const [taskId, task] of memoryTaskStore) {
-    if (now - task.createdAt > TASK_EXPIRATION_MS) {
+    // SECURITY: Use reduced TTL for anonymous sessions
+    const isAnonymous = task.sessionId.startsWith('anonymous-');
+    const expirationMs = isAnonymous ? ANONYMOUS_TASK_EXPIRATION_MS : TASK_EXPIRATION_MS;
+    if (now - task.createdAt > expirationMs) {
       memorySessionIndex.get(task.sessionId)?.delete(taskId);
       memoryTaskStore.delete(taskId);
       count++;
