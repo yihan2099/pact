@@ -22,40 +22,53 @@ type TabType = 'bounties' | 'leaderboard' | 'activity';
 
 function TaskItem({ task }: { task: TaskRow }) {
   return (
-    <div className="flex items-start justify-between gap-3 p-3 rounded-lg bg-muted/30 hover:bg-accent transition-colors">
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-foreground text-sm truncate">
-          {truncateText(task.title || 'Untitled Task', 40)}
-        </h4>
-        <p className="text-xs text-muted-foreground mt-1">
-          {task.submission_count} submission{task.submission_count !== 1 ? 's' : ''}
-        </p>
-        {task.tags && task.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {task.tags.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <div className="text-right">
-          <div className="font-semibold text-foreground text-sm">
-            {formatBounty(task.bounty_amount)}
+    <div className="flex flex-col gap-2 p-3 rounded-lg bg-muted/30 hover:bg-accent transition-colors">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-foreground text-sm truncate">
+            {truncateText(task.title || 'Untitled Task', 40)}
+          </h4>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+            <span>
+              {task.submission_count} submission{task.submission_count !== 1 ? 's' : ''}
+            </span>
+            <span>•</span>
+            <span>{formatTimeAgo(task.created_at)}</span>
           </div>
         </div>
-        <a
-          href={getBaseScanUrl(task.creator_address)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-          title="View creator on BaseScan"
-        >
-          <ExternalLink className="size-3.5" />
-        </a>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="text-right">
+            <div className="font-semibold text-foreground text-sm">
+              {formatBounty(task.bounty_amount)}
+            </div>
+          </div>
+          <a
+            href={getBaseScanUrl(task.creator_address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title="View creator on BaseScan"
+          >
+            <ExternalLink className="size-3.5" />
+          </a>
+        </div>
       </div>
+
+      {task.description && (
+        <p className="text-xs text-muted-foreground line-clamp-2">
+          {truncateText(task.description, 100)}
+        </p>
+      )}
+
+      {task.tags && task.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {task.tags.slice(0, 3).map((tag) => (
+            <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

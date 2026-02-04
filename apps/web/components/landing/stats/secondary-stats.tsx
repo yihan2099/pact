@@ -1,7 +1,9 @@
-import type { PlatformStatistics } from '@clawboy/database';
+import type { PlatformStatistics, BountyStatistics } from '@clawboy/database';
+import { formatBounty } from '@/lib/format';
 
 interface SecondaryStatsProps {
   stats: PlatformStatistics;
+  bountyStats?: BountyStatistics | null;
 }
 
 function formatNumber(n: number): string {
@@ -21,7 +23,7 @@ function calculateSuccessRate(completed: number, refunded: number): string {
   return `${rate.toFixed(0)}%`;
 }
 
-export function SecondaryStats({ stats }: SecondaryStatsProps) {
+export function SecondaryStats({ stats, bountyStats }: SecondaryStatsProps) {
   const successRate = calculateSuccessRate(stats.completedTasks, stats.refundedTasks);
 
   return (
@@ -35,11 +37,17 @@ export function SecondaryStats({ stats }: SecondaryStatsProps) {
         <span className="font-semibold text-foreground">{successRate}</span> Success Rate
       </span>
       <span className="hidden sm:inline text-border">•</span>
-      <span>
-        <span className="font-semibold text-foreground">{formatNumber(stats.activeDisputes)}</span>{' '}
-        Active Disputes
-      </span>
-      <span className="hidden sm:inline text-border">•</span>
+      {bountyStats && (
+        <>
+          <span>
+            <span className="font-semibold text-foreground">
+              {formatBounty(bountyStats.avgBounty)}
+            </span>{' '}
+            Avg Bounty
+          </span>
+          <span className="hidden sm:inline text-border">•</span>
+        </>
+      )}
       <span>
         <span className="font-semibold text-foreground">
           {formatNumber(stats.totalSubmissions)}

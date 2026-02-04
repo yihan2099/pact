@@ -2,6 +2,36 @@ import { getSupabaseClient } from '../client';
 import type { TaskRow } from '../schema/tasks';
 import type { SubmissionRow } from '../schema/submissions';
 
+/**
+ * Tag statistics for displaying category breakdown
+ */
+export interface TagStatistic {
+  tag: string;
+  count: number;
+}
+
+/**
+ * Featured completed task with details for showcase
+ */
+export interface FeaturedTask {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  bounty_amount: string;
+  created_at: string;
+  selected_at: string | null;
+}
+
+/**
+ * Bounty distribution statistics
+ */
+export interface BountyStatistics {
+  minBounty: string;
+  maxBounty: string;
+  avgBounty: string;
+}
+
 export interface PlatformStatistics {
   totalTasks: number;
   openTasks: number;
@@ -146,4 +176,97 @@ export async function getRecentSubmissions(limit = 5): Promise<SubmissionWithTas
   }
 
   return (data ?? []) as SubmissionWithTask[];
+}
+
+/**
+ * Get tag statistics - count of tasks per tag for category breakdown.
+ * Returns top N tags by task count.
+ */
+export async function getTagStatistics(limit = 6): Promise<TagStatistic[]> {
+  const supabase = getSupabaseClient();
+
+  // Fetch all tasks with tags (we'll aggregate in memory since Supabase
+  // doesn't support array unnesting in a simple query)
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('tags')
+    .not('tags', 'is', null);
+
+  if (error) {
+    throw new Error(`Failed to get tag statistics: ${error.message}`);
+  }
+
+  // Aggregate tag counts
+  const tagCounts = new Map<string, number>();
+  for (const row of data ?? []) {
+    if (row.tags && Array.isArray(row.tags)) {
+      for (const tag of row.tags) {
+        tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+      }
+    }
+  }
+
+  // Sort by count descending and take top N
+  const sortedTags = Array.from(tagCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([tag, count]) => ({ tag, count }));
+
+  return sortedTags;
+}
+
+/**
+ * Get recently completed tasks for the featured showcase.
+ */
+export async function getFeaturedCompletedTasks(limit = 3): Promise<FeaturedTask[]> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('id, title, description, tags, bounty_amount, created_at, selected_at')
+    .eq('status', 'completed')
+    .order('selected_at', { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to get featured completed tasks: ${error.message}`);
+  }
+
+  return (data ?? []) as FeaturedTask[];
+}
+
+/**
+ * Get bounty distribution statistics (min, max, avg).
+ */
+export async function getBountyStatistics(): Promise<BountyStatistics> {
+  const supabase = getSupabaseClient();
+
+  // Get all bounty amounts to calculate statistics
+  // Note: Using individual queries since Supabase doesn't have built-in aggregation functions
+  const { data, error } = await supabase.from('tasks').select('bounty_amount');
+
+  if (error) {
+    throw new Error(`Failed to get bounty statistics: ${error.message}`);
+  }
+
+  if (!data || data.length === 0) {
+    return {
+      minBounty: '0',
+      maxBounty: '0',
+      avgBounty: '0',
+    };
+  }
+
+  // Convert to BigInt for precision
+  const amounts = data.map((row) => BigInt(row.bounty_amount));
+  const min = amounts.reduce((a, b) => (a < b ? a : b), amounts[0]);
+  const max = amounts.reduce((a, b) => (a > b ? a : b), amounts[0]);
+  const sum = amounts.reduce((a, b) => a + b, BigInt(0));
+  const avg = sum / BigInt(amounts.length);
+
+  return {
+    minBounty: min.toString(),
+    maxBounty: max.toString(),
+    avgBounty: avg.toString(),
+  };
 }

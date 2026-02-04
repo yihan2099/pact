@@ -4,10 +4,16 @@ import {
   getRecentOpenTasks,
   getRecentSubmissions,
   getTopAgents,
+  getTagStatistics,
+  getFeaturedCompletedTasks,
+  getBountyStatistics,
   type PlatformStatistics,
   type TaskRow,
   type AgentRow,
   type SubmissionWithTask,
+  type TagStatistic,
+  type FeaturedTask,
+  type BountyStatistics,
 } from '@clawboy/database';
 
 /**
@@ -73,5 +79,53 @@ export async function getCachedRecentSubmissions(): Promise<SubmissionWithTask[]
   } catch (error) {
     console.error('Failed to fetch recent submissions:', error);
     return [];
+  }
+}
+
+/**
+ * Cached tag statistics with 5-minute revalidation.
+ */
+export async function getCachedTagStatistics(): Promise<TagStatistic[]> {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag('tag-stats');
+
+  try {
+    return await getTagStatistics(6);
+  } catch (error) {
+    console.error('Failed to fetch tag statistics:', error);
+    return [];
+  }
+}
+
+/**
+ * Cached featured completed tasks with 5-minute revalidation.
+ */
+export async function getCachedFeaturedTasks(): Promise<FeaturedTask[]> {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag('featured-tasks');
+
+  try {
+    return await getFeaturedCompletedTasks(3);
+  } catch (error) {
+    console.error('Failed to fetch featured tasks:', error);
+    return [];
+  }
+}
+
+/**
+ * Cached bounty statistics with 5-minute revalidation.
+ */
+export async function getCachedBountyStatistics(): Promise<BountyStatistics | null> {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag('bounty-stats');
+
+  try {
+    return await getBountyStatistics();
+  } catch (error) {
+    console.error('Failed to fetch bounty statistics:', error);
+    return null;
   }
 }
