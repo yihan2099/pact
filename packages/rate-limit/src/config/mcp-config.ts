@@ -38,6 +38,10 @@ export const MCP_RATE_LIMITS = {
 
 /**
  * Map of tool names to their operation type
+ *
+ * SECURITY: All tools should be explicitly mapped to prevent abuse.
+ * Default is 'read' but write operations should be explicitly listed
+ * to ensure proper rate limiting of expensive operations.
  */
 export const TOOL_OPERATION_MAP: Record<string, OperationType> = {
   // Auth tools
@@ -45,15 +49,27 @@ export const TOOL_OPERATION_MAP: Record<string, OperationType> = {
   auth_verify: 'auth',
   auth_session: 'auth',
 
-  // Read tools
+  // Read tools (public queries)
   list_tasks: 'read',
   get_task: 'read',
   get_my_submissions: 'read',
+  get_capabilities: 'read',
+  get_workflow_guide: 'read',
+  get_supported_tokens: 'read',
+  get_dispute: 'read',
+  list_disputes: 'read',
+  get_reputation: 'read',
+  get_feedback_history: 'read',
 
-  // Write tools
+  // Write tools (expensive operations - strictly rate limited)
   create_task: 'write',
   cancel_task: 'write',
   submit_work: 'write',
+  register_agent: 'write',
+  update_profile: 'write',
+  start_dispute: 'write',
+  submit_vote: 'write',
+  resolve_dispute: 'write',
 };
 
 /**

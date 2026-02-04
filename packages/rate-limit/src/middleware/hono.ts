@@ -6,20 +6,44 @@ import type { Context, Next, MiddlewareHandler } from 'hono';
 import { getOperationType, getMcpLimiter, getGlobalLimiter } from '../config/mcp-config';
 
 /**
+ * SECURITY: Whether to trust proxy headers for client IP detection.
+ * Only enable if behind a trusted reverse proxy that overwrites these headers.
+ * When false, uses a fallback identifier that may group multiple users.
+ */
+const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === 'true';
+
+/**
+ * SECURITY: Simple IPv4/IPv6 validation pattern to prevent injection attacks
+ */
+const IP_PATTERN = /^(?:(?:\d{1,3}\.){3}\d{1,3}|(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+)$/;
+
+/**
  * Get client IP from Hono context
+ *
+ * SECURITY: x-forwarded-for and x-real-ip headers can be spoofed by attackers
+ * unless behind a trusted reverse proxy that overwrites these headers.
+ * Only trusts these headers if TRUST_PROXY_HEADERS=true is set.
  */
 function getClientIp(c: Context): string {
-  const forwarded = c.req.header('x-forwarded-for');
-  if (forwarded) {
-    return forwarded.split(',')[0].trim();
+  if (TRUST_PROXY_HEADERS) {
+    const forwarded = c.req.header('x-forwarded-for');
+    if (forwarded) {
+      const clientIp = forwarded.split(',')[0].trim();
+      // Validate IP format to prevent injection
+      if (IP_PATTERN.test(clientIp)) {
+        return clientIp;
+      }
+    }
+
+    const realIp = c.req.header('x-real-ip');
+    if (realIp && IP_PATTERN.test(realIp)) {
+      return realIp;
+    }
   }
 
-  const realIp = c.req.header('x-real-ip');
-  if (realIp) {
-    return realIp;
-  }
-
-  return 'unknown';
+  // Fallback: Use a consistent identifier when IP cannot be determined
+  // This prevents rate limit bypass but may group multiple users
+  return 'unknown-client';
 }
 
 /**
