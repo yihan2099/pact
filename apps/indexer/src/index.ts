@@ -146,6 +146,28 @@ async function processRetryableEvents(): Promise<void> {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       const errorStack = error instanceof Error ? error.stack : undefined;
 
+      // Check for duplicate key error (PostgreSQL error code 23505)
+      // This indicates the record already exists - resolve as success
+      const isDuplicateKeyError = errorMessage.includes('duplicate key value violates unique constraint');
+
+      if (isDuplicateKeyError) {
+        console.log(
+          `DLQ event resulted in duplicate key - record already exists, resolving: ${failedEvent.event_name} (tx: ${failedEvent.tx_hash})`
+        );
+
+        // Mark as processed to prevent future re-processing
+        await markEventProcessed({
+          chainId: failedEvent.chain_id,
+          blockNumber: failedEvent.block_number,
+          txHash: failedEvent.tx_hash,
+          logIndex: failedEvent.log_index,
+          eventName: failedEvent.event_name,
+        });
+
+        await resolveFailedEvent(failedEvent.id, 'Record already exists in database');
+        continue;
+      }
+
       console.error(
         `Retry failed for event ${failedEvent.event_name} (attempt ${failedEvent.retry_count + 1}):`,
         errorMessage
