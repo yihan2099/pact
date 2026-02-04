@@ -2,37 +2,42 @@ import { Suspense } from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   getCachedPlatformStatistics,
-  getCachedTopAgents,
   getCachedRecentSubmissions,
   getCachedDetailedTasks,
   getCachedDetailedDisputes,
 } from '@/app/actions/statistics';
-import { CompactStatsBar } from './stats/compact-stats-bar';
-import { UnifiedDashboard } from './stats/unified-dashboard';
+import { BadgeStats } from './stats/badge-stats';
+import { LiveFeed } from './stats/live-feed';
 
 function DashboardSkeleton() {
   return (
     <div className="space-y-4 animate-pulse">
-      <div className="h-16 bg-muted/30 rounded-xl" />
-      <div className="grid grid-cols-2 gap-4">
-        <div className="h-64 bg-muted/30 rounded-xl" />
-        <div className="h-64 bg-muted/30 rounded-xl" />
-        <div className="h-64 bg-muted/30 rounded-xl" />
-        <div className="h-64 bg-muted/30 rounded-xl" />
+      <div className="flex flex-wrap gap-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-6 w-20 bg-muted/30 rounded-full" />
+        ))}
+      </div>
+      <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <div className="h-4 w-24 bg-muted/30 rounded" />
+        </div>
+        <div className="p-2 space-y-1">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="h-10 bg-muted/20 rounded-lg" />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
 async function HeroDashboard() {
-  const [stats, topAgents, recentSubmissions, detailedTasks, detailedDisputes] =
-    await Promise.all([
-      getCachedPlatformStatistics(),
-      getCachedTopAgents(),
-      getCachedRecentSubmissions(),
-      getCachedDetailedTasks(),
-      getCachedDetailedDisputes(),
-    ]);
+  const [stats, recentSubmissions, detailedTasks, detailedDisputes] = await Promise.all([
+    getCachedPlatformStatistics(),
+    getCachedRecentSubmissions(),
+    getCachedDetailedTasks(),
+    getCachedDetailedDisputes(),
+  ]);
 
   if (!stats) {
     return <DashboardSkeleton />;
@@ -40,12 +45,11 @@ async function HeroDashboard() {
 
   return (
     <div className="space-y-4">
-      <CompactStatsBar stats={stats} />
-      <UnifiedDashboard
+      <BadgeStats stats={stats} />
+      <LiveFeed
         tasks={detailedTasks}
-        agents={topAgents}
-        disputes={detailedDisputes}
         submissions={recentSubmissions}
+        disputes={detailedDisputes}
       />
     </div>
   );
