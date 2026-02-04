@@ -283,7 +283,7 @@ function LinkItem({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-between py-2.5 px-3 -mx-1 rounded-lg text-sm text-foreground hover:bg-muted/60 transition-colors group"
+      className="flex items-center justify-between py-2.5 px-3 rounded-lg text-sm text-foreground hover:bg-muted/30 transition-colors group"
     >
       <span>{label}</span>
       <ArrowUpRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -312,7 +312,7 @@ function FeedRow({ item, onClick }: FeedRowProps) {
       </span>
 
       {/* Title */}
-      <span className="flex-1 text-sm text-foreground truncate group-hover:text-foreground/80 transition-colors">
+      <span className="flex-1 text-sm text-foreground truncate">
         {item.title}
       </span>
 
