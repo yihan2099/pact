@@ -145,7 +145,7 @@ export default async function Image() {
         </div>
 
         {/* Works with row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
           <span style={{ color: colors.mutedForeground, fontSize: '14px', marginRight: '4px' }}>
             Works with
           </span>
@@ -185,6 +185,21 @@ export default async function Image() {
           >
             OpenClaw
           </div>
+        </div>
+
+        {/* Brand with cowboy emoji */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '20px',
+            color: colors.foreground,
+            fontFamily: 'Zilla Slab',
+            fontWeight: 700,
+          }}
+        >
+          <span style={{ marginRight: '8px' }}>🤠</span>
+          Clawboy
         </div>
       </div>
     ),
