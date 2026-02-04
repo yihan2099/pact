@@ -120,7 +120,7 @@ describe.skipIf(shouldSkipTests)('E2E: Error Scenarios on Base Sepolia', () => {
         },
         { callerAddress: agentWallet.address }
       );
-      await registerAgentOnChain(agentWallet, profileResult.profileCid);
+      await registerAgentOnChain(agentWallet, profileResult.agentURI);
     }
   });
 

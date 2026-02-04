@@ -81,8 +81,8 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
         },
         { callerAddress: agentWallet.address }
       );
-      await registerAgentOnChain(agentWallet, profileResult.profileCid);
-      originalProfileCid = profileResult.profileCid;
+      await registerAgentOnChain(agentWallet, profileResult.agentURI);
+      originalProfileCid = profileResult.agentURI;
       await sleep(3000);
     } else {
       // Get existing profile CID and check if it's accessible
@@ -101,12 +101,13 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
         preferredTaskTypes: ['code', 'document'],
       };
       const uploadResult = await uploadAgentProfile(newProfile);
-      originalProfileCid = uploadResult.cid;
-      console.log(`New profile CID: ${originalProfileCid}`);
+      const newProfileURI = `ipfs://${uploadResult.cid}`;
+      originalProfileCid = newProfileURI;
+      console.log(`New profile URI: ${originalProfileCid}`);
 
-      // Update on-chain to point to new CID
+      // Update on-chain to point to new URI
       console.log('Updating on-chain profile reference...');
-      await updateProfileOnChain(agentWallet, originalProfileCid);
+      await updateProfileOnChain(agentWallet, newProfileURI);
       await sleep(3000);
     }
 
@@ -126,21 +127,21 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
         { callerAddress: agentWallet.address }
       );
 
-      console.log(`Previous CID: ${result.previousCid}`);
+      console.log(`Previous URI: ${result.previousURI}`);
       console.log(`New profile CID: ${result.newProfileCid}`);
       console.log(`Updated fields: ${result.updatedFields.join(', ')}`);
 
-      // CIDs should be different
-      expect(result.previousCid).toBeDefined();
+      // URIs should be different
+      expect(result.previousURI).toBeDefined();
       expect(result.newProfileCid).toBeDefined();
-      expect(result.previousCid).not.toBe(result.newProfileCid);
+      expect(result.previousURI).not.toBe(result.newAgentURI);
 
       // Updated fields should include name
       expect(result.updatedFields).toContain('name');
 
       // Update on-chain
       console.log('Updating profile on-chain...');
-      const txHash = await updateProfileOnChain(agentWallet, result.newProfileCid);
+      const txHash = await updateProfileOnChain(agentWallet, result.newAgentURI);
       console.log(`Update tx: ${txHash}`);
 
       await sleep(3000);
@@ -177,7 +178,7 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
       expect(result.updatedFields).toContain('skills');
 
       // Update on-chain
-      const txHash = await updateProfileOnChain(agentWallet, result.newProfileCid);
+      const txHash = await updateProfileOnChain(agentWallet, result.newAgentURI);
       console.log(`Update tx: ${txHash}`);
 
       await sleep(3000);
@@ -212,7 +213,7 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
       expect(result.updatedFields).toContain('webhookUrl');
 
       // Update on-chain
-      const txHash = await updateProfileOnChain(agentWallet, result.newProfileCid);
+      const txHash = await updateProfileOnChain(agentWallet, result.newAgentURI);
       console.log(`Update tx: ${txHash}`);
 
       await sleep(3000);
@@ -260,7 +261,7 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
         { webhookUrl: 'https://temp.example.com/webhook' },
         { callerAddress: agentWallet.address }
       );
-      await updateProfileOnChain(agentWallet, addResult.newProfileCid);
+      await updateProfileOnChain(agentWallet, addResult.newAgentURI);
       await sleep(3000);
 
       // Now remove it
@@ -275,7 +276,7 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
       expect(result.updatedFields).toContain('webhookUrl');
 
       // Update on-chain
-      const txHash = await updateProfileOnChain(agentWallet, result.newProfileCid);
+      const txHash = await updateProfileOnChain(agentWallet, result.newAgentURI);
       console.log(`Update tx: ${txHash}`);
 
       await sleep(3000);

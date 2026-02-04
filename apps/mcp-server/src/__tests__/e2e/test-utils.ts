@@ -33,7 +33,7 @@ import {
   waitForTransaction,
 } from '@clawboy/web3-utils';
 import { gasTracker } from './gas-tracker';
-import { TaskManagerABI, ClawboyRegistryABI, getContractAddresses } from '@clawboy/contracts';
+import { TaskManagerABI, ClawboyAgentAdapterABI, ERC8004IdentityRegistryABI, getContractAddresses } from '@clawboy/contracts';
 import { getTaskByChainId } from '@clawboy/database';
 
 // Chain configuration - supports both Base Sepolia and local Anvil
@@ -189,13 +189,13 @@ export async function authenticateWallet(wallet: TestWallet): Promise<{
  */
 export async function registerAgentOnChain(
   wallet: TestWallet,
-  profileCid: string
+  agentURI: string
 ): Promise<`0x${string}`> {
   const hash = await wallet.walletClient.writeContract({
-    address: addresses.clawboyRegistry,
-    abi: ClawboyRegistryABI,
+    address: addresses.agentAdapter,
+    abi: ClawboyAgentAdapterABI,
     functionName: 'register',
-    args: [profileCid],
+    args: [agentURI],
   });
 
   const receipt = await waitForTransaction(hash, CHAIN_ID);
@@ -215,8 +215,8 @@ export async function checkAgentRegistered(address: `0x${string}`): Promise<bool
   const publicClient = getPublicClient(CHAIN_ID);
 
   return publicClient.readContract({
-    address: addresses.clawboyRegistry,
-    abi: ClawboyRegistryABI,
+    address: addresses.agentAdapter,
+    abi: ClawboyAgentAdapterABI,
     functionName: 'isRegistered',
     args: [address],
   }) as Promise<boolean>;
@@ -664,13 +664,13 @@ export async function cancelTaskOnChain(
  */
 export async function updateProfileOnChain(
   wallet: TestWallet,
-  newProfileCid: string
+  newURI: string
 ): Promise<`0x${string}`> {
   const hash = await wallet.walletClient.writeContract({
-    address: addresses.clawboyRegistry,
-    abi: ClawboyRegistryABI,
+    address: addresses.agentAdapter,
+    abi: ClawboyAgentAdapterABI,
     functionName: 'updateProfile',
-    args: [newProfileCid],
+    args: [newURI],
   });
 
   const receipt = await waitForTransaction(hash, CHAIN_ID);
@@ -684,16 +684,17 @@ export async function updateProfileOnChain(
 }
 
 /**
- * Get agent profile CID from chain
+ * Get agent profile URI from chain (ERC-8004)
+ * Returns the IPFS URI (ipfs://CID) or null if not registered
  */
-export async function getAgentProfileCid(address: `0x${string}`): Promise<string | null> {
+export async function getAgentProfileURI(address: `0x${string}`): Promise<string | null> {
   const publicClient = getPublicClient(CHAIN_ID);
 
   try {
     // First check if registered
     const isRegistered = (await publicClient.readContract({
-      address: addresses.clawboyRegistry,
-      abi: ClawboyRegistryABI,
+      address: addresses.agentAdapter,
+      abi: ClawboyAgentAdapterABI,
       functionName: 'isRegistered',
       args: [address],
     })) as boolean;
@@ -702,28 +703,44 @@ export async function getAgentProfileCid(address: `0x${string}`): Promise<string
       return null;
     }
 
-    // Get agent data using getAgent
-    const agent = await publicClient.readContract({
-      address: addresses.clawboyRegistry,
-      abi: ClawboyRegistryABI,
-      functionName: 'getAgent',
+    // Get agent ID
+    const agentId = (await publicClient.readContract({
+      address: addresses.agentAdapter,
+      abi: ClawboyAgentAdapterABI,
+      functionName: 'getAgentId',
       args: [address],
-    });
+    })) as bigint;
 
-    // getAgent returns tuple: (reputation, tasksWon, disputesWon, disputesLost, profileCid, registeredAt, isActive)
-    const agentData = agent as {
-      reputation: bigint;
-      tasksWon: bigint;
-      disputesWon: bigint;
-      disputesLost: bigint;
-      profileCid: string;
-      registeredAt: bigint;
-      isActive: boolean;
-    };
-    return agentData.profileCid;
+    if (agentId === 0n) {
+      return null;
+    }
+
+    // Get agent URI from identity registry
+    const agentURI = (await publicClient.readContract({
+      address: addresses.identityRegistry,
+      abi: ERC8004IdentityRegistryABI,
+      functionName: 'getAgentURI',
+      args: [agentId],
+    })) as string;
+
+    return agentURI || null;
   } catch {
     return null;
   }
+}
+
+/**
+ * @deprecated Use getAgentProfileURI instead
+ * Get agent profile CID from chain (extracts CID from URI)
+ */
+export async function getAgentProfileCid(address: `0x${string}`): Promise<string | null> {
+  const uri = await getAgentProfileURI(address);
+  if (!uri) return null;
+  // Extract CID from ipfs://CID format
+  if (uri.startsWith('ipfs://')) {
+    return uri.slice(7);
+  }
+  return uri;
 }
 
 // Re-export gasTracker for test files to print reports

@@ -349,7 +349,7 @@ describe.skipIf(shouldSkipTests)('E2E: Dispute Flow on Base Sepolia', () => {
           },
           { callerAddress: agentWallet.address }
         );
-        await registerAgentOnChain(agentWallet, profileResult.profileCid);
+        await registerAgentOnChain(agentWallet, profileResult.agentURI);
         await sleep(3000); // Wait for state propagation
       }
 
@@ -368,7 +368,7 @@ describe.skipIf(shouldSkipTests)('E2E: Dispute Flow on Base Sepolia', () => {
           },
           { callerAddress: voterWallet.address }
         );
-        await registerAgentOnChain(voterWallet, profileResult.profileCid);
+        await registerAgentOnChain(voterWallet, profileResult.agentURI);
         await sleep(3000); // Wait for state propagation
       }
 

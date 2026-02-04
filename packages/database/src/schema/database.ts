@@ -79,6 +79,8 @@ export interface Database {
         Row: {
           id: string;
           address: string;
+          agent_id: string | null; // ERC-8004 NFT token ID
+          agent_uri: string | null; // ERC-8004 IPFS URI (ipfs://CID)
           reputation: string;
           tasks_won: number;
           disputes_won: number;
@@ -95,6 +97,8 @@ export interface Database {
         Insert: {
           id?: string;
           address: string;
+          agent_id?: string | null;
+          agent_uri?: string | null;
           reputation?: string;
           tasks_won?: number;
           disputes_won?: number;
@@ -111,6 +115,8 @@ export interface Database {
         Update: {
           id?: string;
           address?: string;
+          agent_id?: string | null;
+          agent_uri?: string | null;
           reputation?: string;
           tasks_won?: number;
           disputes_won?: number;

@@ -197,7 +197,7 @@ describe.skipIf(shouldSkipTests)('E2E: Discovery Tools on Base Sepolia', () => {
             },
             { callerAddress: agentWallet.address }
           );
-          await registerAgentOnChain(agentWallet, profileResult.profileCid);
+          await registerAgentOnChain(agentWallet, profileResult.agentURI);
         }
 
         const context = createRegisteredContext(agentWallet.address, agentSessionId);

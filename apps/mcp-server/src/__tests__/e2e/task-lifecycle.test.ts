@@ -176,7 +176,7 @@ describe.skipIf(shouldSkipTests)('E2E: Task Lifecycle on Base Sepolia', () => {
         { callerAddress: agentWallet.address }
       );
 
-      agentProfileCid = profileResult.profileCid;
+      agentProfileCid = profileResult.agentURI;
       console.log(`Profile CID: ${agentProfileCid}`);
 
       // Register on-chain
@@ -449,7 +449,7 @@ describe.skipIf(shouldSkipTests)('E2E: Task Cancellation on Base Sepolia', () =>
         },
         { callerAddress: agentWallet.address }
       );
-      await registerAgentOnChain(agentWallet, profileResult.profileCid);
+      await registerAgentOnChain(agentWallet, profileResult.agentURI);
     }
   });
 
