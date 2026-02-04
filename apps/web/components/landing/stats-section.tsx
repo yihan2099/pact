@@ -1,6 +1,5 @@
 import {
   getCachedPlatformStatistics,
-  getCachedRecentTasks,
   getCachedTopAgents,
   getCachedRecentSubmissions,
   getCachedTagStatistics,
@@ -9,19 +8,12 @@ import {
   getCachedDetailedTasks,
   getCachedDetailedDisputes,
 } from '@/app/actions/statistics';
-import {
-  HeroStats,
-  SecondaryStats,
-  ActivityFeedGrid,
-  TaskCategoriesCard,
-  FeaturedTasksCard,
-  MiniDashboard,
-} from './stats';
+import { OverviewPanel } from './stats/overview-panel';
+import { DashboardTabs } from './stats/dashboard-tabs';
 
 export async function StatsSection() {
   const [
     stats,
-    recentTasks,
     topAgents,
     recentSubmissions,
     tagStats,
@@ -31,7 +23,6 @@ export async function StatsSection() {
     detailedDisputes,
   ] = await Promise.all([
     getCachedPlatformStatistics(),
-    getCachedRecentTasks(),
     getCachedTopAgents(),
     getCachedRecentSubmissions(),
     getCachedTagStatistics(),
@@ -46,40 +37,30 @@ export async function StatsSection() {
     return null;
   }
 
-  const showTaskDetails = tagStats.length > 0 || featuredTasks.length > 0;
-  const showMiniDashboard =
-    detailedTasks.length > 0 || detailedDisputes.length > 0 || recentSubmissions.length > 0;
-
   return (
     <section className="py-32">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-8">
-          Platform Activity
-        </h2>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Platform Dashboard
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Real-time overview of tasks, agents, and platform activity
+          </p>
+        </div>
 
-        <HeroStats stats={stats} />
-        <SecondaryStats stats={stats} bountyStats={bountyStats} />
+        <OverviewPanel stats={stats} />
 
-        {/* Mini Dashboard - Detailed Task/Dispute/Submission Cards */}
-        {showMiniDashboard && (
-          <div className="mb-8">
-            <MiniDashboard
-              tasks={detailedTasks}
-              disputes={detailedDisputes}
-              submissions={recentSubmissions}
-            />
-          </div>
-        )}
-
-        {/* Task Details Section - Popular Categories & Featured Tasks */}
-        {showTaskDetails && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <TaskCategoriesCard tags={tagStats} />
-            <FeaturedTasksCard tasks={featuredTasks} />
-          </div>
-        )}
-
-        <ActivityFeedGrid tasks={recentTasks} agents={topAgents} submissions={recentSubmissions} />
+        <DashboardTabs
+          tasks={detailedTasks}
+          disputes={detailedDisputes}
+          agents={topAgents}
+          stats={stats}
+          tagStats={tagStats}
+          featuredTasks={featuredTasks}
+          bountyStats={bountyStats}
+          submissions={recentSubmissions}
+        />
       </div>
     </section>
   );

@@ -1,7 +1,6 @@
-export { HeroStats } from './hero-stats';
-export { SecondaryStats } from './secondary-stats';
-export { ActivityFeedGrid } from './activity-feed-grid';
+export { OverviewPanel } from './overview-panel';
+export { DashboardTabs } from './dashboard-tabs';
 export { StatsSectionSkeleton } from './stats-section-skeleton';
-export { TaskCategoriesCard } from './task-categories-card';
-export { FeaturedTasksCard } from './featured-tasks-card';
-export { MiniDashboard } from './mini-dashboard';
+
+// Tab components (for direct access if needed)
+export { TasksTab, AgentsTab, DisputesTab, AnalyticsTab } from './tabs';
