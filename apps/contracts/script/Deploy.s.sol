@@ -21,7 +21,8 @@ contract DeployScript is Script {
         console.log("ERC8004IdentityRegistry deployed at:", address(identityRegistry));
 
         // 2. Deploy ERC-8004 ReputationRegistry (initialized with IdentityRegistry in constructor)
-        ERC8004ReputationRegistry reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
+        ERC8004ReputationRegistry reputationRegistry =
+            new ERC8004ReputationRegistry(address(identityRegistry));
         console.log("ERC8004ReputationRegistry deployed at:", address(reputationRegistry));
 
         // 4. Deploy ClawboyAgentAdapter

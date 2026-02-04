@@ -290,9 +290,7 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
 
         // Try to get task wins - fallback to 0 if getSummary reverts (too many clients/feedback)
         try reputationRegistry.getSummary(agentId, new address[](0), TAG_TASK, TAG_WIN) returns (
-            uint64 count,
-            int128,
-            uint8
+            uint64 count, int128, uint8
         ) {
             taskWins = count;
         } catch {
@@ -302,9 +300,7 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
 
         // Try to get dispute wins
         try reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_WIN) returns (
-            uint64 count,
-            int128,
-            uint8
+            uint64 count, int128, uint8
         ) {
             disputeWins = count;
         } catch {
@@ -312,10 +308,10 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
         }
 
         // Try to get dispute losses
-        try reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_LOSS) returns (
-            uint64 count,
-            int128,
-            uint8
+        try reputationRegistry.getSummary(
+            agentId, new address[](0), TAG_DISPUTE, TAG_LOSS
+        ) returns (
+            uint64 count, int128, uint8
         ) {
             disputeLosses = count;
         } catch {

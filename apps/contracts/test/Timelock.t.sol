@@ -35,10 +35,12 @@ contract TimelockTest is Test {
         reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
 
         // Deploy ClawboyAgentAdapter
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         // Deploy EscrowVault with predicted TaskManager address
-        address predictedTaskManager = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
+        address predictedTaskManager =
+            vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
         escrowVault = new EscrowVault(predictedTaskManager);
 
         // Deploy TaskManager
@@ -53,12 +55,7 @@ contract TimelockTest is Test {
         address[] memory executors = new address[](1);
         executors[0] = deployer;
 
-        timelock = new TimelockController(
-            TIMELOCK_DELAY,
-            proposers,
-            executors,
-            deployer
-        );
+        timelock = new TimelockController(TIMELOCK_DELAY, proposers, executors, deployer);
 
         // Configure timelock on all contracts
         taskManager.setTimelock(address(timelock));
@@ -94,7 +91,8 @@ contract TimelockTest is Test {
         address newResolver = address(0x111);
 
         // Schedule the operation
-        bytes memory data = abi.encodeWithSelector(TaskManager.setDisputeResolver.selector, newResolver);
+        bytes memory data =
+            abi.encodeWithSelector(TaskManager.setDisputeResolver.selector, newResolver);
 
         timelock.schedule(address(taskManager), 0, data, bytes32(0), bytes32(0), TIMELOCK_DELAY);
 
@@ -186,7 +184,10 @@ contract TimelockTest is Test {
         disputeResolver.emergencyCancelDispute(1);
 
         // Verify dispute is cancelled
-        assertEq(uint256(disputeResolver.getDispute(1).status), uint256(IDisputeResolver.DisputeStatus.Cancelled));
+        assertEq(
+            uint256(disputeResolver.getDispute(1).status),
+            uint256(IDisputeResolver.DisputeStatus.Cancelled)
+        );
     }
 
     function test_DisputeResolver_EmergencyWithdrawSlashedStakes_OnlyOwner() public {
@@ -232,7 +233,8 @@ contract TimelockTest is Test {
         address newTaskManager = address(0x888);
 
         // Schedule the operation
-        bytes memory data = abi.encodeWithSelector(ClawboyAgentAdapter.setTaskManager.selector, newTaskManager);
+        bytes memory data =
+            abi.encodeWithSelector(ClawboyAgentAdapter.setTaskManager.selector, newTaskManager);
 
         timelock.schedule(address(agentAdapter), 0, data, bytes32(0), bytes32(0), TIMELOCK_DELAY);
 
@@ -265,7 +267,8 @@ contract TimelockTest is Test {
 
     function test_TimelockDelayEnforced() public {
         address newResolver = address(0xAAA);
-        bytes memory data = abi.encodeWithSelector(TaskManager.setDisputeResolver.selector, newResolver);
+        bytes memory data =
+            abi.encodeWithSelector(TaskManager.setDisputeResolver.selector, newResolver);
 
         // Start at a known timestamp
         vm.warp(1000);

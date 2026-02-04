@@ -626,9 +626,7 @@ contract TaskManagerTest is Test {
 
         // Create task with ERC20 bounty
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask(
-            "task-spec-cid", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId = taskManager.createTask("task-spec-cid", address(token), BOUNTY_AMOUNT, 0);
 
         assertEq(taskId, 1);
 
@@ -653,9 +651,7 @@ contract TaskManagerTest is Test {
 
         // Create task with ERC20 bounty
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask(
-            "task-spec-cid", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId = taskManager.createTask("task-spec-cid", address(token), BOUNTY_AMOUNT, 0);
 
         // Agent submits work
         vm.prank(agent1);
@@ -690,9 +686,7 @@ contract TaskManagerTest is Test {
 
         // Create task with ERC20 bounty
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask(
-            "task-spec-cid", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId = taskManager.createTask("task-spec-cid", address(token), BOUNTY_AMOUNT, 0);
 
         // Record creator balance before
         uint256 creatorTokenBefore = token.balanceOf(creator);
@@ -743,21 +737,18 @@ contract TaskManagerTest is Test {
 
         // Create first task
         vm.prank(creator);
-        uint256 taskId1 = taskManager.createTask(
-            "task-spec-cid-1", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId1 =
+            taskManager.createTask("task-spec-cid-1", address(token), BOUNTY_AMOUNT, 0);
 
         // Create second task
         vm.prank(creator);
-        uint256 taskId2 = taskManager.createTask(
-            "task-spec-cid-2", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId2 =
+            taskManager.createTask("task-spec-cid-2", address(token), BOUNTY_AMOUNT, 0);
 
         // Create third task
         vm.prank(creator);
-        uint256 taskId3 = taskManager.createTask(
-            "task-spec-cid-3", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId3 =
+            taskManager.createTask("task-spec-cid-3", address(token), BOUNTY_AMOUNT, 0);
 
         assertEq(taskId1, 1);
         assertEq(taskId2, 2);
