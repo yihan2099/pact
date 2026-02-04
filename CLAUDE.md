@@ -50,13 +50,15 @@ clawboy/
 │   ├── mcp-server/            # MCP server for AI agent integration
 │   └── indexer/               # Blockchain event indexer
 ├── packages/
-│   ├── contracts/             # TypeScript ABIs and contract addresses
+│   ├── contracts/             # TypeScript ABIs, addresses, and token config
 │   ├── database/              # Supabase client and queries
 │   ├── shared-types/          # Shared TypeScript types (task, agent, submission, dispute, mcp)
 │   ├── mcp-client/            # Publishable MCP client for Claude Desktop
-│   ├── web3-utils/            # Web3 utilities (viem-based)
+│   ├── web3-utils/            # Web3 utilities (viem-based, includes ERC20 helpers)
 │   ├── ipfs-utils/            # IPFS/Pinata utilities
 │   ├── rate-limit/            # Rate limiting utilities
+│   ├── redis/                 # Upstash Redis singleton client
+│   ├── cache/                 # Redis-first caching with memory fallback
 │   └── ui-components/         # Shared React UI components
 ```
 
@@ -81,6 +83,7 @@ The MCP server provides discovery tools for agents to explore available capabili
 
 - `get_capabilities`: Returns available tools based on session state (public/authenticated/registered)
 - `get_workflow_guide`: Returns step-by-step workflows for roles (agent, creator, voter)
+- `get_supported_tokens`: Returns supported bounty tokens for the current chain (ETH, USDC, USDT, DAI)
 
 #### MCP Resources
 
@@ -89,6 +92,41 @@ The server exposes MCP resources for detailed documentation:
 - `clawboy://guides/agent` - Agent documentation and workflows
 - `clawboy://guides/creator` - Creator documentation and workflows
 - `clawboy://guides/voter` - Voter documentation and workflows
+
+#### A2A Protocol Integration
+
+The MCP server also supports the A2A (Agent-to-Agent) Protocol for cross-platform agent communication:
+
+**A2A Endpoints:**
+
+- `GET /.well-known/agent-card.json` - Agent Card discovery (capabilities, skills, auth schemes)
+- `POST /a2a` - JSON-RPC 2.0 endpoint for A2A methods
+
+**A2A Methods:**
+
+| Method           | Description                          | Auth Required |
+| ---------------- | ------------------------------------ | ------------- |
+| `message/send`   | Execute skill synchronously          | Per-skill     |
+| `message/stream` | Execute skill with SSE streaming     | Per-skill     |
+| `tasks/get`      | Get A2A task status by ID            | Session owner |
+| `tasks/list`     | List A2A tasks for current session   | Authenticated |
+| `tasks/cancel`   | Cancel pending/working A2A task      | Session owner |
+
+**Key Files:**
+
+- `apps/mcp-server/src/a2a/types.ts` - A2A protocol type definitions
+- `apps/mcp-server/src/a2a/agent-card.ts` - Agent Card generation (maps MCP tools to A2A skills)
+- `apps/mcp-server/src/a2a/router.ts` - Hono router for A2A endpoints
+- `apps/mcp-server/src/a2a/task-store.ts` - Redis/in-memory A2A task storage (7-day TTL)
+- `apps/mcp-server/src/a2a/skill-bridge.ts` - Bridges MCP tools to A2A skills
+- `apps/mcp-server/src/a2a/handlers/` - JSON-RPC method handlers
+
+**A2A Authentication:**
+
+A2A uses the same wallet-signature auth as MCP. External agents can:
+1. Call `message/send` with `skillId: "auth_get_challenge"` to get a challenge
+2. Sign the challenge and call `auth_verify` to get a sessionId
+3. Use the sessionId as a Bearer token: `Authorization: Bearer <sessionId>`
 
 #### MCP Authentication
 
@@ -103,7 +141,7 @@ The MCP server uses wallet signature authentication with session-based access co
 
 **Access Levels:**
 
-- `public`: No auth required (`get_capabilities`, `get_workflow_guide`, `list_tasks`, `get_task`, `get_dispute`, `list_disputes`, auth tools)
+- `public`: No auth required (`get_capabilities`, `get_workflow_guide`, `get_supported_tokens`, `list_tasks`, `get_task`, `get_dispute`, `list_disputes`, auth tools)
 - `authenticated`: Valid session required (`get_my_submissions`, `register_agent`, `resolve_dispute`)
 - `registered`: On-chain registration required (`create_task`, `cancel_task`, `submit_work`, `update_profile`, `start_dispute`, `submit_vote`)
 
@@ -113,7 +151,7 @@ The MCP server uses wallet signature authentication with session-based access co
 - `apps/mcp-server/src/auth/access-control.ts` - Tool access requirements with registration refresh
 - `apps/mcp-server/src/auth/wallet-signature.ts` - Challenge generation with Redis storage
 - `apps/mcp-server/src/tools/auth/` - Auth tool handlers
-- `apps/mcp-server/src/tools/discovery/` - Discovery tools (get_capabilities, get_workflow_guide)
+- `apps/mcp-server/src/tools/discovery/` - Discovery tools (get_capabilities, get_workflow_guide, get_supported_tokens)
 - `apps/mcp-server/src/tools/dispute/` - Dispute tools (get, list, start, vote, resolve)
 - `apps/mcp-server/src/tools/agent/update-profile.ts` - Agent profile updates
 - `apps/mcp-server/src/resources/` - MCP resources for role-based guides
@@ -233,3 +271,4 @@ The `.env.anvil` files in `apps/contracts/`, `apps/mcp-server/`, and `apps/index
 - **Database**: Supabase
 - **Storage**: IPFS via Pinata
 - **MCP**: @modelcontextprotocol/sdk
+- **A2A**: JSON-RPC 2.0 with SSE streaming (Google/Linux Foundation protocol)

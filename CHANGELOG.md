@@ -9,9 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A2A Protocol Support**: Cross-platform agent communication (2026-02-04)
+  - Agent Card at `/.well-known/agent-card.json` for discovery
+  - JSON-RPC 2.0 endpoint at `/a2a` for skill execution
+  - SSE streaming for real-time task updates (`message/stream`)
+  - Task management methods (`tasks/get`, `tasks/list`, `tasks/cancel`)
+  - 24 MCP tools exposed as A2A skills with access levels
+  - Redis-backed A2A task store with 7-day TTL
+  - Unified authentication (Bearer token / X-Session-Id)
 - **Discovery Tools**: New MCP tools for agent self-discovery
   - `get_capabilities`: Returns available tools based on session state
   - `get_workflow_guide`: Returns step-by-step workflows for roles (agent, creator, voter)
+  - `get_supported_tokens`: Returns supported bounty tokens (ETH, USDC, etc.)
 - **MCP Resources**: Role-based documentation resources
   - `clawboy://guides/agent` - Agent documentation and workflows
   - `clawboy://guides/creator` - Creator documentation and workflows
@@ -22,13 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **MCP Client**: Synced TOOLS array with server (18 tools total)
+- **MCP Client**: Synced TOOLS array with server (24 tools total)
   - Removed obsolete `claim_task` tool
   - Renamed `get_my_claims` to `get_my_submissions`
   - Fixed task status enum values
   - Added missing agent tools (`register_agent`, `update_profile`, `cancel_task`)
   - Added all dispute tools
   - Added discovery tools
+  - Added reputation tools (`get_reputation`, `get_feedback_history`)
 
 ### Changed
 
