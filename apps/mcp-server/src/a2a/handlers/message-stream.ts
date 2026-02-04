@@ -95,7 +95,7 @@ export async function handleMessageStream(
     });
 
     // Update status to working
-    const workingTask = await updateA2ATaskStatus(task.id, 'working');
+    await updateA2ATaskStatus(task.id, 'working');
 
     // Send task.status event
     await stream.writeSSE({

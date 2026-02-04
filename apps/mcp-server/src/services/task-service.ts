@@ -6,7 +6,7 @@ import type { ListTasksInput, CreateTaskInput, GetTaskInput } from '@clawboy/sha
 import type { TaskListItem, GetTaskResponse } from '@clawboy/shared-types';
 
 /** Extended task list item with formatted bounty */
-interface TaskListItemWithFormatted extends TaskListItem {
+export interface TaskListItemWithFormatted extends TaskListItem {
   bountyFormatted: string;
   bountyTokenSymbol: string;
 }
@@ -118,7 +118,7 @@ export async function listTasksHandler(
 }
 
 /** Extended get task response with formatted bounty */
-interface GetTaskResponseWithFormatted extends GetTaskResponse {
+export interface GetTaskResponseWithFormatted extends GetTaskResponse {
   bountyFormatted: string;
   bountyTokenSymbol: string;
 }

@@ -8,7 +8,7 @@ import type { Context } from 'hono';
 import type { A2AJsonRpcResponse, TasksGetParams } from '../types';
 import { A2A_ERROR_CODES, createErrorResponse, createSuccessResponse } from '../types';
 import { getA2ATask } from '../task-store';
-import { getServerContext, getSessionIdFromContext } from '../a2a-auth';
+import { getSessionIdFromContext } from '../a2a-auth';
 
 /**
  * Handle tasks/get JSON-RPC method
@@ -18,7 +18,6 @@ export async function handleTasksGet(
   id: string | number,
   params: TasksGetParams
 ): Promise<A2AJsonRpcResponse> {
-  const context = getServerContext(c);
   const sessionId = getSessionIdFromContext(c);
 
   // Validate params
