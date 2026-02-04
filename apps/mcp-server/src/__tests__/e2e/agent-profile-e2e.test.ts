@@ -113,7 +113,7 @@ describe.skipIf(shouldSkipTests)('E2E: Agent Profile on Base Sepolia', () => {
 
     console.log(`Original profile CID: ${originalProfileCid}`);
     console.log('');
-  });
+  }, TEST_TIMEOUT);
 
   test(
     'Test 1: Update profile name after registration',
