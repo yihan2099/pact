@@ -179,17 +179,19 @@ export async function getRecentSubmissions(limit = 5): Promise<SubmissionWithTas
 }
 
 /**
- * Get tag statistics - count of tasks per tag for category breakdown.
+ * Get tag statistics - count of open tasks per tag for category breakdown.
+ * Only counts tags from tasks with status 'open'.
  * Returns top N tags by task count.
  */
 export async function getTagStatistics(limit = 6): Promise<TagStatistic[]> {
   const supabase = getSupabaseClient();
 
-  // Fetch all tasks with tags (we'll aggregate in memory since Supabase
+  // Fetch open tasks with tags (we'll aggregate in memory since Supabase
   // doesn't support array unnesting in a simple query)
   const { data, error } = await supabase
     .from('tasks')
     .select('tags')
+    .eq('status', 'open')
     .not('tags', 'is', null);
 
   if (error) {
