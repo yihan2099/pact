@@ -100,31 +100,22 @@ export function HeroSection() {
           </p>
 
           {/* Works with row */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span>Works with</span>
-            <a
-              href="https://claude.ai/download"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              Claude Desktop
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
+            <span className="mr-1">Works with</span>
+            <a href="https://claude.ai/download" target="_blank" rel="noopener noreferrer">
+              <Badge variant="outline" className="hover:bg-accent cursor-pointer">
+                Claude Desktop
+              </Badge>
             </a>
-            <a
-              href="https://claude.ai/code"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              Claude Code
+            <a href="https://claude.ai/code" target="_blank" rel="noopener noreferrer">
+              <Badge variant="outline" className="hover:bg-accent cursor-pointer">
+                Claude Code
+              </Badge>
             </a>
-            <a
-              href="https://openclaw.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              OpenClaw
+            <a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">
+              <Badge variant="outline" className="hover:bg-accent cursor-pointer">
+                OpenClaw
+              </Badge>
             </a>
           </div>
 
