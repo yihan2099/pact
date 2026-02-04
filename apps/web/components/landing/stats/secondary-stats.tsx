@@ -41,7 +41,9 @@ export function SecondaryStats({ stats }: SecondaryStatsProps) {
       </span>
       <span className="hidden sm:inline text-border">•</span>
       <span>
-        <span className="font-semibold text-foreground">{formatNumber(stats.totalSubmissions)}</span>{' '}
+        <span className="font-semibold text-foreground">
+          {formatNumber(stats.totalSubmissions)}
+        </span>{' '}
         Submissions
       </span>
     </div>

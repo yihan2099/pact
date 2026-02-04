@@ -42,7 +42,9 @@ function TaskItem({ task }: { task: TaskRow }) {
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <div className="text-right">
-          <div className="font-semibold text-foreground text-sm">{formatBounty(task.bounty_amount)}</div>
+          <div className="font-semibold text-foreground text-sm">
+            {formatBounty(task.bounty_amount)}
+          </div>
         </div>
         <a
           href={getBaseScanUrl(task.creator_address)}
@@ -102,7 +104,9 @@ function SubmissionItem({ submission }: { submission: SubmissionWithTask }) {
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <div className="text-xs text-muted-foreground">{formatTimeAgo(submission.submitted_at)}</div>
+        <div className="text-xs text-muted-foreground">
+          {formatTimeAgo(submission.submitted_at)}
+        </div>
         <a
           href={getBaseScanUrl(submission.agent_address)}
           target="_blank"
@@ -184,7 +188,9 @@ export function ActivityFeedGrid({ tasks, agents, submissions }: ActivityFeedGri
     submissions.length === 0 ? (
       <EmptyState message="No activity yet" />
     ) : (
-      submissions.map((submission) => <SubmissionItem key={submission.id} submission={submission} />)
+      submissions.map((submission) => (
+        <SubmissionItem key={submission.id} submission={submission} />
+      ))
     );
 
   return (
