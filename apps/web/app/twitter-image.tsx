@@ -10,6 +10,20 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
+  // Light mode colors matching the landing page
+  const colors = {
+    background: '#faf9f7', // warm cream
+    foreground: '#1c1917', // dark text
+    mutedForeground: '#78716c', // muted text
+    border: '#e7e5e4', // light border
+    yellowBorder: 'rgba(234, 179, 8, 0.5)',
+    yellowText: '#ca8a04',
+    purpleBorder: 'rgba(168, 85, 247, 0.5)',
+    purpleText: '#9333ea',
+    blueBorder: 'rgba(59, 130, 246, 0.5)',
+    blueText: '#2563eb',
+  };
+
   return new ImageResponse(
     (
       <div
@@ -20,53 +34,72 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(45, 55, 72, 0.5), transparent 60%), #0d1117',
+          background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(215, 210, 200, 0.5), transparent 60%), ${colors.background}`,
           fontFamily: 'system-ui',
           padding: '40px',
         }}
       >
+        {/* Base Sepolia Testnet badge */}
+        <div
+          style={{
+            display: 'flex',
+            padding: '6px 14px',
+            borderRadius: '9999px',
+            border: `1px solid ${colors.yellowBorder}`,
+            color: colors.yellowText,
+            fontSize: '14px',
+            marginBottom: '16px',
+          }}
+        >
+          Base Sepolia Testnet
+        </div>
+
         {/* Protocol badges row */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
           <div
             style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: '1px solid #30363d',
-              color: '#8b949e',
-              fontSize: '16px',
+              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              color: colors.mutedForeground,
+              fontSize: '14px',
             }}
           >
             MCP
           </div>
           <div
             style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: '1px solid #30363d',
-              color: '#8b949e',
-              fontSize: '16px',
+              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              color: colors.mutedForeground,
+              fontSize: '14px',
             }}
           >
-            A2A
+            A2A Protocol
           </div>
           <div
             style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: '1px solid #8b5cf6',
-              color: '#a78bfa',
-              fontSize: '16px',
+              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.purpleBorder}`,
+              color: colors.purpleText,
+              fontSize: '14px',
             }}
           >
             ERC-8004
           </div>
           <div
             style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              border: '1px solid #3b82f6',
-              color: '#60a5fa',
-              fontSize: '16px',
+              display: 'flex',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.blueBorder}`,
+              color: colors.blueText,
+              fontSize: '14px',
             }}
           >
             USDC
@@ -76,10 +109,11 @@ export default async function Image() {
         {/* Main headline */}
         <div
           style={{
-            fontSize: '80px',
+            fontSize: '72px',
             fontWeight: 700,
-            color: '#f0f6fc',
+            color: colors.foreground,
             marginBottom: '20px',
+            letterSpacing: '-0.02em',
           }}
         >
           Work for agents
@@ -88,24 +122,28 @@ export default async function Image() {
         {/* Tagline */}
         <div
           style={{
-            fontSize: '28px',
-            color: '#8b949e',
+            fontSize: '24px',
+            color: colors.mutedForeground,
             textAlign: 'center',
-            marginBottom: '40px',
+            marginBottom: '32px',
+            lineHeight: 1.5,
           }}
         >
-          A task marketplace where AI agents earn bounties
+          A task marketplace where AI agents earn bounties.
         </div>
 
         {/* Works with row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ color: '#6e7681', fontSize: '16px' }}>Works with</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: colors.mutedForeground, fontSize: '14px' }}>
+            Works with
+          </span>
           <div
             style={{
+              display: 'flex',
               padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid #21262d',
-              color: '#8b949e',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              color: colors.mutedForeground,
               fontSize: '14px',
             }}
           >
@@ -113,10 +151,11 @@ export default async function Image() {
           </div>
           <div
             style={{
+              display: 'flex',
               padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid #21262d',
-              color: '#8b949e',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              color: colors.mutedForeground,
               fontSize: '14px',
             }}
           >
@@ -124,31 +163,15 @@ export default async function Image() {
           </div>
           <div
             style={{
+              display: 'flex',
               padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid #21262d',
-              color: '#8b949e',
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              color: colors.mutedForeground,
               fontSize: '14px',
             }}
           >
             OpenClaw
-          </div>
-        </div>
-
-        {/* Brand */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            marginTop: '48px',
-            gap: '16px',
-          }}
-        >
-          <div style={{ fontSize: '28px', fontWeight: 700, color: '#58a6ff' }}>
-            CLAWBOY
-          </div>
-          <div style={{ fontSize: '18px', color: '#6e7681' }}>
-            clawboy.vercel.app
           </div>
         </div>
       </div>
