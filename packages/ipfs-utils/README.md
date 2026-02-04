@@ -131,6 +131,7 @@ export class IpfsUploadError extends Error {
 ```
 
 **Error scenarios:**
+
 - Network errors
 - Pinata API errors
 - Upload timeouts (configurable via `timeoutMs`)
@@ -138,12 +139,12 @@ export class IpfsUploadError extends Error {
 
 ## Timeout Configuration
 
-| Function | Default Timeout |
-|----------|-----------------|
-| `uploadJson()` | 30 seconds |
-| `uploadFile()` | 60 seconds |
-| `uploadBlob()` | 60 seconds |
-| `uploadBytes()` | 60 seconds |
+| Function        | Default Timeout |
+| --------------- | --------------- |
+| `uploadJson()`  | 30 seconds      |
+| `uploadFile()`  | 60 seconds      |
+| `uploadBlob()`  | 60 seconds      |
+| `uploadBytes()` | 60 seconds      |
 
 Override with the `timeoutMs` option:
 

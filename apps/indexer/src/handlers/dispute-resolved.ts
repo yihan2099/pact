@@ -51,9 +51,7 @@ export async function handleDisputeResolved(event: IndexerEvent): Promise<void> 
     );
   } catch (error) {
     // Agent may not exist in database yet - log but don't fail the event
-    console.warn(
-      `Could not update dispute stats for ${dispute.disputer_address}: ${error}`
-    );
+    console.warn(`Could not update dispute stats for ${dispute.disputer_address}: ${error}`);
   }
 
   // Invalidate relevant caches

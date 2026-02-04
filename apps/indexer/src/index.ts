@@ -148,7 +148,9 @@ async function processRetryableEvents(): Promise<void> {
 
       // Check for duplicate key error (PostgreSQL error code 23505)
       // This indicates the record already exists - resolve as success
-      const isDuplicateKeyError = errorMessage.includes('duplicate key value violates unique constraint');
+      const isDuplicateKeyError = errorMessage.includes(
+        'duplicate key value violates unique constraint'
+      );
 
       if (isDuplicateKeyError) {
         console.log(

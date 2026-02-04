@@ -30,8 +30,4 @@ export {
   hasEnoughBalance,
 } from './erc20';
 
-export {
-  withContractRetry,
-  ContractReadError,
-  type RetryConfig,
-} from './retry';
+export { withContractRetry, ContractReadError, type RetryConfig } from './retry';

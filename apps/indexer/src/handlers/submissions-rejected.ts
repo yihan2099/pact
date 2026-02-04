@@ -29,10 +29,7 @@ export async function handleAllSubmissionsRejected(event: IndexerEvent): Promise
   });
 
   // Invalidate relevant caches
-  await Promise.all([
-    invalidateTaskCaches(task.id),
-    invalidateSubmissionCaches(task.id),
-  ]);
+  await Promise.all([invalidateTaskCaches(task.id), invalidateSubmissionCaches(task.id)]);
 
   console.log(`All submissions rejected for task ${taskId}: ${reason}`);
 }

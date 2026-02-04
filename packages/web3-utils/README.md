@@ -104,13 +104,13 @@ const result = await withContractRetry(
 
 **RetryConfig Interface:**
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `maxAttempts` | `number` | 3 | Maximum retry attempts |
-| `initialDelayMs` | `number` | 1000 | Initial delay before first retry |
-| `maxDelayMs` | `number` | 10000 | Maximum delay between retries |
-| `backoffMultiplier` | `number` | 2 | Multiplier for exponential backoff |
-| `onRetry` | `function` | - | Callback on each retry |
+| Property            | Type       | Default | Description                        |
+| ------------------- | ---------- | ------- | ---------------------------------- |
+| `maxAttempts`       | `number`   | 3       | Maximum retry attempts             |
+| `initialDelayMs`    | `number`   | 1000    | Initial delay before first retry   |
+| `maxDelayMs`        | `number`   | 10000   | Maximum delay between retries      |
+| `backoffMultiplier` | `number`   | 2       | Multiplier for exponential backoff |
+| `onRetry`           | `function` | -       | Callback on each retry             |
 
 **Error Handling:**
 

@@ -101,15 +101,18 @@ See [DEPLOYMENT.md](/DEPLOYMENT.md) for deployment details and verification link
 ## Contract Constraints
 
 ### TaskManager
+
 - `refundExpiredTask()` only works for tasks with deadlines (`deadline != 0`)
 - Tasks without deadlines must be cancelled via `cancelTask()`
 - Reverts with `TaskHasNoDeadline()` if attempting to refund a task without deadline
 
 ### DisputeResolver
+
 - Maximum 500 voters per dispute (`MAX_VOTERS_PER_DISPUTE`)
 - Prevents gas exhaustion during dispute resolution
 
 ### ERC8004ReputationRegistry
+
 - `getSummary()` limited to 100 clients, 100 feedback entries per client
 - Use `getPaginatedSummary(agentId, clientOffset, feedbackOffset, maxClients, maxFeedback)` for agents with more feedback
 - Pagination functions support iterating over large datasets without gas issues
