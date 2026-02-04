@@ -20,7 +20,7 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#0d1117',
+          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(45, 55, 72, 0.5), transparent 60%), #0d1117',
           fontFamily: 'system-ui',
           padding: '40px',
         }}
