@@ -17,6 +17,7 @@
       "name": "@clawboy/indexer",
       "version": "0.0.1",
       "dependencies": {
+        "@clawboy/cache": "workspace:*",
         "@clawboy/contracts": "workspace:*",
         "@clawboy/database": "workspace:*",
         "@clawboy/ipfs-utils": "workspace:*",

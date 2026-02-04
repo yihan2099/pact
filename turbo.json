@@ -3,10 +3,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "build:contracts": {
       "cache": true,
+      "inputs": ["apps/contracts/src/**/*.sol", "apps/contracts/foundry.toml"],
       "outputs": ["apps/contracts/out/**", "apps/contracts/abis/**"]
     },
     "dev": {
@@ -21,19 +23,26 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "lint:fix": {},
+    "lint": {
+      "inputs": ["src/**", "*.ts", "*.tsx", "*.js", "*.jsx", "eslint.config.*"]
+    },
+    "lint:fix": {
+      "inputs": ["src/**", "*.ts", "*.tsx", "*.js", "*.jsx", "eslint.config.*"]
+    },
     "clean": {
       "cache": false
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "__tests__/**", "*.test.ts", "*.spec.ts"]
     },
     "test:contracts": {
-      "cache": true
+      "cache": true,
+      "inputs": ["apps/contracts/src/**/*.sol", "apps/contracts/test/**/*.sol"]
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json"]
     },
     "db:migrate": {
       "cache": false
