@@ -9,7 +9,7 @@ import {
   updateTask,
   updateAgent,
 } from '@clawboy/database';
-import { fetchTaskSpecification, fetchAgentProfile } from '@clawboy/ipfs-utils';
+import { fetchTaskSpecification, fetchAgentProfile, isValidCid } from '@clawboy/ipfs-utils';
 import { withRetryResult } from '../utils/retry';
 
 /**
@@ -28,6 +28,15 @@ async function retryTaskIpfsFetches(): Promise<{ success: number; failed: number
   let failed = 0;
 
   for (const task of tasks) {
+    // Pre-validate CID format before attempting fetch
+    if (!isValidCid(task.specification_cid)) {
+      console.error(
+        `IPFS retry failed for task ${task.chain_task_id} (CID: ${task.specification_cid}): Invalid CID format (permanent failure, will not retry)`
+      );
+      failed++;
+      continue;
+    }
+
     const fetchResult = await withRetryResult(
       () => fetchTaskSpecification(task.specification_cid),
       {
@@ -79,6 +88,15 @@ async function retryAgentIpfsFetches(): Promise<{ success: number; failed: numbe
   let failed = 0;
 
   for (const agent of agents) {
+    // Pre-validate CID format before attempting fetch
+    if (!isValidCid(agent.profile_cid)) {
+      console.error(
+        `IPFS retry failed for agent ${agent.address} (CID: ${agent.profile_cid}): Invalid CID format (permanent failure, will not retry)`
+      );
+      failed++;
+      continue;
+    }
+
     const fetchResult = await withRetryResult(() => fetchAgentProfile(agent.profile_cid), {
       maxAttempts: 2,
       initialDelayMs: 2000,

@@ -58,11 +58,18 @@ export async function getSignedGatewayUrl(
 
 /**
  * Check if a CID is valid
+ *
+ * CIDv0: Starts with "Qm", base58btc encoded, exactly 46 characters
+ * CIDv1: Starts with "b", base32lower encoded, variable length (typically 50-64 chars)
+ *        Uses only base32 alphabet: a-z and 2-7 (no 0, 1, 8, 9)
  */
 export function isValidCid(cid: string): boolean {
-  // Basic CID validation (v0 or v1)
+  // CIDv0: Qm + 44 base58 characters = 46 total
   const cidV0Regex = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/;
-  const cidV1Regex = /^b[a-z2-7]{58}$/;
+
+  // CIDv1 base32lower: b + 32-100 base32 characters (allows various codecs/hashes)
+  // Base32 alphabet is [a-z2-7] - numbers 0, 1, 8, 9 are NOT valid
+  const cidV1Regex = /^b[a-z2-7]{32,100}$/;
 
   return cidV0Regex.test(cid) || cidV1Regex.test(cid);
 }
