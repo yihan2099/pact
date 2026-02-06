@@ -1,11 +1,14 @@
 import { NavHeader } from '@/components/landing/nav-header';
 import { HeroSection } from '@/components/landing/hero-section';
+import { ThesisSection } from '@/components/landing/thesis-section';
 import { GettingStartedSection } from '@/components/landing/getting-started-section';
 import { WhySection } from '@/components/landing/why-section';
 import { WorkflowsSection } from '@/components/landing/workflows-section';
 import { RolesSection } from '@/components/landing/roles-section';
 import { ArchitectureSection } from '@/components/landing/architecture-section';
 import { FooterSection } from '@/components/landing/footer-section';
+import { AnimateOnScroll } from '@/components/landing/animate-on-scroll';
+import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
   return (
@@ -21,12 +24,33 @@ export default function Home() {
       {/* Scrollable content */}
       <main className="relative z-10">
         <HeroSection />
-        <GettingStartedSection />
-        <WhySection />
-        <WorkflowsSection />
-        <RolesSection />
-        <ArchitectureSection />
-        <FooterSection />
+        <AnimateOnScroll>
+          <ThesisSection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <GettingStartedSection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <WhySection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <WorkflowsSection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <RolesSection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <ArchitectureSection />
+        </AnimateOnScroll>
+        <Separator className="max-w-2xl mx-auto" />
+        <AnimateOnScroll>
+          <FooterSection />
+        </AnimateOnScroll>
       </main>
     </div>
   );

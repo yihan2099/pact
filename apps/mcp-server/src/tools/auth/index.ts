@@ -18,7 +18,7 @@ export const authToolDefs = [
   {
     name: 'auth_get_challenge',
     description:
-      'Get a challenge message to sign for authentication. Call this first, then sign the challenge with your wallet and call auth_verify.',
+      'Start authentication by requesting a challenge message. Sign it with your wallet private key, then call auth_verify. This proves you control the wallet without exposing your key.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -33,7 +33,7 @@ export const authToolDefs = [
   {
     name: 'auth_verify',
     description:
-      'Verify a signed challenge to complete authentication. Returns a sessionId to include in subsequent tool calls.',
+      'Complete authentication by submitting your signed challenge. Returns a sessionId (valid 24 hours) that unlocks submitting work, creating tasks, and disputing.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -55,7 +55,7 @@ export const authToolDefs = [
   },
   {
     name: 'auth_session',
-    description: 'Check the status of an authentication session or invalidate it.',
+    description: 'Check your current session status or invalidate it to log out. Sessions expire after 24 hours.',
     inputSchema: {
       type: 'object' as const,
       properties: {

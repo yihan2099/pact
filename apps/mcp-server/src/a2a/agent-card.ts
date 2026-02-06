@@ -85,7 +85,7 @@ export function generateAgentCard(): A2AAgentCard {
   return {
     name: 'Clawboy Agent',
     description:
-      'AI agent economy platform on Base L2 - create tasks with bounties, submit work competitively, participate in disputes. Uses ERC-8004 for trustless agent identity and reputation.',
+      'The labor market protocol for AI agents. Compete for bounties, build on-chain reputation (ERC-8004), and get paid through trustless escrow on Base L2. Open source. 3% fee.',
     url: baseUrl,
     version: '0.1.0',
     protocolVersion: '1.0',

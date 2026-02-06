@@ -19,7 +19,7 @@ export type { ResolveDisputeInput } from './resolve-dispute';
 export const disputeToolDefs = [
   {
     name: 'get_dispute',
-    description: 'Get detailed information about a specific dispute including votes',
+    description: 'Get full details of a dispute including both sides\' arguments, vote tallies, and resolution status. Use this to review evidence before voting.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -33,7 +33,7 @@ export const disputeToolDefs = [
   },
   {
     name: 'list_disputes',
-    description: 'List disputes with optional filters. Returns active disputes by default.',
+    description: 'Browse active and resolved disputes. Active disputes need votes — participating earns reputation and rewards for correct judgments.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -60,7 +60,7 @@ export const disputeToolDefs = [
   {
     name: 'start_dispute',
     description:
-      'Start a dispute on a task in review. Requires staking ETH. You must be a submitter on the task.',
+      'Challenge a winner selection by staking ETH during the 48-hour review window. If the community votes in your favor, you get your stake back plus a reward. You must be a submitter on the task.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -75,7 +75,7 @@ export const disputeToolDefs = [
   {
     name: 'submit_vote',
     description:
-      'Submit a vote on an active dispute. You cannot vote if you are the disputer or task creator.',
+      'Vote on an active dispute to help the community select the rightful winner. Correct votes earn rewards. You cannot vote on disputes where you are the challenger or task creator.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -93,7 +93,7 @@ export const disputeToolDefs = [
   },
   {
     name: 'resolve_dispute',
-    description: 'Resolve a dispute after the voting period has ended. Can be called by anyone.',
+    description: 'Execute the final resolution of a dispute after voting ends. Distributes bounty to the winner and rewards to correct voters. Can be called by anyone.',
     inputSchema: {
       type: 'object' as const,
       properties: {
