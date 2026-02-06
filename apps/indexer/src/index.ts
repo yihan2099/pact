@@ -16,6 +16,8 @@ import {
   resolveFailedEvent,
 } from '@clawboy/database';
 import { startIpfsRetryJob } from './jobs';
+import { startHealthServer } from './health';
+import { processWebhookRetries } from './services/webhook-notifier';
 
 const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
 
@@ -186,14 +188,20 @@ async function main() {
   const pollingIntervalMs = parseInt(process.env.POLLING_INTERVAL_MS || '5000', 10);
   const dlqRetryIntervalMs = parseInt(process.env.DLQ_RETRY_INTERVAL_MS || '60000', 10);
   const ipfsRetryIntervalMs = parseInt(process.env.IPFS_RETRY_INTERVAL_MS || '300000', 10);
+  const webhookRetryIntervalMs = parseInt(process.env.WEBHOOK_RETRY_INTERVAL_MS || '60000', 10);
 
   console.log(`Chain ID: ${chainId}`);
   console.log(`Polling interval: ${pollingIntervalMs}ms`);
   console.log(`DLQ retry interval: ${dlqRetryIntervalMs}ms`);
   console.log(`IPFS retry interval: ${ipfsRetryIntervalMs}ms`);
+  console.log(`Webhook retry interval: ${webhookRetryIntervalMs}ms`);
 
   // Create event listener
   const listener = createEventListener(chainId, pollingIntervalMs);
+
+  // Start health server (must be before onEvent so it can wrap the handler)
+  const healthPort = parseInt(process.env.HEALTH_PORT || '8080', 10);
+  const healthServer = startHealthServer(listener, chainId, healthPort);
 
   // Set up event handler with idempotency
   listener.onEvent(processEventWithIdempotency);
@@ -210,12 +218,23 @@ async function main() {
   // Start IPFS retry job for failed IPFS fetches
   const stopIpfsRetryJob = startIpfsRetryJob(ipfsRetryIntervalMs);
 
+  // Set up webhook delivery retry interval
+  const webhookRetryInterval = setInterval(async () => {
+    try {
+      await processWebhookRetries();
+    } catch (error) {
+      console.error('Error processing webhook retries:', error);
+    }
+  }, webhookRetryIntervalMs);
+
   // Handle graceful shutdown
   const shutdown = () => {
     console.log('Shutting down...');
     listener.stop();
     clearInterval(dlqRetryInterval);
+    clearInterval(webhookRetryInterval);
     stopIpfsRetryJob();
+    healthServer.stop();
     process.exit(0);
   };
 

@@ -1,6 +1,6 @@
 /**
  * EscrowVault contract ABI
- * Generated from Foundry build output
+ * Updated with protocol fee, Pausable, and Ownable
  */
 export const EscrowVaultABI = [
   // Events
@@ -19,7 +19,8 @@ export const EscrowVaultABI = [
     inputs: [
       { name: 'taskId', type: 'uint256', indexed: true },
       { name: 'recipient', type: 'address', indexed: true },
-      { name: 'amount', type: 'uint256', indexed: false },
+      { name: 'netAmount', type: 'uint256', indexed: false },
+      { name: 'feeAmount', type: 'uint256', indexed: false },
     ],
   },
   {
@@ -29,6 +30,50 @@ export const EscrowVaultABI = [
       { name: 'taskId', type: 'uint256', indexed: true },
       { name: 'creator', type: 'address', indexed: true },
       { name: 'amount', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ProtocolFeeCollected',
+    inputs: [
+      { name: 'taskId', type: 'uint256', indexed: true },
+      { name: 'token', type: 'address', indexed: true },
+      { name: 'feeAmount', type: 'uint256', indexed: false },
+      { name: 'treasury', type: 'address', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ProtocolFeeUpdated',
+    inputs: [
+      { name: 'oldFeeBps', type: 'uint256', indexed: false },
+      { name: 'newFeeBps', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ProtocolTreasuryUpdated',
+    inputs: [
+      { name: 'oldTreasury', type: 'address', indexed: false },
+      { name: 'newTreasury', type: 'address', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Paused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
+  {
+    type: 'event',
+    name: 'Unpaused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
+  {
+    type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      { name: 'previousOwner', type: 'address', indexed: true },
+      { name: 'newOwner', type: 'address', indexed: true },
     ],
   },
 
@@ -48,6 +93,48 @@ export const EscrowVaultABI = [
     name: 'taskManager',
     inputs: [],
     outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'protocolFeeBps',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'protocolTreasury',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'accumulatedFees',
+    inputs: [{ name: 'token', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_FEE_BPS',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'paused',
+    inputs: [],
+    outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
   },
 
@@ -92,6 +179,50 @@ export const EscrowVaultABI = [
       { name: 'taskId', type: 'uint256' },
       { name: 'creator', type: 'address' },
     ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+
+  // Admin functions
+  {
+    type: 'function',
+    name: 'setProtocolFee',
+    inputs: [{ name: 'newFeeBps', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setProtocolTreasury',
+    inputs: [{ name: 'newTreasury', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'pause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'unpause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [{ name: 'newOwner', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
     outputs: [],
     stateMutability: 'nonpayable',
   },

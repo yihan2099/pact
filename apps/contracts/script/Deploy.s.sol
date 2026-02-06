@@ -39,7 +39,7 @@ contract DeployScript is Script {
         console.log("Predicted TaskManager address:", predictedTaskManager);
 
         // 6. Deploy EscrowVault with predicted TaskManager address
-        EscrowVault escrowVault = new EscrowVault(predictedTaskManager);
+        EscrowVault escrowVault = new EscrowVault(predictedTaskManager, deployer, 300);
         console.log("EscrowVault deployed at:", address(escrowVault));
 
         // 7. Deploy TaskManager (will be at predicted address)

@@ -5,13 +5,14 @@ import { ITaskManager } from "./interfaces/ITaskManager.sol";
 import { IEscrowVault } from "./interfaces/IEscrowVault.sol";
 import { IClawboyAgentAdapter } from "./IClawboyAgentAdapter.sol";
 import { IDisputeResolver } from "./interfaces/IDisputeResolver.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title TaskManager
  * @notice Manages competitive task creation, submissions, and winner selection
  * @dev Implements optimistic verification - creator selects winner, disputes go to community vote
  */
-contract TaskManager is ITaskManager {
+contract TaskManager is ITaskManager, Pausable {
     // State
     uint256 private _taskCounter;
     mapping(uint256 => Task) private _tasks;
@@ -29,9 +30,15 @@ contract TaskManager is ITaskManager {
     address public pendingOwner;
     address public timelock;
 
-    // Configuration
-    uint256 public constant CHALLENGE_WINDOW = 48 hours;
-    uint256 public constant SELECTION_DEADLINE = 7 days; // Creator has 7 days after task deadline to select
+    // Configuration (configurable time constants with bounded setters)
+    uint256 public challengeWindow = 48 hours;
+    uint256 public selectionDeadline = 7 days; // Creator has 7 days after task deadline to select
+
+    // Bounds for configurable time constants
+    uint256 public constant MIN_CHALLENGE_WINDOW = 24 hours;
+    uint256 public constant MAX_CHALLENGE_WINDOW = 7 days;
+    uint256 public constant MIN_SELECTION_DEADLINE = 3 days;
+    uint256 public constant MAX_SELECTION_DEADLINE = 30 days;
 
     // Errors
     error TaskNotFound();
@@ -59,6 +66,7 @@ contract TaskManager is ITaskManager {
     error NotPendingOwner();
     error TaskNotDisputed();
     error OnlyTimelock();
+    error ValueOutOfBounds();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert OnlyOwner();
@@ -90,6 +98,10 @@ contract TaskManager is ITaskManager {
 
     // Emergency bypass event
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed selector);
+
+    // Time configuration events
+    event ChallengeWindowUpdated(uint256 oldWindow, uint256 newWindow);
+    event SelectionDeadlineUpdated(uint256 oldDeadline, uint256 newDeadline);
 
     /**
      * @notice Initiate ownership transfer (two-step process)
@@ -159,6 +171,46 @@ contract TaskManager is ITaskManager {
     }
 
     /**
+     * @notice Set the challenge window duration
+     * @param newWindow The new challenge window in seconds (min 24h, max 7 days)
+     */
+    function setChallengeWindow(uint256 newWindow) external onlyOwner {
+        if (newWindow < MIN_CHALLENGE_WINDOW || newWindow > MAX_CHALLENGE_WINDOW) {
+            revert ValueOutOfBounds();
+        }
+        uint256 oldWindow = challengeWindow;
+        challengeWindow = newWindow;
+        emit ChallengeWindowUpdated(oldWindow, newWindow);
+    }
+
+    /**
+     * @notice Set the selection deadline duration
+     * @param newDeadline The new selection deadline in seconds (min 3 days, max 30 days)
+     */
+    function setSelectionDeadline(uint256 newDeadline) external onlyOwner {
+        if (newDeadline < MIN_SELECTION_DEADLINE || newDeadline > MAX_SELECTION_DEADLINE) {
+            revert ValueOutOfBounds();
+        }
+        uint256 oldDeadline = selectionDeadline;
+        selectionDeadline = newDeadline;
+        emit SelectionDeadlineUpdated(oldDeadline, newDeadline);
+    }
+
+    /**
+     * @notice Pause the contract (emergency stop)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /**
      * @notice Create a new task with a bounty
      * @param specificationCid IPFS CID of the task specification
      * @param bountyToken Token address for bounty (address(0) for ETH)
@@ -174,6 +226,7 @@ contract TaskManager is ITaskManager {
     )
         external
         payable
+        whenNotPaused
         returns (uint256 taskId)
     {
         if (bountyAmount == 0) revert InsufficientBounty();
@@ -217,7 +270,7 @@ contract TaskManager is ITaskManager {
      * @param taskId The task ID
      * @param submissionCid IPFS CID of the work submission
      */
-    function submitWork(uint256 taskId, string calldata submissionCid) external {
+    function submitWork(uint256 taskId, string calldata submissionCid) external whenNotPaused {
         Task storage task = _tasks[taskId];
         if (task.id == 0) revert TaskNotFound();
         if (task.status != TaskStatus.Open) revert TaskNotOpen();
@@ -284,7 +337,7 @@ contract TaskManager is ITaskManager {
      * @param taskId The task ID
      * @param winner The address of the winning agent
      */
-    function selectWinner(uint256 taskId, address winner) external {
+    function selectWinner(uint256 taskId, address winner) external whenNotPaused {
         Task storage task = _tasks[taskId];
         if (task.id == 0) revert TaskNotFound();
         if (task.creator != msg.sender) revert NotTaskCreator();
@@ -297,7 +350,7 @@ contract TaskManager is ITaskManager {
         task.status = TaskStatus.InReview;
         task.selectedWinner = winner;
         task.selectedAt = block.timestamp;
-        task.challengeDeadline = block.timestamp + CHALLENGE_WINDOW;
+        task.challengeDeadline = block.timestamp + challengeWindow;
 
         emit WinnerSelected(taskId, winner, task.challengeDeadline);
     }
@@ -307,7 +360,7 @@ contract TaskManager is ITaskManager {
      * @param taskId The task ID
      * @param reason Reason for rejection
      */
-    function rejectAll(uint256 taskId, string calldata reason) external {
+    function rejectAll(uint256 taskId, string calldata reason) external whenNotPaused {
         Task storage task = _tasks[taskId];
         if (task.id == 0) revert TaskNotFound();
         if (task.creator != msg.sender) revert NotTaskCreator();
@@ -317,7 +370,7 @@ contract TaskManager is ITaskManager {
         task.status = TaskStatus.InReview;
         task.selectedWinner = address(0); // No winner = rejection
         task.selectedAt = block.timestamp;
-        task.challengeDeadline = block.timestamp + CHALLENGE_WINDOW;
+        task.challengeDeadline = block.timestamp + challengeWindow;
 
         emit AllSubmissionsRejected(taskId, msg.sender, reason);
     }
@@ -326,7 +379,7 @@ contract TaskManager is ITaskManager {
      * @notice Finalize task after challenge window (releases bounty)
      * @param taskId The task ID
      */
-    function finalizeTask(uint256 taskId) external {
+    function finalizeTask(uint256 taskId) external whenNotPaused {
         Task storage task = _tasks[taskId];
         if (task.id == 0) revert TaskNotFound();
         if (task.status != TaskStatus.InReview) revert TaskNotInReview();
@@ -366,10 +419,10 @@ contract TaskManager is ITaskManager {
         // Tasks without deadlines cannot auto-expire - creator must cancel manually
         if (task.deadline == 0) revert InvalidDeadline();
 
-        // Selection deadline is task deadline + SELECTION_DEADLINE (7 days)
-        uint256 selectionDeadline = task.deadline + SELECTION_DEADLINE;
+        // Selection deadline is task deadline + selectionDeadline
+        uint256 taskSelectionDeadline = task.deadline + selectionDeadline;
 
-        if (block.timestamp <= selectionDeadline) revert DeadlineNotPassed();
+        if (block.timestamp <= taskSelectionDeadline) revert DeadlineNotPassed();
 
         task.status = TaskStatus.Refunded;
         escrowVault.refund(taskId, task.creator);
@@ -415,7 +468,7 @@ contract TaskManager is ITaskManager {
         // Revert to InReview status
         task.status = TaskStatus.InReview;
         // Reset challenge deadline to give participants time to react
-        task.challengeDeadline = block.timestamp + CHALLENGE_WINDOW;
+        task.challengeDeadline = block.timestamp + challengeWindow;
 
         // Clear the active dispute
         _activeDisputeId[taskId] = 0;

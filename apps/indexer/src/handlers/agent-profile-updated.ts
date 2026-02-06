@@ -1,5 +1,5 @@
 import type { IndexerEvent } from '../listener';
-import { updateAgent } from '@clawboy/database';
+import { updateAgent, getAgentByAddress } from '@clawboy/database';
 import { fetchJson } from '@clawboy/ipfs-utils';
 import { withRetryResult } from '../utils/retry';
 import { invalidateAgentCaches } from '@clawboy/cache';
@@ -64,6 +64,7 @@ export async function handleAgentProfileUpdated(event: IndexerEvent): Promise<vo
   // Fetch updated profile from IPFS with retry
   let name: string | undefined;
   let skills: string[] | undefined;
+  let webhookUrl: string | null | undefined;
   let ipfsFetchFailed = false;
 
   const fetchResult = await withRetryResult(() => fetchJson<ERC8004AgentURI>(profileCid), {
@@ -80,6 +81,8 @@ export async function handleAgentProfileUpdated(event: IndexerEvent): Promise<vo
   if (fetchResult.success && fetchResult.data) {
     name = fetchResult.data.name;
     skills = fetchResult.data.skills;
+    // Track webhook URL changes: undefined means no change, null means removed, string means set
+    webhookUrl = fetchResult.data.webhookUrl ?? null;
     console.log(
       `Successfully fetched updated ERC-8004 agent profile after ${fetchResult.attempts} attempt(s)`
     );
@@ -91,6 +94,26 @@ export async function handleAgentProfileUpdated(event: IndexerEvent): Promise<vo
     console.warn('Agent will be updated with new URI; IPFS fetch will be retried later');
   }
 
+  // Build webhook update fields
+  const webhookUpdates: Record<string, string | null> = {};
+  if (webhookUrl !== undefined) {
+    webhookUpdates.webhook_url = webhookUrl;
+    if (webhookUrl) {
+      // Generate new webhook secret when URL is set/changed
+      const existingAgent = await getAgentByAddress(wallet.toLowerCase());
+      if (!existingAgent?.webhook_secret) {
+        const randomBytes = new Uint8Array(32);
+        crypto.getRandomValues(randomBytes);
+        webhookUpdates.webhook_secret = Array.from(randomBytes)
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+      }
+    } else {
+      // Clear secret when URL is removed
+      webhookUpdates.webhook_secret = null;
+    }
+  }
+
   // Update agent in database with new ERC-8004 fields
   await updateAgent(wallet.toLowerCase(), {
     agent_uri: newURI,
@@ -98,6 +121,7 @@ export async function handleAgentProfileUpdated(event: IndexerEvent): Promise<vo
     ...(name && { name }),
     ...(skills && { skills }),
     ipfs_fetch_failed: ipfsFetchFailed,
+    ...webhookUpdates,
   });
 
   // Invalidate agent caches

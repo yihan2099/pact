@@ -9,7 +9,7 @@ const cspDirectives = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https: blob:",
-  "connect-src 'self' https://*.supabase.co https://*.upstash.io wss://*.supabase.co https://vercel.live",
+  "connect-src 'self' https://*.supabase.co https://*.upstash.io wss://*.supabase.co https://vercel.live https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://rpc.sepolia.org https://*.base.org https://*.infura.io https://*.alchemy.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

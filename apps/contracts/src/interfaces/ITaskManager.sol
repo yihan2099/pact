@@ -121,6 +121,15 @@ interface ITaskManager {
 
     function taskCount() external view returns (uint256);
 
+    // Time configuration
+    function challengeWindow() external view returns (uint256);
+
+    function selectionDeadline() external view returns (uint256);
+
+    function setChallengeWindow(uint256 newWindow) external;
+
+    function setSelectionDeadline(uint256 newDeadline) external;
+
     // Timelock management
     function setTimelock(address _timelock) external;
 

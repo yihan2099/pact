@@ -24,6 +24,7 @@ contract TimelockTest is Test {
     address public randomUser = address(0x888);
     address public agent1 = address(0x1);
     address public creator = address(0x2);
+    address public treasury = address(0x777);
 
     uint256 public constant TIMELOCK_DELAY = 48 hours;
 
@@ -41,7 +42,7 @@ contract TimelockTest is Test {
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
-        escrowVault = new EscrowVault(predictedTaskManager);
+        escrowVault = new EscrowVault(predictedTaskManager, treasury, 300);
 
         // Deploy TaskManager
         taskManager = new TaskManager(address(escrowVault), address(agentAdapter));

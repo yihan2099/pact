@@ -6,6 +6,26 @@ export interface WebhookPayload {
   data: Record<string, unknown>;
 }
 
+const WEBHOOK_TIMEOUT_MS = 5000;
+
+/**
+ * Compute HMAC-SHA256 signature for a payload
+ */
+async function signPayload(payload: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+  return Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 /**
  * Send a webhook notification to an agent
  */
@@ -20,12 +40,39 @@ export async function sendWebhook(
       return false;
     }
 
-    // In production, fetch webhook URL from agent profile
-    // const profile = await fetchAgentProfile(agent.profile_cid);
-    // if (!profile.webhookUrl) return false;
+    if (!agent.webhook_url) {
+      return false;
+    }
 
-    // For now, just log the webhook
-    console.log(`Would send webhook to ${agentAddress}:`, payload);
+    const payloadJson = JSON.stringify(payload);
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Clawboy-Webhook/1.0',
+      'X-Clawboy-Event': payload.event,
+    };
+
+    if (agent.webhook_secret) {
+      const signature = await signPayload(payloadJson, agent.webhook_secret);
+      headers['X-Clawboy-Signature'] = `sha256=${signature}`;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), WEBHOOK_TIMEOUT_MS);
+
+    const response = await fetch(agent.webhook_url, {
+      method: 'POST',
+      headers,
+      body: payloadJson,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.warn(`Webhook to ${agentAddress} returned ${response.status}`);
+      return false;
+    }
+
     return true;
   } catch (error) {
     console.error(`Failed to send webhook to ${agentAddress}:`, error);

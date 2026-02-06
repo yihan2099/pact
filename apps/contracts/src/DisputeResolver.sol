@@ -5,6 +5,7 @@ import { IDisputeResolver } from "./interfaces/IDisputeResolver.sol";
 import { ITaskManager } from "./interfaces/ITaskManager.sol";
 import { IClawboyAgentAdapter } from "./IClawboyAgentAdapter.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title DisputeResolver
@@ -12,14 +13,18 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
  * @dev Community votes with reputation-weighted voting to resolve disputes
  * @dev SECURITY: Uses ReentrancyGuard to prevent reentrancy attacks on stake transfers
  */
-contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
+contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
     // Constants
     uint256 public constant MIN_DISPUTE_STAKE = 0.01 ether;
     uint256 public constant DISPUTE_STAKE_PERCENT = 1; // 1% of bounty
-    uint256 public constant VOTING_PERIOD = 48 hours;
     uint256 public constant MAJORITY_THRESHOLD = 60; // 60% weighted majority
     uint256 public constant MAX_VOTERS_PER_DISPUTE = 500; // Prevent gas exhaustion in resolution
     uint256 public constant VOTER_REP_BATCH_SIZE = 50; // Max voters processed per batch call
+
+    // Configurable time constant with bounded setter
+    uint256 public votingPeriod = 48 hours;
+    uint256 public constant MIN_VOTING_PERIOD = 24 hours;
+    uint256 public constant MAX_VOTING_PERIOD = 7 days;
 
     // State
     uint256 private _disputeCounter;
@@ -63,6 +68,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     error ZeroAddress();
     error VoterRepAlreadyComplete();
     error DisputeNotResolved();
+    error ValueOutOfBounds();
 
     /// @notice Emitted when a dispute is cancelled
     event DisputeCancelled(uint256 indexed disputeId, uint256 indexed taskId, address cancelledBy);
@@ -81,6 +87,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     // Emergency bypass event
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed selector);
 
+    // Time configuration event
+    event VotingPeriodUpdated(uint256 oldPeriod, uint256 newPeriod);
+
     modifier onlyOwner() {
         if (msg.sender != owner) revert OnlyOwner();
         _;
@@ -95,6 +104,33 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
         taskManager = ITaskManager(_taskManager);
         agentAdapter = IClawboyAgentAdapter(_agentAdapter);
         owner = msg.sender;
+    }
+
+    /**
+     * @notice Set the voting period duration
+     * @param newPeriod The new voting period in seconds (min 24h, max 7 days)
+     */
+    function setVotingPeriod(uint256 newPeriod) external onlyOwner {
+        if (newPeriod < MIN_VOTING_PERIOD || newPeriod > MAX_VOTING_PERIOD) {
+            revert ValueOutOfBounds();
+        }
+        uint256 oldPeriod = votingPeriod;
+        votingPeriod = newPeriod;
+        emit VotingPeriodUpdated(oldPeriod, newPeriod);
+    }
+
+    /**
+     * @notice Pause the contract (emergency stop)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /**
@@ -122,7 +158,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
      * @param taskId The task ID to dispute
      * @return disputeId The created dispute ID
      */
-    function startDispute(uint256 taskId) external payable returns (uint256 disputeId) {
+    function startDispute(uint256 taskId) external payable whenNotPaused returns (uint256 disputeId) {
         ITaskManager.Task memory task = taskManager.getTask(taskId);
 
         // Verify task is in review (within challenge window)
@@ -145,7 +181,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
             taskId: taskId,
             disputer: msg.sender,
             disputeStake: msg.value,
-            votingDeadline: block.timestamp + VOTING_PERIOD,
+            votingDeadline: block.timestamp + votingPeriod,
             status: DisputeStatus.Active,
             disputerWon: false,
             votesForDisputer: 0,
@@ -158,7 +194,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
         taskManager.markDisputed(taskId, disputeId, msg.sender);
 
         emit DisputeCreated(
-            disputeId, taskId, msg.sender, msg.value, block.timestamp + VOTING_PERIOD
+            disputeId, taskId, msg.sender, msg.value, block.timestamp + votingPeriod
         );
     }
 
@@ -167,7 +203,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
      * @param disputeId The dispute ID
      * @param supportsDisputer True to support disputer, false to support creator
      */
-    function submitVote(uint256 disputeId, bool supportsDisputer) external {
+    function submitVote(uint256 disputeId, bool supportsDisputer) external whenNotPaused {
         Dispute storage dispute = _disputes[disputeId];
         if (dispute.id == 0) revert DisputeNotFound();
         if (dispute.status != DisputeStatus.Active) revert VotingNotActive();

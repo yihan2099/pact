@@ -26,6 +26,7 @@ contract DisputeResolverTest is Test {
     address public voter1 = address(0x4);
     address public voter2 = address(0x5);
     address public voter3 = address(0x6);
+    address public treasury = address(0x7);
 
     uint256 public constant BOUNTY_AMOUNT = 1 ether;
 
@@ -43,7 +44,7 @@ contract DisputeResolverTest is Test {
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
-        escrowVault = new EscrowVault(predictedTaskManager);
+        escrowVault = new EscrowVault(predictedTaskManager, treasury, 300);
 
         // Deploy TaskManager
         taskManager = new TaskManager(address(escrowVault), address(agentAdapter));
@@ -403,8 +404,9 @@ contract DisputeResolverTest is Test {
         assertEq(uint256(dispute.status), uint256(IDisputeResolver.DisputeStatus.Resolved));
         assertTrue(dispute.disputerWon);
 
-        // Verify stake returned to disputer + bounty
-        assertEq(agent1.balance, agent1BalanceBefore - stake + stake + BOUNTY_AMOUNT);
+        // Verify stake returned to disputer + bounty (minus 3% protocol fee)
+        uint256 expectedFee = (BOUNTY_AMOUNT * 300) / 10_000;
+        assertEq(agent1.balance, agent1BalanceBefore - stake + stake + BOUNTY_AMOUNT - expectedFee);
 
         // Verify task completed with disputer as winner
         ITaskManager.Task memory task = taskManager.getTask(taskId);
@@ -685,8 +687,9 @@ contract DisputeResolverTest is Test {
 
         disputeResolver.resolveDispute(disputeId);
 
-        // agent2 should get the bounty (overriding agent1 selection)
-        assertEq(agent2.balance, agent2BalanceBefore + stake + BOUNTY_AMOUNT);
+        // agent2 should get the bounty (overriding agent1 selection, minus 3% protocol fee)
+        uint256 expectedFee = (BOUNTY_AMOUNT * 300) / 10_000;
+        assertEq(agent2.balance, agent2BalanceBefore + stake + BOUNTY_AMOUNT - expectedFee);
 
         ITaskManager.Task memory task = taskManager.getTask(taskId);
         assertEq(task.selectedWinner, agent2);

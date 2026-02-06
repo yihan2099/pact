@@ -12,6 +12,7 @@ import { handleAgentProfileUpdated } from './handlers/agent-profile-updated';
 import { handleDisputeCreated } from './handlers/dispute-started';
 import { handleVoteSubmitted } from './handlers/vote-submitted';
 import { handleDisputeResolved } from './handlers/dispute-resolved';
+import { dispatchWebhookNotifications } from './services/webhook-dispatch';
 
 /**
  * Process an indexer event by routing to the appropriate handler
@@ -80,6 +81,10 @@ export async function processEvent(event: IndexerEvent): Promise<void> {
       default:
         console.warn(`Unknown event type: ${event.name}`);
     }
+
+    // Fire-and-forget webhook notifications after successful event processing.
+    // This never throws -- errors are logged but don't block event processing.
+    dispatchWebhookNotifications(event);
   } catch (error) {
     console.error(`Failed to process event ${event.name}:`, error);
     throw error; // Re-throw to allow retry logic

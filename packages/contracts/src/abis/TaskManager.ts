@@ -131,6 +131,32 @@ export const TaskManagerABI = [
       { name: 'selector', type: 'bytes4', indexed: true },
     ],
   },
+  {
+    type: 'event',
+    name: 'ChallengeWindowUpdated',
+    inputs: [
+      { name: 'oldWindow', type: 'uint256', indexed: false },
+      { name: 'newWindow', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SelectionDeadlineUpdated',
+    inputs: [
+      { name: 'oldDeadline', type: 'uint256', indexed: false },
+      { name: 'newDeadline', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Paused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
+  {
+    type: 'event',
+    name: 'Unpaused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
 
   // Read functions
   {
@@ -264,16 +290,23 @@ export const TaskManagerABI = [
   },
   {
     type: 'function',
-    name: 'CHALLENGE_WINDOW',
+    name: 'challengeWindow',
     inputs: [],
     outputs: [{ name: '', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    name: 'SELECTION_DEADLINE',
+    name: 'selectionDeadline',
     inputs: [],
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'paused',
+    inputs: [],
+    outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
   },
 
@@ -429,6 +462,34 @@ export const TaskManagerABI = [
     type: 'function',
     name: 'emergencySetAgentAdapter',
     inputs: [{ name: '_adapter', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setChallengeWindow',
+    inputs: [{ name: 'newWindow', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setSelectionDeadline',
+    inputs: [{ name: 'newDeadline', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'pause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'unpause',
+    inputs: [],
     outputs: [],
     stateMutability: 'nonpayable',
   },

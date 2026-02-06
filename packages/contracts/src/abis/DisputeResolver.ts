@@ -113,6 +113,24 @@ export const DisputeResolverABI = [
       { name: 'selector', type: 'bytes4', indexed: true },
     ],
   },
+  {
+    type: 'event',
+    name: 'VotingPeriodUpdated',
+    inputs: [
+      { name: 'oldPeriod', type: 'uint256', indexed: false },
+      { name: 'newPeriod', type: 'uint256', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Paused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
+  {
+    type: 'event',
+    name: 'Unpaused',
+    inputs: [{ name: 'account', type: 'address', indexed: false }],
+  },
 
   // Read functions
   {
@@ -227,9 +245,16 @@ export const DisputeResolverABI = [
   },
   {
     type: 'function',
-    name: 'VOTING_PERIOD',
+    name: 'votingPeriod',
     inputs: [],
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'paused',
+    inputs: [],
+    outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
   },
   {
@@ -389,6 +414,27 @@ export const DisputeResolverABI = [
     type: 'function',
     name: 'setTimelock',
     inputs: [{ name: '_timelock', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setVotingPeriod',
+    inputs: [{ name: 'newPeriod', type: 'uint256' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'pause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'unpause',
+    inputs: [],
     outputs: [],
     stateMutability: 'nonpayable',
   },

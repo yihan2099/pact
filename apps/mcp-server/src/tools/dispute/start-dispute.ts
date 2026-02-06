@@ -98,7 +98,7 @@ export const startDisputeTool = {
     const votingPeriod = (await publicClient.readContract({
       address: addresses.disputeResolver,
       abi: DisputeResolverABI,
-      functionName: 'VOTING_PERIOD',
+      functionName: 'votingPeriod',
     })) as bigint;
 
     return {

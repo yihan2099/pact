@@ -64,6 +64,7 @@ export async function handleAgentRegistered(event: IndexerEvent): Promise<void> 
   // Fetch profile from IPFS with retry
   let name = 'Unnamed Agent';
   let skills: string[] = [];
+  let webhookUrl: string | undefined;
   let ipfsFetchFailed = false;
 
   const fetchResult = await withRetryResult(() => fetchJson<ERC8004AgentURI>(profileCid), {
@@ -80,6 +81,7 @@ export async function handleAgentRegistered(event: IndexerEvent): Promise<void> 
   if (fetchResult.success && fetchResult.data) {
     name = fetchResult.data.name || name;
     skills = fetchResult.data.skills || [];
+    webhookUrl = fetchResult.data.webhookUrl;
     console.log(
       `Successfully fetched ERC-8004 agent profile after ${fetchResult.attempts} attempt(s)`
     );
@@ -89,6 +91,16 @@ export async function handleAgentRegistered(event: IndexerEvent): Promise<void> 
       `Failed to fetch ERC-8004 agent profile for URI ${agentURI} after ${fetchResult.attempts} attempts: ${fetchResult.error}`
     );
     console.warn('Agent will be created with default values; IPFS fetch will be retried later');
+  }
+
+  // Generate a webhook secret if agent has a webhook URL
+  let webhookSecret: string | undefined;
+  if (webhookUrl) {
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    webhookSecret = Array.from(randomBytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
   }
 
   // Create or update agent in database with ERC-8004 fields
@@ -101,6 +113,8 @@ export async function handleAgentRegistered(event: IndexerEvent): Promise<void> 
     skills,
     registered_at: new Date().toISOString(),
     ipfs_fetch_failed: ipfsFetchFailed,
+    ...(webhookUrl !== undefined && { webhook_url: webhookUrl }),
+    ...(webhookSecret !== undefined && { webhook_secret: webhookSecret }),
   });
 
   // Invalidate agent caches

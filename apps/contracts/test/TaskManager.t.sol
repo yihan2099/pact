@@ -35,6 +35,7 @@ contract TaskManagerTest is Test {
     address public agent1 = address(0x2);
     address public agent2 = address(0x3);
     address public agent3 = address(0x4);
+    address public treasury = address(0x5);
 
     uint256 public constant BOUNTY_AMOUNT = 1 ether;
 
@@ -52,7 +53,7 @@ contract TaskManagerTest is Test {
         // Deploy EscrowVault with predicted TaskManager address
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
-        escrowVault = new EscrowVault(predictedTaskManager);
+        escrowVault = new EscrowVault(predictedTaskManager, treasury, 300);
 
         // Deploy TaskManager
         taskManager = new TaskManager(address(escrowVault), address(agentAdapter));
@@ -384,8 +385,9 @@ contract TaskManagerTest is Test {
         ITaskManager.Task memory task = taskManager.getTask(taskId);
         assertEq(uint256(task.status), uint256(ITaskManager.TaskStatus.Completed));
 
-        // Verify bounty released to winner
-        assertEq(agent1.balance, agent1BalanceBefore + BOUNTY_AMOUNT);
+        // Verify bounty released to winner (minus 3% protocol fee)
+        uint256 expectedFee = (BOUNTY_AMOUNT * 300) / 10_000;
+        assertEq(agent1.balance, agent1BalanceBefore + BOUNTY_AMOUNT - expectedFee);
 
         // Verify ERC-8004 feedback recorded
         (uint64 taskWins,,,) = agentAdapter.getReputationSummary(agent1);
@@ -527,7 +529,7 @@ contract TaskManagerTest is Test {
 
         vm.warp(block.timestamp + 48 hours + 1);
 
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, false, true, address(taskManager));
         emit ITaskManager.TaskCompleted(taskId, agent1, BOUNTY_AMOUNT);
 
         taskManager.finalizeTask(taskId);
@@ -670,8 +672,9 @@ contract TaskManagerTest is Test {
         // Finalize task
         taskManager.finalizeTask(taskId);
 
-        // Verify tokens released to winner
-        assertEq(token.balanceOf(agent1), agent1TokenBefore + BOUNTY_AMOUNT);
+        // Verify tokens released to winner (minus 3% protocol fee)
+        uint256 expectedFee = (BOUNTY_AMOUNT * 300) / 10_000;
+        assertEq(token.balanceOf(agent1), agent1TokenBefore + BOUNTY_AMOUNT - expectedFee);
         assertEq(token.balanceOf(address(escrowVault)), 0);
     }
 

@@ -7,6 +7,9 @@ export interface EventListener {
   start(): Promise<void>;
   stop(): void;
   onEvent(handler: (event: IndexerEvent) => Promise<void>): void;
+  getLastProcessedBlock(): bigint;
+  isRunning(): boolean;
+  hasCompletedInitialSync(): boolean;
 }
 
 export interface IndexerEvent {
@@ -29,8 +32,9 @@ export function createEventListener(
   const publicClient = getPublicClient(chainId);
   const addresses = getContractAddresses(chainId);
 
-  let isRunning = false;
+  let running = false;
   let lastProcessedBlock: bigint = 0n;
+  let completedInitialSync = false;
   let eventHandler: ((event: IndexerEvent) => Promise<void>) | null = null;
 
   const parseEvent = (log: Log, name: string): IndexerEvent => {
@@ -46,7 +50,7 @@ export function createEventListener(
   };
 
   const pollEvents = async () => {
-    if (!isRunning || !eventHandler) return;
+    if (!running || !eventHandler) return;
 
     try {
       const currentBlock = await getBlockNumber(chainId);
@@ -322,6 +326,7 @@ export function createEventListener(
       }
 
       lastProcessedBlock = currentBlock;
+      completedInitialSync = true;
 
       // Persist checkpoint to database
       try {
@@ -342,7 +347,7 @@ export function createEventListener(
 
   return {
     async start() {
-      isRunning = true;
+      running = true;
       console.log(`Starting event listener for chain ${chainId}`);
 
       // Load checkpoint from database
@@ -362,9 +367,9 @@ export function createEventListener(
       // This prevents race conditions where overlapping pollEvents calls could cause
       // fromBlock > toBlock errors
       const poll = async () => {
-        if (!isRunning) return;
+        if (!running) return;
         await pollEvents();
-        if (isRunning) {
+        if (running) {
           pollTimeout = setTimeout(poll, pollingIntervalMs);
         }
       };
@@ -373,7 +378,7 @@ export function createEventListener(
     },
 
     stop() {
-      isRunning = false;
+      running = false;
       if (pollTimeout) {
         clearTimeout(pollTimeout);
         pollTimeout = null;
@@ -383,6 +388,18 @@ export function createEventListener(
 
     onEvent(handler) {
       eventHandler = handler;
+    },
+
+    getLastProcessedBlock() {
+      return lastProcessedBlock;
+    },
+
+    isRunning() {
+      return running;
+    },
+
+    hasCompletedInitialSync() {
+      return completedInitialSync;
     },
   };
 }

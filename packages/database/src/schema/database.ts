@@ -90,6 +90,8 @@ export interface Database {
           skills: string[];
           is_active: boolean;
           ipfs_fetch_failed: boolean;
+          webhook_url: string | null;
+          webhook_secret: string | null;
           registered_at: string;
           created_at: string;
           updated_at: string;
@@ -108,6 +110,8 @@ export interface Database {
           skills?: string[];
           is_active?: boolean;
           ipfs_fetch_failed?: boolean;
+          webhook_url?: string | null;
+          webhook_secret?: string | null;
           registered_at: string;
           created_at?: string;
           updated_at?: string;
@@ -126,6 +130,8 @@ export interface Database {
           skills?: string[];
           is_active?: boolean;
           ipfs_fetch_failed?: boolean;
+          webhook_url?: string | null;
+          webhook_secret?: string | null;
           registered_at?: string;
           created_at?: string;
           updated_at?: string;
@@ -298,6 +304,50 @@ export interface Database {
           log_index?: number;
           event_name?: string;
           processed_at?: string;
+        };
+      };
+      webhook_deliveries: {
+        Row: {
+          id: string;
+          agent_address: string;
+          event_name: string;
+          payload: Record<string, unknown>;
+          status: string; // 'pending', 'delivered', 'failed'
+          status_code: number | null;
+          error_message: string | null;
+          attempt: number;
+          max_attempts: number;
+          next_retry_at: string | null;
+          created_at: string;
+          delivered_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          agent_address: string;
+          event_name: string;
+          payload: Record<string, unknown>;
+          status?: string;
+          status_code?: number | null;
+          error_message?: string | null;
+          attempt?: number;
+          max_attempts?: number;
+          next_retry_at?: string | null;
+          created_at?: string;
+          delivered_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          agent_address?: string;
+          event_name?: string;
+          payload?: Record<string, unknown>;
+          status?: string;
+          status_code?: number | null;
+          error_message?: string | null;
+          attempt?: number;
+          max_attempts?: number;
+          next_retry_at?: string | null;
+          created_at?: string;
+          delivered_at?: string | null;
         };
       };
       failed_events: {
