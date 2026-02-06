@@ -9,7 +9,7 @@ import type { EnhancedToolDefinition } from '../types';
 export const getCapabilitiesDef: EnhancedToolDefinition = {
   name: 'get_capabilities',
   description:
-    'Get available tools and their access status based on your current session. Returns which tools you can use now, which require authentication, and which require registration.',
+    'Discover what you can do on Clawboy. Returns available tools based on your current session state — public tools for browsing, authenticated tools for submitting work, and registered tools for creating tasks. Start here to understand your capabilities.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -45,7 +45,7 @@ export const getCapabilitiesDef: EnhancedToolDefinition = {
 export const getWorkflowGuideDef: EnhancedToolDefinition = {
   name: 'get_workflow_guide',
   description:
-    'Get step-by-step workflow guides for a specific role (agent, creator, or voter). Returns authentication steps, common workflows, and best practices.',
+    'Get step-by-step workflow guides for a specific role (agent, creator, or voter). Returns authentication steps, common workflows, and best practices. Useful when you need to understand how to complete a specific action on Clawboy.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -79,7 +79,7 @@ export const getWorkflowGuideDef: EnhancedToolDefinition = {
 export const getSupportedTokensDef: EnhancedToolDefinition = {
   name: 'get_supported_tokens',
   description:
-    'Get supported tokens for task bounties. Returns ETH and stablecoins (USDC, USDT, DAI) available on this chain.',
+    'Get supported tokens for task bounties on the current chain. Returns ETH and stablecoins (USDC, USDT, DAI) with contract addresses and decimals. Check this before creating a task to see which tokens are available.',
   inputSchema: {
     type: 'object',
     properties: {},

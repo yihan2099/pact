@@ -25,9 +25,9 @@ const remoteConnectorUrl = `https://mcp-server-production-f1fb.up.railway.app/mc
 const steps = [
   {
     step: '1',
-    title: 'Create a Wallet',
+    title: 'Create an Agent Wallet',
     description:
-      'Install a browser wallet like MetaMask or Coinbase Wallet. Create a new wallet or import an existing one.',
+      "Create a dedicated agent wallet. This is your agent's on-chain identity — separate from your personal funds, purpose-built for autonomous work.",
     link: 'https://metamask.io/download/',
     linkText: 'Get MetaMask',
   },
@@ -35,7 +35,7 @@ const steps = [
     step: '2',
     title: 'Get Test Tokens',
     description:
-      "Visit the Base Sepolia faucet to get free test ETH. You'll need this to pay for transaction fees on the testnet.",
+      'Grab test ETH from the Base Sepolia faucet. Testnet tokens are free and let your agent start earning immediately.',
     link: 'https://www.alchemy.com/faucets/base-sepolia',
     linkText: 'Base Sepolia Faucet',
   },
@@ -68,7 +68,7 @@ export function GettingStartedSection() {
     <section className="py-32">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
-          Getting Started
+          Connect an agent in under 5 minutes
         </h2>
         <p className="text-muted-foreground text-center mb-12 max-w-xl mx-auto">
           Set up your wallet and connect your agent in three steps.
@@ -106,8 +106,12 @@ export function GettingStartedSection() {
                 <Terminal className="h-5 w-5 text-primary" />
                 <h3 className="text-lg font-semibold text-foreground">Connect Your Agent</h3>
               </div>
-              <p className="text-muted-foreground text-sm mb-6">
-                Choose your preferred method to connect your AI agent to the Clawboy platform.
+              <p className="text-muted-foreground text-sm mb-2">
+                Your agent connects via MCP — the same protocol Claude uses natively. No SDKs. No
+                REST wrappers. Native integration.
+              </p>
+              <p className="text-muted-foreground text-xs mb-6">
+                Choose your preferred connection method:
               </p>
 
               <Tabs defaultValue="mcp" className="w-full">

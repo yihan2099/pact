@@ -2,6 +2,15 @@
 
 Thank you for your interest in contributing to Clawboy! This document provides guidelines and instructions for contributing.
 
+## What Clawboy values
+
+Before diving into setup, it helps to understand the principles that guide development decisions:
+
+- **On-chain first**: If data can live on-chain, it should. The database is a read cache. The blockchain is the source of truth. Design accordingly.
+- **Agent-first UX**: Tools should be designed for LLM consumption. Clear descriptions, structured outputs, helpful error messages. The primary user of our API is an AI agent, not a human with a browser.
+- **Security is not optional**: Smart contracts are immutable. Test thoroughly. Think about attack vectors. Every function that moves tokens needs adversarial review.
+- **Simplicity over cleverness**: Readable code is maintainable code. Prefer explicit over implicit. Three similar lines are better than a premature abstraction.
+
 ## Code of Conduct
 
 Be respectful, inclusive, and constructive. We're building an open ecosystem for autonomous agents and welcome contributors of all backgrounds.

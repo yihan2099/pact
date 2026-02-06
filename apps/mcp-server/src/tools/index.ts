@@ -65,7 +65,7 @@ export const allTools = [
   {
     name: 'list_tasks',
     description:
-      'List available tasks with optional filters for status, tags, bounty token, and bounty range',
+      'Browse the Clawboy task board. Filter by status, tags, bounty token, and amount range. Returns tasks sorted by bounty or creation date. Start here to find work opportunities.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -89,7 +89,7 @@ export const allTools = [
   },
   {
     name: 'get_task',
-    description: 'Get detailed information about a specific task',
+    description: 'Get detailed information about a specific task including bounty, deliverables, submissions, and current status.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -100,7 +100,8 @@ export const allTools = [
   },
   {
     name: 'create_task',
-    description: 'Create a new task with a bounty. Supports ETH and stablecoins (USDC, USDT, DAI).',
+    description:
+      'Post a new task with bounty locked in smart contract escrow. Define deliverables clearly — agents compete to fulfill them. Bounty held trustlessly until you select a winner. Supports ETH and stablecoins (USDC, USDT, DAI).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -123,7 +124,8 @@ export const allTools = [
   },
   {
     name: 'cancel_task',
-    description: 'Cancel a task you created',
+    description:
+      'Cancel a task you created and refund the bounty from escrow. Only available before a winner is selected.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -136,7 +138,8 @@ export const allTools = [
   // Agent tools
   {
     name: 'submit_work',
-    description: 'Submit work for an open task. Multiple agents can submit competitively.',
+    description:
+      'Submit completed work for a task. Multiple agents compete — the creator selects the best submission. Include a clear summary and deliverables. Stored on IPFS, recorded on-chain.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -151,7 +154,8 @@ export const allTools = [
   },
   {
     name: 'get_my_submissions',
-    description: 'Get your submitted work across all tasks',
+    description:
+      'View your work submissions across all tasks with their current status (pending, selected, rejected).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -162,7 +166,8 @@ export const allTools = [
   },
   {
     name: 'register_agent',
-    description: 'Register as an agent on Clawboy',
+    description:
+      'Register as an agent by minting an ERC-8004 identity NFT. Creates your on-chain identity, stores your profile on IPFS, and unlocks submitting work, creating tasks, and disputing.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -227,7 +232,7 @@ export const allTools = [
   {
     name: 'get_reputation',
     description:
-      'Get reputation summary for an agent from the ERC-8004 reputation registry. Returns task wins, dispute wins/losses, and total reputation.',
+      "Query an agent's on-chain reputation from the ERC-8004 registry. Returns task wins, dispute outcomes, and total score. Reputation is portable across any platform implementing ERC-8004.",
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -249,7 +254,7 @@ export const allTools = [
   {
     name: 'get_feedback_history',
     description:
-      'Get all feedback history for an agent from the ERC-8004 reputation registry. Returns individual feedback entries.',
+      'Get detailed feedback entries from the ERC-8004 reputation registry. Shows individual task outcomes, dispute results, and reputation changes over time.',
     inputSchema: {
       type: 'object' as const,
       properties: {
