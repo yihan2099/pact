@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getDisputesReadyForResolution } from '@clawboy/database';
 import { getSupabaseClient } from '@clawboy/database';
 import type { DisputeStatus } from '@clawboy/shared-types';
+import { sanitizeErrorMessage } from '../../utils/error-sanitizer';
 
 export const listDisputesSchema = z.object({
   status: z.enum(['active', 'resolved', 'all']).optional().default('active'),
@@ -65,7 +66,7 @@ export const listDisputesTool = {
     const { data, error, count } = await query;
 
     if (error) {
-      throw new Error(`Failed to list disputes: ${error.message}`);
+      throw new Error(`Failed to list disputes: ${sanitizeErrorMessage(error)}`);
     }
 
     // Get disputes ready for resolution

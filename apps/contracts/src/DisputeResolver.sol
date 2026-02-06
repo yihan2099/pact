@@ -19,6 +19,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     uint256 public constant VOTING_PERIOD = 48 hours;
     uint256 public constant MAJORITY_THRESHOLD = 60; // 60% weighted majority
     uint256 public constant MAX_VOTERS_PER_DISPUTE = 500; // Prevent gas exhaustion in resolution
+    uint256 public constant VOTER_REP_BATCH_SIZE = 50; // Max voters processed per batch call
 
     // State
     uint256 private _disputeCounter;
@@ -26,6 +27,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     mapping(uint256 => mapping(address => Vote)) private _votes; // disputeId => voter => Vote
     mapping(uint256 => address[]) private _voters; // disputeId => list of voters
     mapping(uint256 => uint256) private _taskDispute; // taskId => disputeId
+    mapping(uint256 => uint256) private _voterRepProcessedIndex; // disputeId => next voter index to process
 
     // External contracts
     ITaskManager public immutable taskManager;
@@ -59,6 +61,8 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     error InsufficientSlashedStakes();
     error OnlyTimelock();
     error ZeroAddress();
+    error VoterRepAlreadyComplete();
+    error DisputeNotResolved();
 
     /// @notice Emitted when a dispute is cancelled
     event DisputeCancelled(uint256 indexed disputeId, uint256 indexed taskId, address cancelledBy);
@@ -70,6 +74,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     // Slashed stakes events
     event StakeSlashed(uint256 indexed disputeId, address indexed disputer, uint256 amount);
     event StakesWithdrawn(address indexed recipient, uint256 amount);
+
+    // Voter reputation batch processing event
+    event VoterReputationBatchProcessed(uint256 indexed disputeId, uint256 processed, uint256 remaining);
 
     // Emergency bypass event
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed selector);
@@ -263,12 +270,16 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
     }
 
     /**
-     * @dev Update reputation for voters based on whether they voted with majority
+     * @dev Update reputation for voters based on whether they voted with majority.
+     *      Processes up to VOTER_REP_BATCH_SIZE voters inline. If more voters remain,
+     *      they must be processed via processVoterReputationBatch().
      */
     function _updateVoterReputation(uint256 disputeId, bool disputerWon) private {
         address[] storage voters = _voters[disputeId];
+        uint256 total = voters.length;
+        uint256 batchEnd = total < VOTER_REP_BATCH_SIZE ? total : VOTER_REP_BATCH_SIZE;
 
-        for (uint256 i = 0; i < voters.length; i++) {
+        for (uint256 i = 0; i < batchEnd; i++) {
             Vote storage vote = _votes[disputeId][voters[i]];
             bool votedWithMajority = (vote.supportsDisputer == disputerWon);
 
@@ -278,6 +289,61 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard {
                 agentAdapter.updateVoterReputation(voters[i], -2); // -2 for voting against majority
             }
         }
+
+        _voterRepProcessedIndex[disputeId] = batchEnd;
+
+        if (batchEnd < total) {
+            emit VoterReputationBatchProcessed(disputeId, batchEnd, total - batchEnd);
+        }
+    }
+
+    /**
+     * @notice Process voter reputation updates in batches for disputes with many voters
+     * @param disputeId The dispute ID
+     * @dev Anyone can call this to process remaining voter reputation updates.
+     *      Processes up to VOTER_REP_BATCH_SIZE voters per call.
+     */
+    function processVoterReputationBatch(uint256 disputeId) external {
+        Dispute storage dispute = _disputes[disputeId];
+        if (dispute.id == 0) revert DisputeNotFound();
+        if (dispute.status != DisputeStatus.Resolved) revert DisputeNotResolved();
+
+        address[] storage voters = _voters[disputeId];
+        uint256 startIndex = _voterRepProcessedIndex[disputeId];
+        uint256 total = voters.length;
+
+        if (startIndex >= total) revert VoterRepAlreadyComplete();
+
+        uint256 batchEnd = startIndex + VOTER_REP_BATCH_SIZE;
+        if (batchEnd > total) batchEnd = total;
+
+        bool disputerWon = dispute.disputerWon;
+
+        for (uint256 i = startIndex; i < batchEnd; i++) {
+            Vote storage vote = _votes[disputeId][voters[i]];
+            bool votedWithMajority = (vote.supportsDisputer == disputerWon);
+
+            if (votedWithMajority) {
+                agentAdapter.updateVoterReputation(voters[i], 3);
+            } else {
+                agentAdapter.updateVoterReputation(voters[i], -2);
+            }
+        }
+
+        _voterRepProcessedIndex[disputeId] = batchEnd;
+        uint256 remaining = total > batchEnd ? total - batchEnd : 0;
+        emit VoterReputationBatchProcessed(disputeId, batchEnd - startIndex, remaining);
+    }
+
+    /**
+     * @notice Get the number of unprocessed voter reputation updates for a dispute
+     * @param disputeId The dispute ID
+     * @return remaining Number of voters still needing reputation updates
+     */
+    function pendingVoterRepUpdates(uint256 disputeId) external view returns (uint256 remaining) {
+        uint256 total = _voters[disputeId].length;
+        uint256 processed = _voterRepProcessedIndex[disputeId];
+        remaining = total > processed ? total - processed : 0;
     }
 
     /**

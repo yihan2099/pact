@@ -35,13 +35,16 @@ import { getChallengeHandler, verifySignatureHandler, getSessionHandler } from '
 import { allTools } from './tools';
 import { logAccessDenied, logSecurityEvent } from './services/security-logger';
 import { a2aRouter } from './a2a';
+import { sanitizeErrorMessage, isUnknownToolError } from './utils/error-sanitizer';
 
 const app = new Hono();
 
 // SECURITY: Configure CORS with allowed origins from environment
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-  : ['*']; // Default to all for development
+  : process.env.NODE_ENV === 'production'
+    ? [] // SECURITY: Deny all origins in production when CORS_ORIGINS is not set
+    : ['*']; // Default to all for development only
 
 // SECURITY WARNING: Log warning if wildcard CORS is used in production
 if (allowedOrigins.includes('*') && process.env.NODE_ENV === 'production') {
@@ -51,12 +54,22 @@ if (allowedOrigins.includes('*') && process.env.NODE_ENV === 'production') {
   );
 }
 
+if (allowedOrigins.length === 0 && process.env.NODE_ENV === 'production') {
+  console.error(
+    'SECURITY: CORS_ORIGINS not configured in production. All cross-origin requests will be denied. ' +
+      'Set CORS_ORIGINS environment variable to allow specific origins.'
+  );
+}
+
 app.use(
   '/*',
   cors({
     origin: (origin) => {
       // Allow requests with no origin (same-origin, curl, etc.)
       if (!origin) return '*';
+
+      // If no origins configured (production without CORS_ORIGINS), deny all
+      if (allowedOrigins.length === 0) return null;
 
       // If wildcard is allowed, permit all origins
       if (allowedOrigins.includes('*')) return origin;
@@ -344,12 +357,13 @@ app.post('/tools/:toolName', async (c) => {
 
     return c.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    // Return 404 for unknown tools, 500 for other errors (sanitized)
+    if (isUnknownToolError(error)) {
+      const message = error instanceof Error ? error.message : 'Unknown tool';
+      return c.json({ error: message }, 404);
+    }
 
-    // Return 404 for unknown tools, 500 for other errors
-    const status = message.startsWith('Unknown tool:') ? 404 : 500;
-
-    return c.json({ error: message }, status);
+    return c.json({ error: sanitizeErrorMessage(error) }, 500);
   }
 });
 

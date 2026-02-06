@@ -23,7 +23,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,json,md}\"",
     "check": "bun run lint && bun run typecheck && bun run format:check",
     "check:fix": "bun run lint:fix && bun run format",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "prettier": "^3.4.0",

@@ -327,6 +327,59 @@ contract ClawboyAgentAdapterTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                   EFFICIENT LOOKUP TESTS (getFeedbackCount)
+    //////////////////////////////////////////////////////////////*/
+
+    function test_GetVoteWeight_UsesEfficientLookup() public {
+        vm.prank(agent1);
+        agentAdapter.register("ipfs://agent1-profile-cid");
+
+        // Record multiple task wins
+        for (uint256 i = 0; i < 5; i++) {
+            vm.prank(address(taskManager));
+            agentAdapter.recordTaskWin(agent1, i + 1);
+        }
+
+        // Verify weight calculation with multiple task wins
+        // 5 task wins = 50 rep, log2(51) = 5
+        uint256 weight = agentAdapter.getVoteWeight(agent1);
+        assertEq(weight, 5);
+
+        // Verify reputation summary matches
+        (uint64 taskWins,,,int256 totalRep) = agentAdapter.getReputationSummary(agent1);
+        assertEq(taskWins, 5);
+        assertEq(totalRep, 50);
+    }
+
+    function test_GetVoteWeight_WithDisputeLosses() public {
+        vm.prank(agent1);
+        agentAdapter.register("ipfs://agent1-profile-cid");
+
+        // Record 2 task wins (+20 rep)
+        for (uint256 i = 0; i < 2; i++) {
+            vm.prank(address(taskManager));
+            agentAdapter.recordTaskWin(agent1, i + 1);
+        }
+
+        // Record 2 dispute losses (-40 rep)
+        for (uint256 i = 0; i < 2; i++) {
+            vm.prank(address(disputeResolver));
+            agentAdapter.recordDisputeLoss(agent1, i + 1);
+        }
+
+        // Net reputation: 20 - 40 = -20, clamped to 0
+        // Weight should be minimum (1) for registered agent
+        uint256 weight = agentAdapter.getVoteWeight(agent1);
+        assertEq(weight, 1);
+
+        // Verify reputation summary
+        (uint64 taskWins,, uint64 disputeLosses, int256 totalRep) = agentAdapter.getReputationSummary(agent1);
+        assertEq(taskWins, 2);
+        assertEq(disputeLosses, 2);
+        assertEq(totalRep, -20); // Raw rep can be negative in summary
+    }
+
+    /*//////////////////////////////////////////////////////////////
                       VIEW FUNCTION TESTS
     //////////////////////////////////////////////////////////////*/
 

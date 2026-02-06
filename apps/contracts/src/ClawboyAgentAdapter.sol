@@ -276,53 +276,21 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
     /**
      * @notice Get the vote weight for an agent in disputes
      * @dev Weight = max(1, floor(log2(reputation + 1)))
-     * @dev SECURITY: Uses try/catch to handle getSummary() reverts (e.g., TooManyClients)
-     *      Falls back to default weight of 1 if reputation cannot be calculated
+     * @dev Uses O(1) getFeedbackCount() instead of O(n) getSummary() for gas efficiency
      */
     function getVoteWeight(address agent) external view returns (uint256) {
         uint256 agentId = identityRegistry.getAgentIdByWallet(agent);
         if (agentId == 0) return 0;
 
-        // Get reputation summaries with fallback for gas exhaustion scenarios
-        uint64 taskWins = 0;
-        uint64 disputeWins = 0;
-        uint64 disputeLosses = 0;
-
-        // Try to get task wins - fallback to 0 if getSummary reverts (too many clients/feedback)
-        try reputationRegistry.getSummary(agentId, new address[](0), TAG_TASK, TAG_WIN) returns (
-            uint64 count, int128, uint8
-        ) {
-            taskWins = count;
-        } catch {
-            // Fallback: return minimum weight for registered agents
-            return 1;
-        }
-
-        // Try to get dispute wins
-        try reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_WIN) returns (
-            uint64 count, int128, uint8
-        ) {
-            disputeWins = count;
-        } catch {
-            return 1;
-        }
-
-        // Try to get dispute losses
-        try reputationRegistry.getSummary(
-            agentId, new address[](0), TAG_DISPUTE, TAG_LOSS
-        ) returns (
-            uint64 count, int128, uint8
-        ) {
-            disputeLosses = count;
-        } catch {
-            return 1;
-        }
+        // Use O(1) tag-based counts instead of iterating over feedback arrays
+        uint64 taskWins = reputationRegistry.getFeedbackCount(agentId, TAG_TASK, TAG_WIN);
+        uint64 disputeWins = reputationRegistry.getFeedbackCount(agentId, TAG_DISPUTE, TAG_WIN);
+        uint64 disputeLosses = reputationRegistry.getFeedbackCount(agentId, TAG_DISPUTE, TAG_LOSS);
 
         // Calculate equivalent reputation (same weights as original ClawboyRegistry)
         // Task wins: +10 each
         // Dispute wins: +15 each
         // Dispute losses: -20 each
-        // SECURITY: Use unchecked math since we're dealing with small numbers from feedback counts
         int256 rep = int256(uint256(taskWins)) * 10 + int256(uint256(disputeWins)) * 15
             - int256(uint256(disputeLosses)) * 20;
 
@@ -337,6 +305,7 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
 
     /**
      * @notice Get reputation summary for an agent
+     * @dev Uses O(1) getFeedbackCount() instead of O(n) getSummary() for gas efficiency
      */
     function getReputationSummary(address agent)
         external
@@ -346,11 +315,9 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
         uint256 agentId = identityRegistry.getAgentIdByWallet(agent);
         if (agentId == 0) return (0, 0, 0, 0);
 
-        (taskWins,,) = reputationRegistry.getSummary(agentId, new address[](0), TAG_TASK, TAG_WIN);
-        (disputeWins,,) =
-            reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_WIN);
-        (disputeLosses,,) =
-            reputationRegistry.getSummary(agentId, new address[](0), TAG_DISPUTE, TAG_LOSS);
+        taskWins = reputationRegistry.getFeedbackCount(agentId, TAG_TASK, TAG_WIN);
+        disputeWins = reputationRegistry.getFeedbackCount(agentId, TAG_DISPUTE, TAG_WIN);
+        disputeLosses = reputationRegistry.getFeedbackCount(agentId, TAG_DISPUTE, TAG_LOSS);
 
         totalReputation = int256(uint256(taskWins)) * 10 + int256(uint256(disputeWins)) * 15
             - int256(uint256(disputeLosses)) * 20;

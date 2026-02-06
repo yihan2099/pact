@@ -559,6 +559,103 @@ contract DisputeResolverTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                   ZERO VOTES FULL SIDE EFFECTS TEST
+    //////////////////////////////////////////////////////////////*/
+
+    function test_ResolveDispute_ZeroVotes_FullSideEffects() public {
+        uint256 taskId = _createTaskWithSubmission();
+
+        vm.prank(creator);
+        taskManager.rejectAll(taskId, "reason");
+
+        uint256 stake = disputeResolver.calculateDisputeStake(BOUNTY_AMOUNT);
+        uint256 agent1BalanceBefore = agent1.balance;
+
+        vm.prank(agent1);
+        uint256 disputeId = disputeResolver.startDispute{ value: stake }(taskId);
+
+        // No votes submitted, warp past deadline
+        vm.warp(block.timestamp + 48 hours + 1);
+
+        disputeResolver.resolveDispute(disputeId);
+
+        // Creator wins by default - verify full side effects
+        IDisputeResolver.Dispute memory dispute = disputeResolver.getDispute(disputeId);
+        assertEq(uint256(dispute.status), uint256(IDisputeResolver.DisputeStatus.Resolved));
+        assertFalse(dispute.disputerWon);
+        assertEq(dispute.votesForDisputer, 0);
+        assertEq(dispute.votesAgainstDisputer, 0);
+
+        // Verify stake was slashed
+        assertEq(agent1.balance, agent1BalanceBefore - stake);
+        assertEq(disputeResolver.totalSlashedStakes(), stake);
+
+        // Verify dispute loss recorded for disputer
+        (,, uint64 disputeLosses,) = agentAdapter.getReputationSummary(agent1);
+        assertEq(disputeLosses, 1);
+
+        // Verify voter array is empty
+        address[] memory voters = disputeResolver.getVoters(disputeId);
+        assertEq(voters.length, 0);
+
+        // Verify task was refunded to creator
+        ITaskManager.Task memory task = taskManager.getTask(taskId);
+        assertEq(uint256(task.status), uint256(ITaskManager.TaskStatus.Refunded));
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                   GAS SAFETY TEST (MANY VOTERS)
+    //////////////////////////////////////////////////////////////*/
+
+    function test_ResolveDispute_ManyVoters_GasCheck() public {
+        uint256 taskId = _createTaskWithSubmission();
+
+        vm.prank(creator);
+        taskManager.rejectAll(taskId, "reason");
+
+        uint256 stake = disputeResolver.calculateDisputeStake(BOUNTY_AMOUNT);
+
+        vm.prank(agent1);
+        uint256 disputeId = disputeResolver.startDispute{ value: stake }(taskId);
+
+        // Register and vote with 100 unique voters
+        for (uint256 i = 0; i < 100; i++) {
+            address voter = address(uint160(0x1000 + i));
+            vm.deal(voter, 1 ether);
+
+            vm.prank(voter);
+            agentAdapter.register(string(abi.encodePacked("ipfs://voter-", i)));
+
+            vm.prank(voter);
+            disputeResolver.submitVote(disputeId, i % 2 == 0); // Alternate votes
+        }
+
+        vm.warp(block.timestamp + 48 hours + 1);
+
+        // Measure gas for resolution (now only processes first VOTER_REP_BATCH_SIZE voters inline)
+        uint256 gasBefore = gasleft();
+        disputeResolver.resolveDispute(disputeId);
+        uint256 gasUsed = gasBefore - gasleft();
+
+        // resolveDispute now only processes up to 50 voters inline, well under 15M
+        assertLt(gasUsed, 15_000_000, "Gas exceeded 15M safety threshold with batch processing");
+        console.log("Gas used for resolveDispute with 100 voters (batched):", gasUsed);
+
+        // Verify remaining voters need batch processing
+        uint256 remaining = disputeResolver.pendingVoterRepUpdates(disputeId);
+        assertEq(remaining, 50); // 100 voters - 50 processed inline
+
+        // Process remaining batch
+        disputeResolver.processVoterReputationBatch(disputeId);
+        remaining = disputeResolver.pendingVoterRepUpdates(disputeId);
+        assertEq(remaining, 0); // All processed
+
+        // Verify all voter rep is now complete
+        vm.expectRevert(DisputeResolver.VoterRepAlreadyComplete.selector);
+        disputeResolver.processVoterReputationBatch(disputeId);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                    DISPUTE WITH SELECTED WINNER TESTS
     //////////////////////////////////////////////////////////////*/
 
