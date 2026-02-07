@@ -24,7 +24,7 @@
     "check": "bun run lint && bun run typecheck && bun run format:check",
     "check:fix": "bun run lint:fix && bun run format",
     "clean": "turbo clean && rm -rf node_modules",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "devDependencies": {
     "prettier": "^3.4.0",
