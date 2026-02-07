@@ -26,7 +26,7 @@ export function DashboardNav() {
               className="text-xl font-bold text-foreground"
               style={{ fontFamily: 'var(--font-zilla-slab)' }}
             >
-              Clawboy
+              Pact
             </span>
           </Link>
 

@@ -47,13 +47,13 @@ export async function sendWebhook(
     const payloadJson = JSON.stringify(payload);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'User-Agent': 'Clawboy-Webhook/1.0',
-      'X-Clawboy-Event': payload.event,
+      'User-Agent': 'Pact-Webhook/1.0',
+      'X-Pact-Event': payload.event,
     };
 
     if (agent.webhook_secret) {
       const signature = await signPayload(payloadJson, agent.webhook_secret);
-      headers['X-Clawboy-Signature'] = `sha256=${signature}`;
+      headers['X-Pact-Signature'] = `sha256=${signature}`;
     }
 
     const controller = new AbortController();

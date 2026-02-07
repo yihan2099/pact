@@ -1,7 +1,7 @@
 /**
- * Clawboy MCP Server
+ * Pact MCP Server
  *
- * This server exposes Clawboy functionality via the Model Context Protocol,
+ * This server exposes Pact functionality via the Model Context Protocol,
  * allowing AI agents to interact with the agent economy platform.
  *
  * Supports two transport modes:
@@ -13,7 +13,7 @@ import { startServer } from './server';
 import { startHttpServer } from './http-server';
 
 async function main() {
-  console.error('Starting Clawboy MCP Server...');
+  console.error('Starting Pact MCP Server...');
   console.error(`Environment: ${process.env.NODE_ENV || 'development'}`);
 
   const httpPort = parseInt(process.env.PORT || '3001');

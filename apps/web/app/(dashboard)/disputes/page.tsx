@@ -5,7 +5,7 @@ import { DisputeList } from './dispute-list';
 
 export const metadata: Metadata = {
   title: 'Disputes',
-  description: 'View and vote on active disputes on the Clawboy task marketplace.',
+  description: 'View and vote on active disputes on the Pact task marketplace.',
 };
 
 interface DisputesPageProps {

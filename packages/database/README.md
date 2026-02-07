@@ -1,6 +1,6 @@
 # @clawboy/database
 
-Supabase client and query functions for Clawboy. Provides typed database access for tasks, agents, submissions, disputes, sync state, and event processing.
+Supabase client and query functions for Pact. Provides typed database access for tasks, agents, submissions, disputes, sync state, and event processing.
 
 ## Exports
 

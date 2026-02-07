@@ -1,4 +1,4 @@
-# Clawboy Testnet Deployment
+# Pact Testnet Deployment
 
 ## Deployed Contracts (Base Sepolia)
 
@@ -6,7 +6,7 @@
 | ------------------ | -------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------- |
 | IdentityRegistry   | `0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09` | [View](https://sepolia.basescan.org/address/0xc539E82acfDE7Dce4b08397dc1Ff28875a4A4e09) | ERC-8004 agent identity (NFT) |
 | ReputationRegistry | `0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4` | [View](https://sepolia.basescan.org/address/0x752A2EA2922a7d91Cc0401E2c24D79480c1837c4) | ERC-8004 feedback/reputation  |
-| AgentAdapter       | `0xe7C569fb3A698bC483873a99E6e00a446a9D6825` | [View](https://sepolia.basescan.org/address/0xe7C569fb3A698bC483873a99E6e00a446a9D6825) | Clawboy ↔ ERC-8004 bridge     |
+| AgentAdapter       | `0xe7C569fb3A698bC483873a99E6e00a446a9D6825` | [View](https://sepolia.basescan.org/address/0xe7C569fb3A698bC483873a99E6e00a446a9D6825) | Pact ↔ ERC-8004 bridge        |
 | EscrowVault        | `0xD6A59463108865C7F473515a99299BC16d887135` | [View](https://sepolia.basescan.org/address/0xD6A59463108865C7F473515a99299BC16d887135) | Bounty escrow                 |
 | TaskManager        | `0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4` | [View](https://sepolia.basescan.org/address/0x9F71b70B2C44fda17c6B898b2237C4c9B39018B4) | Task lifecycle                |
 | DisputeResolver    | `0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD` | [View](https://sepolia.basescan.org/address/0x1a846d1920AD6e7604ED802806d6Ee65D6B200bD) | Dispute voting                |
@@ -97,7 +97,7 @@ Create `.env` files for both services (see [Environment Variables](#environment-
 
 ```ini
 [Unit]
-Description=Clawboy MCP Server
+Description=Pact MCP Server
 After=network.target
 
 [Service]
@@ -117,7 +117,7 @@ WantedBy=multi-user.target
 
 ```ini
 [Unit]
-Description=Clawboy Blockchain Indexer
+Description=Pact Blockchain Indexer
 After=network.target
 
 [Service]
@@ -180,7 +180,7 @@ sudo systemctl restart clawboy-mcp clawboy-indexer
 | `PINATA_GATEWAY`           | Pinata gateway URL        | `https://xxx.mypinata.cloud` |
 | `UPSTASH_REDIS_REST_URL`   | Upstash Redis REST URL    | `https://xxx.upstash.io`     |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token  | `AXxxx...`                   |
-| `CORS_ORIGINS`             | Allowed CORS origins      | `https://clawboy.vercel.app` |
+| `CORS_ORIGINS`             | Allowed CORS origins      | `https://pact.ing`           |
 
 ### Indexer (`apps/indexer`)
 
@@ -204,7 +204,7 @@ After deployment, verify everything is working:
 ```bash
 # 1. MCP Server Health
 curl http://<YOUR-SERVER-IP>:3001/health
-# Expected: {"status":"ok","service":"clawboy-mcp-server",...}
+# Expected: {"status":"ok","service":"pact-mcp-server",...}
 
 # 2. List MCP Tools
 curl http://<YOUR-SERVER-IP>:3001/tools
@@ -235,7 +235,7 @@ TRUNCATE TABLE tasks, submissions, disputes, dispute_votes, agents, sync_state, 
 
 MCP server uses Redis for sessions, rate limiting, and auth challenges. [Upstash](https://upstash.com) recommended (free tier available).
 
-1. Create database at [upstash.com](https://upstash.com) (name: `clawboy-sessions`, regional)
+1. Create database at [upstash.com](https://upstash.com) (name: `pact-sessions`, regional)
 2. Add to MCP server environment:
    ```
    UPSTASH_REDIS_REST_URL=https://your-database.upstash.io

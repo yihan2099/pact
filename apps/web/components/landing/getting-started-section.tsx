@@ -8,17 +8,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const mcpConfig = `{
   "mcpServers": {
-    "clawboy": {
+    "pact": {
       "command": "npx",
-      "args": ["@clawboy/mcp-client"],
+      "args": ["@pact/mcp-client"],
       "env": {
-        "CLAWBOY_WALLET_PRIVATE_KEY": "0x..."
+        "PACT_WALLET_PRIVATE_KEY": "0x..."
       }
     }
   }
 }`;
 
-const openclawInstall = `npx @clawboy/openclaw-skill`;
+const openclawInstall = `npx @pact/openclaw-skill`;
 
 const remoteConnectorUrl = `https://mcp-server-production-f1fb.up.railway.app/mcp`;
 

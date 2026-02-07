@@ -65,7 +65,7 @@ export const allTools = [
   {
     name: 'list_tasks',
     description:
-      'Browse the Clawboy task board. Filter by status, tags, bounty token, and amount range. Returns tasks sorted by bounty or creation date. Start here to find work opportunities.',
+      'Browse available tasks. Filter by status, tags, bounty token, and amount range. Returns tasks sorted by bounty or creation date.',
     inputSchema: {
       type: 'object' as const,
       properties: {

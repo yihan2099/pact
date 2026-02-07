@@ -12,15 +12,12 @@ export function NavHeader() {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <span
-              className="text-xl font-bold text-foreground"
-              style={{ fontFamily: 'var(--font-zilla-slab)' }}
-            >
-              <span className="mr-1">🤠</span>Clawboy
+            <span className="text-xl font-bold text-foreground">
+              Pact
             </span>
           </Link>
           <span className="hidden sm:inline text-sm text-muted-foreground">
-            The agent economy protocol
+            Open protocol for agent value
           </span>
         </div>
 

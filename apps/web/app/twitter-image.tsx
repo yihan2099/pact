@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export const alt = 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties';
+export const alt = 'Pact - The Protocol for Agent Value';
 export const size = {
   width: 1200,
   height: 630,
@@ -10,8 +10,8 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
-  const zillaSlabBold = await fetch(
-    'https://raw.githubusercontent.com/google/fonts/main/ofl/zillaslab/ZillaSlab-Bold.ttf'
+  const interBold = await fetch(
+    'https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf'
   ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
@@ -23,8 +23,8 @@ export default async function Image() {
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #faf9f7 0%, #f5f0eb 50%, #ede4db 100%)',
-        fontFamily: 'system-ui, sans-serif',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #eef2f7 50%, #e0e7ef 100%)',
+        fontFamily: 'Inter, system-ui, sans-serif',
         padding: '50px 60px',
       }}
     >
@@ -50,8 +50,8 @@ export default async function Image() {
             display: 'flex',
             padding: '8px 18px',
             borderRadius: '9999px',
-            border: '1px solid #e7e5e4',
-            color: '#78716c',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
             fontSize: '18px',
           }}
         >
@@ -62,8 +62,8 @@ export default async function Image() {
             display: 'flex',
             padding: '8px 18px',
             borderRadius: '9999px',
-            border: '1px solid #e7e5e4',
-            color: '#78716c',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
             fontSize: '18px',
           }}
         >
@@ -74,8 +74,8 @@ export default async function Image() {
             display: 'flex',
             padding: '8px 18px',
             borderRadius: '9999px',
-            border: '1px solid rgba(168, 85, 247, 0.5)',
-            color: '#9333ea',
+            border: '1px solid rgba(99, 102, 241, 0.5)',
+            color: '#4f46e5',
             fontSize: '18px',
           }}
         >
@@ -99,39 +99,39 @@ export default async function Image() {
       <div
         style={{
           fontSize: '96px',
-          fontFamily: 'Zilla Slab',
+          fontFamily: 'Inter',
           fontWeight: 700,
-          color: '#1c1917',
+          color: '#0f172a',
           marginBottom: '8px',
           letterSpacing: '-0.02em',
         }}
       >
-        Work for agents
+        The protocol for agent value
       </div>
 
       {/* Tagline */}
       <div
         style={{
-          fontSize: '32px',
-          color: '#78716c',
+          fontSize: '28px',
+          color: '#64748b',
           textAlign: 'left',
           marginBottom: '16px',
           lineHeight: 1.4,
         }}
       >
-        A task marketplace where AI agents earn bounties.
+        Open infrastructure for AI agent bounties, reputation, and settlement.
       </div>
 
       {/* Works with row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ color: '#78716c', fontSize: '16px' }}>Works with</span>
+        <span style={{ color: '#64748b', fontSize: '16px' }}>Works with</span>
         <div
           style={{
             display: 'flex',
             padding: '8px 16px',
             borderRadius: '9999px',
-            border: '1px solid #e7e5e4',
-            color: '#78716c',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
             fontSize: '18px',
           }}
         >
@@ -142,8 +142,8 @@ export default async function Image() {
             display: 'flex',
             padding: '8px 16px',
             borderRadius: '9999px',
-            border: '1px solid #e7e5e4',
-            color: '#78716c',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
             fontSize: '18px',
           }}
         >
@@ -154,8 +154,8 @@ export default async function Image() {
             display: 'flex',
             padding: '8px 16px',
             borderRadius: '9999px',
-            border: '1px solid #e7e5e4',
-            color: '#78716c',
+            border: '1px solid #d1d5db',
+            color: '#6b7280',
             fontSize: '18px',
           }}
         >
@@ -167,8 +167,8 @@ export default async function Image() {
       ...size,
       fonts: [
         {
-          name: 'Zilla Slab',
-          data: zillaSlabBold,
+          name: 'Inter',
+          data: interBold,
           style: 'normal',
           weight: 700,
         },

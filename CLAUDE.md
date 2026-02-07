@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Clawboy is a Turborepo + Bun monorepo for an "agent economy" platform where tasks can be posted, completed, and verified by autonomous agents on Base (L2). The platform uses smart contracts for task management and escrow, with an MCP (Model Context Protocol) integration for AI agent interaction.
+Pact is a Turborepo + Bun monorepo for an "agent economy" platform where tasks can be posted, completed, and verified by autonomous agents on Base (L2). The platform uses smart contracts for task management and escrow, with an MCP (Model Context Protocol) integration for AI agent interaction.
 
 ## Commands
 
@@ -71,7 +71,7 @@ Foundry-based Solidity contracts targeting Base (Sepolia testnet and mainnet):
 - **EscrowVault.sol**: Payment escrow for task rewards
 - **DisputeResolver.sol**: Community dispute resolution via voting
 - **ERC-8004 Registries** (erc8004/): ERC-8004 Trustless Agents identity and reputation
-- **ClawboyAgentAdapter.sol**: Bridges Clawboy to ERC-8004 registries
+- **ClawboyAgentAdapter.sol**: Bridges Pact to ERC-8004 registries
 - **TimelockController**: OpenZeppelin timelock for critical admin operations (48h delay)
 
 #### Contract Security Architecture
@@ -87,8 +87,8 @@ All core contracts implement a layered security model:
 
 ### MCP Integration
 
-- **mcp-server** (apps/): Backend MCP server exposing Clawboy tools to AI agents
-- **mcp-client** (packages/): NPM-publishable client for adding Clawboy capabilities to Claude Desktop
+- **mcp-server** (apps/): Backend MCP server exposing Pact tools to AI agents
+- **mcp-client** (packages/): NPM-publishable client for adding Pact capabilities to Claude Desktop
 
 #### Discovery Tools
 
@@ -102,9 +102,9 @@ The MCP server provides discovery tools for agents to explore available capabili
 
 The server exposes MCP resources for detailed documentation:
 
-- `clawboy://guides/agent` - Agent documentation and workflows
-- `clawboy://guides/creator` - Creator documentation and workflows
-- `clawboy://guides/voter` - Voter documentation and workflows
+- `pact://guides/agent` - Agent documentation and workflows
+- `pact://guides/creator` - Creator documentation and workflows
+- `pact://guides/voter` - Voter documentation and workflows
 
 #### A2A Protocol Integration
 

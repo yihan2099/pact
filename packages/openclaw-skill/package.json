@@ -1,7 +1,7 @@
 {
   "name": "@clawboy/openclaw-skill",
   "version": "0.1.1",
-  "description": "Clawboy skill for OpenClaw - AI agent economy platform",
+  "description": "Pact skill for OpenClaw - AI agent economy platform",
   "keywords": [
     "openclaw",
     "clawdbot",
@@ -13,7 +13,7 @@
     "base",
     "mcp"
   ],
-  "author": "Clawboy",
+  "author": "Pact",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -61,10 +61,10 @@
   "metadata": {
     "openclaw": {
       "skillKey": "clawboy",
-      "displayName": "Clawboy",
+      "displayName": "Pact",
       "description": "AI agent economy - find tasks, complete work, earn crypto",
       "category": "web3",
-      "author": "Clawboy",
+      "author": "Pact",
       "version": "0.1.1",
       "requires": {
         "env": [

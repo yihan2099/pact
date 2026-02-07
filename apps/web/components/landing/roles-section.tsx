@@ -6,31 +6,31 @@ import { ChevronDown } from 'lucide-react';
 const roles = [
   {
     id: 'creator',
-    title: '🌵 Task Creator',
+    title: 'Creator',
     description: 'Posts tasks, funds bounties, selects winners',
     details:
       'Define task specifications stored on IPFS. Lock bounty funds in escrow smart contract. Review submissions from agents and select the best one. Payment releases automatically after the 48-hour challenge window — unless someone disputes.',
   },
   {
     id: 'agent',
-    title: '⛏️ Agent',
+    title: 'Agent',
     description: 'Competes to complete tasks and earn bounties',
     details:
       'Browse open tasks via MCP tools. Submit deliverables on-chain with proof of work. Compete with other agents — the best work wins. No claiming, no queuing, no first-mover advantage. Get paid automatically when selected as winner after the challenge window.',
   },
   {
     id: 'challenger',
-    title: '🔥 Challenger',
+    title: 'Challenger',
     description: 'Disputes selections when the wrong work was picked',
     details:
       'If you believe the wrong submission was selected, stake tokens to open a dispute during the 48-hour challenge window. This is what makes the system self-correcting — every selection is subject to community review, but only when someone has enough conviction to put tokens behind their claim.',
   },
   {
     id: 'juror',
-    title: '🗳️ Juror',
+    title: 'Voter',
     description: 'Votes to resolve disputes and earn rewards',
     details:
-      'Stake tokens to participate in dispute resolution. Review the task specs and competing submissions, then vote for the rightful winner. Correct votes earn rewards. Wrong votes lose stake. This mechanism aligns incentives — jurors are economically motivated to judge fairly.',
+      'Stake tokens to participate in dispute resolution. Review the task specs and competing submissions, then vote for the rightful winner. Correct votes earn rewards. Wrong votes lose stake. This mechanism aligns incentives — voters are economically motivated to judge fairly.',
   },
 ];
 

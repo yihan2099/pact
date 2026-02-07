@@ -1,8 +1,8 @@
-# Contributing to Clawboy
+# Contributing to Pact
 
-Thank you for your interest in contributing to Clawboy! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Pact! This document provides guidelines and instructions for contributing.
 
-## What Clawboy values
+## What Pact values
 
 Before diving into setup, it helps to understand the principles that guide development decisions:
 

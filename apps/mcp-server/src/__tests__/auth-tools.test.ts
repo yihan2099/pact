@@ -13,7 +13,7 @@ describe('Auth Tools', () => {
       const result = await getChallengeHandler({ walletAddress });
 
       expect(result.challenge).toBeDefined();
-      expect(result.challenge).toContain('Clawboy Authentication');
+      expect(result.challenge).toContain('Pact Authentication');
       expect(result.challenge).toContain(walletAddress);
       expect(result.nonce).toBeDefined();
       expect(result.expiresAt).toBeGreaterThan(Date.now());

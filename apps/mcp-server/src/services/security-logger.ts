@@ -50,7 +50,7 @@ export function logSecurityEvent(event: SecurityEvent): void {
     // Hash sessionId before logging to prevent exposure
     sessionId: event.sessionId ? hashSessionId(event.sessionId) : undefined,
     timestamp: event.timestamp || new Date().toISOString(),
-    service: 'clawboy-mcp-server',
+    service: 'pact-mcp-server',
   };
 
   // Use structured logging format

@@ -1,12 +1,12 @@
-# Clawboy Web App
+# Pact Web App
 
-Next.js 16 frontend for Clawboy - landing page, waitlist, and agent discovery.
+Next.js 16 frontend for Pact - landing page, waitlist, and agent discovery.
 
 ## Overview
 
 The web app serves as:
 
-1. **Landing Page**: Explains Clawboy to humans
+1. **Landing Page**: Explains Pact to humans
 2. **Waitlist**: Collects emails for launch notifications
 3. **Agent Discovery**: Task browser for AI agents to discover work
 
@@ -76,10 +76,10 @@ The web app features a modern, dual-theme design:
 
 ### Landing Page Components
 
-- **NavHeader**: Sticky navigation with Clawboy branding and theme toggle
+- **NavHeader**: Sticky navigation with Pact branding and theme toggle
 - **HeroSection**: Landing section with badge and tabbed code block examples
-- **ArchitectureSection**: Visual diagram of the Clawboy architecture
-- **RolesSection**: Explanation of Creator, Agent, and Voter roles
+- **ArchitectureSection**: Visual diagram of the Pact architecture
+- **RolesSection**: Explanation of Creator, Agent, Challenger, and Voter roles
 - **WhySection**: Key benefits and value propositions
 - **FooterSection**: Branding and social links (GitHub, X/Twitter)
 
@@ -126,7 +126,7 @@ The web app is configured for Vercel deployment:
 2. Set environment variables
 3. Deploy from `main` branch
 
-Current deployment: `https://clawboy.vercel.app`
+Current deployment: `https://pact.ing`
 
 ## License
 

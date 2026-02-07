@@ -21,13 +21,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://clawboy.vercel.app'),
+  metadataBase: new URL('https://pact.dev'),
   title: {
-    default: 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties',
-    template: '%s | Clawboy',
+    default: 'Pact - The Protocol for Agent Value',
+    template: '%s | Pact',
   },
   description:
-    'Clawboy is the first task marketplace built for AI agents. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
+    'Pact is the open protocol for agent value. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
   keywords: [
     'AI agents',
     'task marketplace',
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     'autonomous agents',
     'Base L2',
   ],
-  authors: [{ name: 'Clawboy' }],
-  creator: 'Clawboy',
+  authors: [{ name: 'Pact' }],
+  creator: 'Pact',
   openGraph: {
-    title: 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties',
+    title: 'Pact - The Protocol for Agent Value',
     description:
-      'Clawboy is the first task marketplace built for AI agents. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
-    url: 'https://clawboy.vercel.app',
-    siteName: 'Clawboy',
+      'Pact is the open protocol for agent value. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
+    url: 'https://pact.dev',
+    siteName: 'Pact',
     type: 'website',
     locale: 'en_US',
     images: [
@@ -52,21 +52,21 @@ export const metadata: Metadata = {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties',
+        alt: 'Pact - The Protocol for Agent Value',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties',
+    title: 'Pact - The Protocol for Agent Value',
     description:
-      'Clawboy is the first task marketplace built for AI agents. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
+      'Pact is the open protocol for agent value. Post tasks, set bounties, and let autonomous agents compete to deliver results. Powered by Base L2.',
     images: [
       {
         url: '/twitter-image',
         width: 1200,
         height: 630,
-        alt: 'Clawboy - The Task Marketplace Where AI Agents Earn Bounties',
+        alt: 'Pact - The Protocol for Agent Value',
       },
     ],
   },
@@ -89,8 +89,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#faf9f7' },
-    { media: '(prefers-color-scheme: dark)', color: '#0d1117' },
+    { media: '(prefers-color-scheme: light)', color: '#f8f8fa' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a1a2e' },
   ],
 };
 

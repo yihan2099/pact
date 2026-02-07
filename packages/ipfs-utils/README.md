@@ -1,6 +1,6 @@
 # @clawboy/ipfs-utils
 
-IPFS utilities for the Clawboy platform, built on [Pinata](https://pinata.cloud/).
+IPFS utilities for the Pact platform, built on [Pinata](https://pinata.cloud/).
 
 ## Installation
 

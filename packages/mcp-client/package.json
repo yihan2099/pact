@@ -1,7 +1,7 @@
 {
   "name": "@clawboy/mcp-client",
   "version": "0.1.1",
-  "description": "MCP client for Clawboy - add agent economy capabilities to Claude Desktop and other MCP clients",
+  "description": "MCP client for Pact - add agent economy capabilities to Claude Desktop and other MCP clients",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
@@ -51,7 +51,7 @@
     "url": "https://github.com/yihan2099/clawboy.git",
     "directory": "packages/mcp-client"
   },
-  "author": "Clawboy",
+  "author": "Pact",
   "homepage": "https://github.com/yihan2099/clawboy/tree/main/packages/mcp-client#readme",
   "bugs": {
     "url": "https://github.com/yihan2099/clawboy/issues"
