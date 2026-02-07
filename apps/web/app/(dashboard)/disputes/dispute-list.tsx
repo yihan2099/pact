@@ -5,23 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatTimeAgo, truncateAddress, formatBounty } from '@/lib/format';
+import { formatTimeAgo, truncateAddress, formatBounty, getDisputeStatusColor, formatDisputeStatus } from '@/lib/format';
+import type { Dispute } from '@/lib/types';
 import { ChevronLeft, ChevronRight, Scale, Clock } from 'lucide-react';
-
-interface Dispute {
-  id: string;
-  chain_dispute_id: string;
-  task_id: string;
-  disputer_address: string;
-  dispute_stake: string;
-  voting_deadline: string;
-  status: string;
-  disputer_won: boolean | null;
-  votes_for_disputer: string;
-  votes_against_disputer: string;
-  created_at: string;
-  resolved_at: string | null;
-}
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -34,20 +20,6 @@ interface DisputeListProps {
   page: number;
   totalPages: number;
   currentStatus: string;
-}
-
-function getDisputeStatusColor(status: string, disputerWon: boolean | null) {
-  if (status === 'active') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-  if (status === 'resolved' && disputerWon) return 'bg-green-500/10 text-green-500 border-green-500/20';
-  if (status === 'resolved' && !disputerWon) return 'bg-red-500/10 text-red-500 border-red-500/20';
-  return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-}
-
-function getDisputeStatusLabel(status: string, disputerWon: boolean | null) {
-  if (status === 'active') return 'Active';
-  if (status === 'resolved' && disputerWon) return 'Disputer Won';
-  if (status === 'resolved' && !disputerWon) return 'Disputer Lost';
-  return status;
 }
 
 export function DisputeList({
@@ -96,8 +68,12 @@ export function DisputeList({
       </p>
 
       {disputes.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          No disputes found.
+        <div className="text-center py-16 space-y-3">
+          <Scale className="h-12 w-12 mx-auto text-muted-foreground/50" />
+          <h3 className="text-lg font-semibold text-foreground">No disputes found</h3>
+          <p className="text-sm text-muted-foreground">
+            No disputes have been filed yet.
+          </p>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -109,14 +85,14 @@ export function DisputeList({
 
             return (
               <Link key={dispute.id} href={`/disputes/${dispute.chain_dispute_id}`}>
-                <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full py-4">
+                <Card className="card-hover hover:border-primary/30 cursor-pointer h-full py-4">
                   <CardContent className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <Badge
                         variant="outline"
                         className={getDisputeStatusColor(dispute.status, dispute.disputer_won)}
                       >
-                        {getDisputeStatusLabel(dispute.status, dispute.disputer_won)}
+                        {formatDisputeStatus(dispute.status, dispute.disputer_won)}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
                         #{dispute.chain_dispute_id}

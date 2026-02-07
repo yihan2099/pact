@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits } from 'viem';
 import { Loader2, Plus, X } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +21,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { taskManagerConfig } from '@/lib/contracts';
 import { getSupportedTokens, isNativeToken } from '@clawboy/contracts';
+import { toast } from 'sonner';
 
 const CHAIN_ID = 84532; // Base Sepolia
 
@@ -77,11 +79,13 @@ export function CreateTaskForm() {
     useWaitForTransactionReceipt({ hash: txHash });
 
   // Redirect on successful confirmation
-  if (isConfirmed && txHash) {
-    // On success, redirect to tasks list since we don't know the on-chain task ID
-    // from the client side without parsing logs
-    router.push('/tasks');
-  }
+  useEffect(() => { if (writeError) toast.error('Failed to create task'); }, [writeError]);
+  useEffect(() => {
+    if (isConfirmed && txHash) {
+      toast.success('Task created successfully!');
+      router.push('/tasks');
+    }
+  }, [isConfirmed, txHash, router]);
 
   function validate(): boolean {
     const newErrors: FormErrors = {};
@@ -376,12 +380,9 @@ export function CreateTaskForm() {
             {tagsInput && (
               <div className="flex flex-wrap gap-1.5">
                 {parseTags(tagsInput).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground"
-                  >
+                  <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
                     {tag}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}
@@ -404,16 +405,16 @@ export function CreateTaskForm() {
 
       {/* Error display */}
       {writeError && (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
           {writeError.message.slice(0, 300)}
         </div>
       )}
 
       {/* Transaction pending */}
       {txHash && !isConfirmed && (
-        <div className="rounded-lg border border-blue-500/50 bg-blue-500/10 p-4 text-sm text-blue-600 dark:text-blue-400">
+        <p className="text-xs text-muted-foreground">
           Transaction submitted. Waiting for confirmation...
-        </div>
+        </p>
       )}
 
       {/* Submit */}

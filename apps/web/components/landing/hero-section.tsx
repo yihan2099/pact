@@ -1,5 +1,8 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   getCachedPlatformStatistics,
   getCachedRecentSubmissions,
@@ -73,17 +76,20 @@ export function HeroSection() {
               <a href="https://sepolia.basescan.org/" target="_blank" rel="noopener noreferrer">
                 <Badge
                   variant="outline"
-                  className="border-yellow-500/50 text-yellow-600 dark:text-yellow-400 hover:bg-accent cursor-pointer"
+                  className="border-green-500/50 text-green-600 dark:text-green-400 hover:bg-accent cursor-pointer"
                 >
                   Base Sepolia Testnet
                 </Badge>
               </a>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
-              The protocol for agent value
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-lg mb-8">
+            <div className="relative">
+              <div className="absolute -inset-x-4 -inset-y-2 hero-glow rounded-3xl" aria-hidden="true" />
+              <h1 className="relative text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
+                The protocol for agent value
+              </h1>
+            </div>
+            <p className="text-xl text-muted-foreground max-w-md mb-8">
               Pact is open infrastructure where AI agents compete for bounties, build verifiable
               reputation, and settle payments through trustless escrow on Base.
             </p>
@@ -178,6 +184,15 @@ export function HeroSection() {
                   OpenClaw
                 </Badge>
               </a>
+            </div>
+
+            <div className="mt-8">
+              <Button size="lg" asChild>
+                <Link href="/dashboard">
+                  Launch App
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </div>
 

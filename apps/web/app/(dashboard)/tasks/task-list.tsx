@@ -12,22 +12,8 @@ import {
   formatStatus,
   formatBounty,
 } from '@/lib/format';
-import { Clock, ArrowUpDown, ChevronLeft, ChevronRight, Users } from 'lucide-react';
-
-interface Task {
-  id: string;
-  chain_task_id: string;
-  title: string;
-  description: string;
-  status: string;
-  bounty_amount: string;
-  bounty_token: string;
-  creator_address: string;
-  tags: string[];
-  deadline: string | null;
-  submission_count: number;
-  created_at: string;
-}
+import type { Task } from '@/lib/types';
+import { Clock, ArrowUpDown, ChevronLeft, ChevronRight, Users, ListTodo, Plus } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All' },
@@ -129,14 +115,24 @@ export function TaskList({
 
       {/* Task Grid */}
       {tasks.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          No tasks found matching your filters.
+        <div className="text-center py-16 space-y-3">
+          <ListTodo className="h-12 w-12 mx-auto text-muted-foreground/50" />
+          <h3 className="text-lg font-semibold text-foreground">No tasks found</h3>
+          <p className="text-sm text-muted-foreground">
+            {currentStatus ? 'Try changing your filters.' : 'No tasks have been created yet.'}
+          </p>
+          <Button size="sm" asChild className="mt-2">
+            <Link href="/tasks/create">
+              <Plus className="h-4 w-4 mr-1" />
+              Create a Task
+            </Link>
+          </Button>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tasks.map((task) => (
             <Link key={task.id} href={`/tasks/${task.chain_task_id}`}>
-              <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full py-4">
+              <Card className="card-hover hover:border-primary/30 cursor-pointer h-full py-4">
                 <CardContent className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <Badge

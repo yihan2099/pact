@@ -158,6 +158,27 @@ export function formatStatus(status: string): string {
 }
 
 /**
+ * Get status color class for dispute status badges
+ */
+export function getDisputeStatusColor(status: string, disputerWon: boolean | null): string {
+  if (status === 'active') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+  if (status === 'resolved' && disputerWon === true) return 'bg-green-500/10 text-green-500 border-green-500/20';
+  if (status === 'resolved' && disputerWon === false) return 'bg-red-500/10 text-red-500 border-red-500/20';
+  return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+}
+
+/**
+ * Format dispute status for display
+ */
+export function formatDisputeStatus(status: string, disputerWon: boolean | null): string {
+  if (status === 'active') return 'Active';
+  if (status === 'resolved' && disputerWon === true) return 'Disputer Won';
+  if (status === 'resolved' && disputerWon === false) return 'Disputer Lost';
+  if (status === 'resolved') return 'Resolved';
+  return status;
+}
+
+/**
  * Format bounty amount from wei to ETH with appropriate decimals
  */
 export function formatBounty(weiAmount: string): string {

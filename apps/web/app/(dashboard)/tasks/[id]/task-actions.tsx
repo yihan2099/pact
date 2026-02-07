@@ -1,11 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { taskManagerConfig } from '@/lib/contracts';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface TaskActionsProps {
   chainTaskId: string;
@@ -45,9 +57,16 @@ export function TaskActions({
     error: finalizeError,
   } = useWriteContract();
 
-  const { isLoading: isSelectConfirming } = useWaitForTransactionReceipt({ hash: selectHash });
-  const { isLoading: isRejectConfirming } = useWaitForTransactionReceipt({ hash: rejectHash });
-  const { isLoading: isFinalizeConfirming } = useWaitForTransactionReceipt({ hash: finalizeHash });
+  const { isLoading: isSelectConfirming, isSuccess: isSelectSuccess } = useWaitForTransactionReceipt({ hash: selectHash });
+  const { isLoading: isRejectConfirming, isSuccess: isRejectSuccess } = useWaitForTransactionReceipt({ hash: rejectHash });
+  const { isLoading: isFinalizeConfirming, isSuccess: isFinalizeSuccess } = useWaitForTransactionReceipt({ hash: finalizeHash });
+
+  useEffect(() => { if (isSelectSuccess) toast.success('Winner selected successfully'); }, [isSelectSuccess]);
+  useEffect(() => { if (isRejectSuccess) toast.success('All submissions rejected'); }, [isRejectSuccess]);
+  useEffect(() => { if (isFinalizeSuccess) toast.success('Task finalized, bounty released!'); }, [isFinalizeSuccess]);
+  useEffect(() => { if (selectError) toast.error('Failed to select winner'); }, [selectError]);
+  useEffect(() => { if (rejectError) toast.error('Failed to reject submissions'); }, [rejectError]);
+  useEffect(() => { if (finalizeError) toast.error('Failed to finalize task'); }, [finalizeError]);
 
   const isCreator = address?.toLowerCase() === creatorAddress.toLowerCase();
   const taskId = BigInt(chainTaskId);
@@ -107,22 +126,38 @@ export function TaskActions({
                 ) : null}
                 Select Winner
               </Button>
-              <Button
-                variant="destructive"
-                disabled={isAnyPending}
-                onClick={() => {
-                  rejectAll({
-                    ...taskManagerConfig,
-                    functionName: 'rejectAll',
-                    args: [taskId, 'Submissions did not meet requirements'],
-                  });
-                }}
-              >
-                {isRejecting || isRejectConfirming ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                ) : null}
-                Reject All
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" disabled={isAnyPending}>
+                    {isRejecting || isRejectConfirming ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                    ) : null}
+                    Reject All
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reject all submissions?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will reject all submissions and re-open the task. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        rejectAll({
+                          ...taskManagerConfig,
+                          functionName: 'rejectAll',
+                          args: [taskId, 'Submissions did not meet requirements'],
+                        });
+                      }}
+                    >
+                      Reject All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         )}

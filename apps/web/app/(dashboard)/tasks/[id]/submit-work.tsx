@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { taskManagerConfig } from '@/lib/contracts';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SubmitWorkProps {
   chainTaskId: string;
@@ -46,6 +47,9 @@ export function SubmitWork({ chainTaskId, status }: SubmitWorkProps) {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
+
+  useEffect(() => { if (isSuccess) toast.success('Work submitted successfully!'); }, [isSuccess]);
+  useEffect(() => { if (writeError) toast.error('Failed to submit work'); }, [writeError]);
 
   // Only show when task is open and wallet is connected
   if (status !== 'open' || !address) {
@@ -255,7 +259,7 @@ export function SubmitWork({ chainTaskId, status }: SubmitWorkProps) {
         {/* Actions */}
         <div className="flex gap-2">
           <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
             {isPending
               ? 'Submitting...'
               : isConfirming

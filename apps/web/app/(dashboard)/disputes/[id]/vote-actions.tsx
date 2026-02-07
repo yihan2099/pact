@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { disputeResolverConfig } from '@/lib/contracts';
 import { Loader2, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface VoteActionsProps {
   chainDisputeId: string;
@@ -21,7 +23,10 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
     error: voteError,
   } = useWriteContract();
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: voteHash });
+  const { isLoading: isConfirming, isSuccess: isVoteSuccess } = useWaitForTransactionReceipt({ hash: voteHash });
+
+  useEffect(() => { if (isVoteSuccess) toast.success('Vote cast successfully!'); }, [isVoteSuccess]);
+  useEffect(() => { if (voteError) toast.error('Failed to cast vote'); }, [voteError]);
 
   if (!address) {
     return (
@@ -73,7 +78,7 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
 
         <div className="flex gap-3">
           <Button
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white"
             disabled={isPending}
             onClick={() => handleVote(true)}
           >
@@ -85,7 +90,7 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
             Support Disputer
           </Button>
           <Button
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            className="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white"
             disabled={isPending}
             onClick={() => handleVote(false)}
           >
@@ -99,7 +104,7 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
         </div>
 
         {voteHash && (
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-muted-foreground">
             Transaction submitted. Waiting for confirmation...
           </p>
         )}

@@ -12,8 +12,8 @@ import {
   formatBounty,
   getIpfsUrl,
 } from '@/lib/format';
-import { Clock, ExternalLink, Users, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Clock, ExternalLink, Users } from 'lucide-react';
+import { PageBreadcrumb } from '@/components/page-breadcrumb';
 import { TaskActions } from './task-actions';
 import { SubmitWork } from './submit-work';
 import { CountdownTimer } from './countdown-timer';
@@ -42,14 +42,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Back link */}
-      <Link
-        href="/tasks"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Tasks
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Tasks', href: '/tasks' }, { label: task.title || 'Task #' + task.chain_task_id }]} />
 
       {/* Task Header */}
       <div className="space-y-3">
@@ -102,7 +95,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
               href={getBaseScanUrl(task.creator_address)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-mono hover:text-primary transition-colors inline-flex items-center gap-1"
+              className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
             >
               {truncateAddress(task.creator_address)}
               <ExternalLink className="h-3 w-3" />
@@ -134,7 +127,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
               href={getIpfsUrl(task.specification_cid)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-mono hover:text-primary transition-colors inline-flex items-center gap-1"
+              className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
             >
               {task.specification_cid.slice(0, 8)}...
               <ExternalLink className="h-3 w-3" />
@@ -198,7 +191,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
                         href={getBaseScanUrl(sub.agent_address)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-mono hover:text-primary transition-colors inline-flex items-center gap-1"
+                        className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                       >
                         {truncateAddress(sub.agent_address)}
                         <ExternalLink className="h-3 w-3" />

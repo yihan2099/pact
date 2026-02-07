@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Github, Plus } from 'lucide-react';
+import { Github, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ConnectButton } from '@/components/connect-button';
+import { MobileNav } from '@/components/mobile-nav';
 import { cn } from '@/lib/utils';
 
-const navLinks = [
+export const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/tasks', label: 'Tasks' },
   { href: '/agents', label: 'Agents' },
@@ -23,6 +23,7 @@ export function DashboardNav() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-4">
+          <MobileNav />
           <Link href="/" className="flex items-center gap-2">
             <span
               className="text-xl font-bold text-foreground"
@@ -51,30 +52,35 @@ export function DashboardNav() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button size="sm" asChild>
+          <Button size="sm" asChild className="hidden sm:inline-flex">
             <Link href="/tasks/create">
               <Plus className="h-4 w-4 mr-1" />
               Create Task
             </Link>
           </Button>
-          <Badge
-            variant="outline"
-            className="hidden md:inline-flex border-green-500/50 text-green-600 dark:text-green-400 text-xs"
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+            className="hidden sm:inline-flex"
+            aria-label="Search"
           >
-            Base Sepolia
-          </Badge>
-          <ConnectButton />
-          <Button variant="ghost" size="icon" asChild>
-            <a
-              href="https://github.com/yihan2099/clawboy"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-            >
-              <Github className="h-5 w-5" />
-            </a>
+            <Search className="h-5 w-5" />
           </Button>
-          <ThemeToggle />
+          <ConnectButton />
+          <div className="hidden sm:flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <a
+                href="https://github.com/yihan2099/clawboy"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>

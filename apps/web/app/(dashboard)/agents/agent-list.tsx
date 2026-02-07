@@ -6,20 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { truncateAddress } from '@/lib/format';
-import { ArrowUpDown, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
-
-interface Agent {
-  id: string;
-  address: string;
-  name: string;
-  reputation: string;
-  tasks_won: number;
-  disputes_won: number;
-  disputes_lost: number;
-  skills: string[];
-  is_active: boolean;
-  registered_at: string;
-}
+import type { Agent } from '@/lib/types';
+import { ArrowUpDown, ChevronLeft, ChevronRight, Trophy, Users } from 'lucide-react';
 
 const SORT_OPTIONS = [
   { value: 'reputation', label: 'Reputation' },
@@ -105,8 +93,12 @@ export function AgentList({
 
       {/* Agent List */}
       {agents.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          No agents registered yet.
+        <div className="text-center py-16 space-y-3">
+          <Users className="h-12 w-12 mx-auto text-muted-foreground/50" />
+          <h3 className="text-lg font-semibold text-foreground">No agents registered</h3>
+          <p className="text-sm text-muted-foreground">
+            Be the first to register as an agent on Pact.
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -116,7 +108,7 @@ export function AgentList({
 
             return (
               <Link key={agent.id} href={`/agents/${agent.address}`}>
-                <Card className="hover:border-primary/30 transition-colors cursor-pointer py-3 mb-2">
+                <Card className="card-hover hover:border-primary/30 cursor-pointer py-3 mb-2">
                   <CardContent>
                     <div className="flex items-center gap-4">
                       {/* Rank */}
@@ -132,11 +124,6 @@ export function AgentList({
                           <span className="text-sm font-medium truncate">
                             {agent.name || truncateAddress(agent.address)}
                           </span>
-                          {!agent.name && (
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {truncateAddress(agent.address)}
-                            </span>
-                          )}
                           {agent.name && (
                             <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
                               {truncateAddress(agent.address)}

@@ -12,9 +12,12 @@ import {
   truncateAddress,
   getBaseScanUrl,
   formatBounty,
+  getDisputeStatusColor,
+  formatDisputeStatus,
 } from '@/lib/format';
-import { ArrowLeft, ExternalLink, Scale } from 'lucide-react';
+import { ExternalLink, Scale } from 'lucide-react';
 import Link from 'next/link';
+import { PageBreadcrumb } from '@/components/page-breadcrumb';
 import { VoteActions } from './vote-actions';
 import { CountdownTimer } from '../../tasks/[id]/countdown-timer';
 
@@ -47,14 +50,7 @@ export default async function DisputeDetailPage({ params }: DisputeDetailPagePro
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Back link */}
-      <Link
-        href="/disputes"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Disputes
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Disputes', href: '/disputes' }, { label: 'Dispute #' + dispute.chain_dispute_id }]} />
 
       {/* Dispute Header */}
       <div className="space-y-3">
@@ -63,19 +59,9 @@ export default async function DisputeDetailPage({ params }: DisputeDetailPagePro
             <div className="flex items-center gap-2">
               <Badge
                 variant="outline"
-                className={
-                  dispute.status === 'active'
-                    ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                    : dispute.disputer_won
-                      ? 'bg-green-500/10 text-green-500 border-green-500/20'
-                      : 'bg-red-500/10 text-red-500 border-red-500/20'
-                }
+                className={getDisputeStatusColor(dispute.status, dispute.disputer_won)}
               >
-                {dispute.status === 'active'
-                  ? 'Active'
-                  : dispute.disputer_won
-                    ? 'Disputer Won'
-                    : 'Disputer Lost'}
+                {formatDisputeStatus(dispute.status, dispute.disputer_won)}
               </Badge>
               <span className="text-xs text-muted-foreground">
                 Dispute #{dispute.chain_dispute_id}
@@ -107,7 +93,7 @@ export default async function DisputeDetailPage({ params }: DisputeDetailPagePro
               href={getBaseScanUrl(dispute.disputer_address)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-mono hover:text-primary transition-colors inline-flex items-center gap-1"
+              className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
             >
               {truncateAddress(dispute.disputer_address)}
               <ExternalLink className="h-3 w-3" />
@@ -217,7 +203,7 @@ export default async function DisputeDetailPage({ params }: DisputeDetailPagePro
                       href={getBaseScanUrl(vote.voter_address)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm font-mono hover:text-primary transition-colors inline-flex items-center gap-1"
+                      className="text-sm font-mono text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                     >
                       {truncateAddress(vote.voter_address)}
                       <ExternalLink className="h-3 w-3" />

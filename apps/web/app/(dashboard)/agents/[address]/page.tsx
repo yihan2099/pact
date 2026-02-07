@@ -15,7 +15,6 @@ import {
   getIpfsUrl,
 } from '@/lib/format';
 import {
-  ArrowLeft,
   ExternalLink,
   Trophy,
   Shield,
@@ -24,6 +23,7 @@ import {
   Globe,
   Clock,
 } from 'lucide-react';
+import { PageBreadcrumb } from '@/components/page-breadcrumb';
 
 interface AgentProfilePageProps {
   params: Promise<{ address: string }>;
@@ -55,14 +55,7 @@ export default async function AgentProfilePage({ params }: AgentProfilePageProps
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Back link */}
-      <Link
-        href="/agents"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Agents
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Agents', href: '/agents' }, { label: agent.name || truncateAddress(agent.address) }]} />
 
       {/* Agent Header */}
       <div className="space-y-3">

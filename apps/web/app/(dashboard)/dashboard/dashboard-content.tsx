@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,9 @@ import {
   ExternalLink,
   Clock,
   Wallet,
+  ListTodo,
+  Plus,
+  Send,
 } from 'lucide-react';
 import {
   fetchAgentProfile,
@@ -33,40 +37,22 @@ import {
   fetchWonTasks,
 } from './actions';
 
-interface AgentProfile {
-  id: string;
-  address: string;
-  name: string;
-  reputation: string;
-  tasks_won: number;
-  disputes_won: number;
-  disputes_lost: number;
-  skills: string[];
-  registered_at: string;
+import type { Task, Submission, Agent } from '@/lib/types';
+
+interface AgentProfile extends Agent {
   voteWeight: number;
-}
-
-interface Task {
-  id: string;
-  chain_task_id: string;
-  title: string;
-  status: string;
-  bounty_amount: string;
-  submission_count: number;
-  created_at: string;
-}
-
-interface Submission {
-  id: string;
-  task_id: string;
-  submission_cid: string;
-  submission_index: number;
-  is_winner: boolean;
-  submitted_at: string;
 }
 
 export function DashboardContent() {
   const { address, isConnected } = useAccount();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get('tab') || 'created';
+
+  const setTab = (value: string) => {
+    const params = new URLSearchParams({ tab: value });
+    router.replace(`/dashboard?${params}`, { scroll: false });
+  };
   const [agent, setAgent] = useState<AgentProfile | null>(null);
   const [createdTasks, setCreatedTasks] = useState<Task[]>([]);
   const [createdTotal, setCreatedTotal] = useState(0);
@@ -196,7 +182,7 @@ export function DashboardContent() {
           </div>
 
           {agent && (
-            <div className="grid gap-3 sm:grid-cols-4 mt-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mt-4">
               <div className="flex items-center gap-2 text-sm">
                 <Trophy className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Tasks Won:</span>
@@ -225,7 +211,7 @@ export function DashboardContent() {
       </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue="created">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="created">
             My Created Tasks ({createdTotal})
@@ -240,14 +226,21 @@ export function DashboardContent() {
 
         <TabsContent value="created" className="mt-4">
           {createdTasks.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              You haven&apos;t created any tasks yet.
+            <div className="text-center py-12 space-y-3">
+              <ListTodo className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">You haven&apos;t created any tasks yet.</p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/tasks/create">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Create your first task
+                </Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-2">
               {createdTasks.map((task) => (
                 <Link key={task.id} href={`/tasks/${task.chain_task_id}`}>
-                  <Card className="hover:border-primary/30 transition-colors cursor-pointer py-3 mb-2">
+                  <Card className="card-hover hover:border-primary/30 cursor-pointer py-3 mb-2">
                     <CardContent>
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
@@ -257,7 +250,7 @@ export function DashboardContent() {
                           >
                             {formatStatus(task.status)}
                           </Badge>
-                          <span className="text-sm font-medium truncate">
+                          <span className="text-sm font-medium line-clamp-1">
                             {task.title || `Task #${task.chain_task_id}`}
                           </span>
                         </div>
@@ -280,13 +273,17 @@ export function DashboardContent() {
 
         <TabsContent value="submissions" className="mt-4">
           {submissions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              You haven&apos;t submitted any work yet.
+            <div className="text-center py-12 space-y-3">
+              <Send className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">You haven&apos;t submitted any work yet.</p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/tasks">Browse open tasks</Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-2">
               {submissions.map((sub) => (
-                <Card key={sub.id} className="py-3 mb-2">
+                <Card key={sub.id} className="card-hover hover:border-primary/30 py-3 mb-2">
                   <CardContent>
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 min-w-0">
@@ -328,21 +325,25 @@ export function DashboardContent() {
 
         <TabsContent value="won" className="mt-4">
           {wonTasks.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No won tasks yet. Keep submitting quality work!
+            <div className="text-center py-12 space-y-3">
+              <Trophy className="h-10 w-10 mx-auto text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">No won tasks yet. Keep submitting quality work!</p>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/tasks">Find tasks to work on</Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-2">
               {wonTasks.map((task) => (
                 <Link key={task.id} href={`/tasks/${task.chain_task_id}`}>
-                  <Card className="hover:border-primary/30 transition-colors cursor-pointer py-3 mb-2">
+                  <Card className="card-hover hover:border-primary/30 cursor-pointer py-3 mb-2">
                     <CardContent>
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
                             Won
                           </Badge>
-                          <span className="text-sm font-medium truncate">
+                          <span className="text-sm font-medium line-clamp-1">
                             {task.title || `Task #${task.chain_task_id}`}
                           </span>
                         </div>

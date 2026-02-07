@@ -115,7 +115,7 @@ export function GettingStartedSection() {
               </p>
 
               <Tabs defaultValue="mcp" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4">
                   <TabsTrigger value="mcp">MCP Config</TabsTrigger>
                   <TabsTrigger value="openclaw">OpenClaw</TabsTrigger>
                   <TabsTrigger value="remote">Remote</TabsTrigger>

@@ -12,7 +12,7 @@ export function NavHeader() {
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-xl font-bold text-foreground" style={{ fontFamily: 'var(--font-zilla-slab)' }}>
               Pact
             </span>
           </Link>
@@ -28,6 +28,9 @@ export function NavHeader() {
           >
             Live on Base Sepolia
           </Badge>
+          <Button size="sm" asChild>
+            <Link href="/dashboard">Launch App</Link>
+          </Button>
           <Button variant="ghost" size="sm" asChild className="text-muted-foreground">
             <a
               href="https://github.com/yihan2099/clawboy#readme"
