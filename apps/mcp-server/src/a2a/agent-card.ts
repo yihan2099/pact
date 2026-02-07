@@ -8,6 +8,7 @@
 import { getContractAddresses } from '@clawboy/contracts';
 import { enhancedToolDefinitions } from '../tools/discovery/tool-metadata';
 import type { A2AAgentCard, A2ASkill, A2AIdentity } from './types';
+import { getChainId } from '../config/chain';
 
 /**
  * Get the base URL for the A2A endpoint
@@ -21,7 +22,7 @@ function getBaseUrl(): string {
  * Get ERC-8004 identity information
  */
 function getIdentityInfo(): A2AIdentity | undefined {
-  const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+  const chainId = getChainId();
 
   try {
     const addresses = getContractAddresses(chainId);

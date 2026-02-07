@@ -1,6 +1,7 @@
 import type { ServerContext } from '../server';
 import { isAgentRegistered, getAgentId } from '@clawboy/web3-utils';
 import { updateSessionRegistration } from './session-manager';
+import { getChainId } from '../config/chain';
 
 /**
  * Access level requirements for tools
@@ -143,7 +144,7 @@ export async function checkAccessWithRegistrationRefresh(
   // Session says not registered - re-check on-chain
   // This handles the case where an agent registered mid-session
   try {
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
     const isNowRegistered = await isAgentRegistered(context.callerAddress, chainId);
 
     if (isNowRegistered && context.sessionId) {

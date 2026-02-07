@@ -13,7 +13,7 @@ const SAFE_ERROR_PATTERNS: RegExp[] = [
   /^Dispute not found/i,
   /^Agent not found/i,
   /^Submission not found/i,
-  /^Invalid .+ format/i,
+  /^Invalid (wallet address|task ID|dispute ID|agent ID|session ID|bounty|CID|token|signature|deadline) format/i,
   /^Missing required/i,
   /^Bounty amount must be/i,
   /^You (are not|have not|must be|cannot|already)/i,

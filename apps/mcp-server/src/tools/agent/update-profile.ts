@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { uploadJson, fetchJson } from '@clawboy/ipfs-utils';
 import { getAgentURI } from '@clawboy/web3-utils';
 import { webhookUrlSchema } from '../../utils/webhook-validation';
+import { getChainId } from '../../config/chain';
 
 /**
  * ERC-8004 compliant agent URI structure
@@ -109,7 +110,7 @@ export const updateProfileTool = {
     }
 
     // Get the current agent URI from ERC-8004 Identity Registry
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
     const currentURI = await getAgentURI(context.callerAddress, chainId);
 
     if (!currentURI) {

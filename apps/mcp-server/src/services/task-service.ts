@@ -4,6 +4,7 @@ import { formatTokenAmount, parseTokenAmount } from '@clawboy/web3-utils';
 import { getTokenByAddress, resolveToken } from '@clawboy/contracts';
 import type { ListTasksInput, CreateTaskInput, GetTaskInput } from '@clawboy/shared-types';
 import type { TaskListItem, GetTaskResponse } from '@clawboy/shared-types';
+import { getChainId } from '../config/chain';
 
 /** Extended task list item with formatted bounty */
 export interface TaskListItemWithFormatted extends TaskListItem {
@@ -17,7 +18,7 @@ export interface TaskListItemWithFormatted extends TaskListItem {
 export async function listTasksHandler(
   input: ListTasksInput
 ): Promise<{ tasks: TaskListItemWithFormatted[]; total: number; hasMore: boolean }> {
-  const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+  const chainId = getChainId();
 
   // Map sortBy field names
   let sortBy: 'created_at' | 'deadline' | 'bounty_amount' | undefined;
@@ -129,7 +130,7 @@ export interface GetTaskResponseWithFormatted extends GetTaskResponse {
 export async function getTaskHandler(
   input: GetTaskInput
 ): Promise<GetTaskResponseWithFormatted | null> {
-  const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+  const chainId = getChainId();
   const task = await getTaskById(input.taskId);
 
   if (!task) {

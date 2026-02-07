@@ -38,13 +38,10 @@ export async function handleTasksGet(
     return createErrorResponse(id, A2A_ERROR_CODES.TASK_NOT_FOUND, `Task not found: ${taskId}`);
   }
 
-  // Validate session ownership
-  // Anonymous tasks (with `anonymous-` prefix) can be accessed without auth
-  // Otherwise, the session must match
-  const isAnonymousTask = task.sessionId.startsWith('anonymous-');
-  if (!isAnonymousTask && task.sessionId !== sessionId) {
-    // If authenticated but different session, still allow access (same user may have multiple sessions)
-    // For now, we require exact session match for security
+  // SECURITY: Require exact session match for all tasks (including anonymous ones).
+  // Anonymous callers already receive results inline from message/send,
+  // so tasks/get does not need an exemption for anonymous tasks.
+  if (task.sessionId !== sessionId) {
     return createErrorResponse(
       id,
       A2A_ERROR_CODES.ACCESS_DENIED,

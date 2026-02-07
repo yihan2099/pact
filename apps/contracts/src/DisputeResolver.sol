@@ -140,7 +140,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
      * @param newOwner The address to transfer ownership to
      */
     function transferOwnership(address newOwner) external onlyOwner {
-        if (newOwner == address(0)) revert TransferFailed(); // Reuse error for zero address
+        if (newOwner == address(0)) revert ZeroAddress();
         pendingOwner = newOwner;
         emit OwnershipTransferInitiated(owner, newOwner);
     }

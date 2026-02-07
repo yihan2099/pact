@@ -787,8 +787,7 @@ contract DisputeResolverTest is Test {
     }
 
     function test_TransferOwnership_RevertIfZeroAddress() public {
-        // DisputeResolver reuses TransferFailed error for zero address
-        vm.expectRevert(DisputeResolver.TransferFailed.selector);
+        vm.expectRevert(DisputeResolver.ZeroAddress.selector);
         disputeResolver.transferOwnership(address(0));
     }
 

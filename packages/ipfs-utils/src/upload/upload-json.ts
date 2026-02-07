@@ -38,63 +38,99 @@ export class IpfsUploadError extends Error {
 }
 
 /**
- * Upload JSON data to IPFS via Pinata with error handling
+ * Check if an error is retryable (network errors, 5xx server errors)
+ */
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof IpfsUploadError && error.message.includes('timed out')) {
+    return true;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  // Retry on network errors and 5xx responses
+  if (/fetch failed|network|ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket/i.test(message)) {
+    return true;
+  }
+  if (/5\d{2}|server error|internal error|service unavailable/i.test(message)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Upload JSON data to IPFS via Pinata with error handling and retry logic
  */
 export async function uploadJson(
   data: Record<string, unknown>,
   options: UploadJsonOptions = {}
 ): Promise<UploadResult> {
   const { timeoutMs = 30000, isPublic = false, ...pinataOptions } = options;
+  const maxRetries = 3;
+  let lastError: unknown;
 
-  try {
-    const pinata = getPinataClient();
-
-    // Get group ID for public uploads
-    const groupId = isPublic ? getPublicGroupId() : undefined;
-
-    // Create abort controller for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const upload = await pinata.upload.json(data, {
-        metadata: {
-          name: pinataOptions.name || 'clawboy-data.json',
-          keyvalues: pinataOptions.keyvalues,
-        },
-        groupId,
-      });
+      const pinata = getPinataClient();
 
-      clearTimeout(timeoutId);
+      // Get group ID for public uploads
+      const groupId = isPublic ? getPublicGroupId() : undefined;
 
-      return {
-        cid: upload.cid,
-        size: upload.size,
-        timestamp: new Date().toISOString(),
-      };
+      // Create abort controller for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const upload = await pinata.upload.json(data, {
+          metadata: {
+            name: pinataOptions.name || 'clawboy-data.json',
+            keyvalues: pinataOptions.keyvalues,
+          },
+          groupId,
+        });
+
+        clearTimeout(timeoutId);
+
+        return {
+          cid: upload.cid,
+          size: upload.size,
+          timestamp: new Date().toISOString(),
+        };
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        // Check if timeout
+        if (controller.signal.aborted) {
+          throw new IpfsUploadError(`IPFS upload timed out after ${timeoutMs}ms`);
+        }
+
+        throw error;
+      }
     } catch (error) {
-      clearTimeout(timeoutId);
+      lastError = error;
 
-      // Check if timeout
-      if (controller.signal.aborted) {
-        throw new IpfsUploadError(`IPFS upload timed out after ${timeoutMs}ms`);
+      // Don't retry on non-retryable errors or on the last attempt
+      if (attempt === maxRetries || !isRetryableError(error)) {
+        break;
       }
 
-      throw error;
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = Math.pow(2, attempt - 1) * 1000;
+      console.warn(
+        `IPFS upload attempt ${attempt}/${maxRetries} failed, retrying in ${delay}ms:`,
+        error instanceof Error ? error.message : error
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
-  } catch (error) {
-    // Already an IpfsUploadError
-    if (error instanceof IpfsUploadError) {
-      throw error;
-    }
-
-    // Wrap other errors
-    const message = error instanceof Error ? error.message : String(error);
-    throw new IpfsUploadError(
-      `Failed to upload JSON to IPFS: ${message}`,
-      error instanceof Error ? error : undefined
-    );
   }
+
+  // All retries exhausted
+  if (lastError instanceof IpfsUploadError) {
+    throw lastError;
+  }
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new IpfsUploadError(
+    `Failed to upload JSON to IPFS: ${message}`,
+    lastError instanceof Error ? lastError : undefined
+  );
 }
 
 /**

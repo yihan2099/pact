@@ -13,9 +13,9 @@ const TASK_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000;
 const TASK_EXPIRATION_SECONDS = 7 * 24 * 60 * 60;
 
 // SECURITY: Reduced TTL for anonymous sessions to prevent task store flooding
-// Anonymous tasks expire in 1 hour instead of 7 days
-const ANONYMOUS_TASK_EXPIRATION_MS = 60 * 60 * 1000;
-const ANONYMOUS_TASK_EXPIRATION_SECONDS = 60 * 60;
+// Anonymous tasks expire in 15 minutes instead of 7 days
+const ANONYMOUS_TASK_EXPIRATION_MS = 15 * 60 * 1000;
+const ANONYMOUS_TASK_EXPIRATION_SECONDS = 15 * 60;
 
 // Redis key prefixes
 const TASK_PREFIX = 'a2a:task:';

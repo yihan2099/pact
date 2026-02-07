@@ -20,14 +20,17 @@ import {
 import type {
   A2AJsonRpcRequest,
   A2AJsonRpcResponse,
-  MessageSendParams,
-  MessageStreamParams,
-  TasksGetParams,
-  TasksListParams,
-  TasksCancelParams,
 } from './types';
 import { A2A_ERROR_CODES, createErrorResponse } from './types';
 import { logSecurityEvent } from '../services/security-logger';
+import {
+  validateParams,
+  messageSendParamsSchema,
+  messageStreamParamsSchema,
+  tasksGetParamsSchema,
+  tasksListParamsSchema,
+  tasksCancelParamsSchema,
+} from './validators';
 
 // SECURITY: Whether to trust proxy headers for client IP detection
 const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === 'true';
@@ -155,29 +158,61 @@ a2aRouter.post('/a2a', async (c) => {
 
   const { id, method, params } = request;
 
-  // Route to appropriate handler
+  // Route to appropriate handler with runtime params validation
   let response: A2AJsonRpcResponse | Response;
 
   switch (method) {
-    case 'message/send':
-      response = await handleMessageSend(c, id, params as MessageSendParams);
+    case 'message/send': {
+      const validated = validateParams(messageSendParamsSchema, params);
+      if (!validated.success) {
+        response = createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, validated.error);
+        break;
+      }
+      response = await handleMessageSend(c, id, validated.data);
       break;
+    }
 
-    case 'message/stream':
+    case 'message/stream': {
+      const validated = validateParams(messageStreamParamsSchema, params);
+      if (!validated.success) {
+        return c.json(
+          createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, validated.error),
+          400
+        );
+      }
       // message/stream returns an SSE Response directly
-      return handleMessageStream(c, id, params as MessageStreamParams);
+      return handleMessageStream(c, id, validated.data);
+    }
 
-    case 'tasks/get':
-      response = await handleTasksGet(c, id, params as TasksGetParams);
+    case 'tasks/get': {
+      const validated = validateParams(tasksGetParamsSchema, params);
+      if (!validated.success) {
+        response = createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, validated.error);
+        break;
+      }
+      response = await handleTasksGet(c, id, validated.data);
       break;
+    }
 
-    case 'tasks/list':
-      response = await handleTasksList(c, id, params as TasksListParams);
+    case 'tasks/list': {
+      const validated = validateParams(tasksListParamsSchema, params);
+      if (!validated.success) {
+        response = createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, validated.error);
+        break;
+      }
+      response = await handleTasksList(c, id, validated.data);
       break;
+    }
 
-    case 'tasks/cancel':
-      response = await handleTasksCancel(c, id, params as TasksCancelParams);
+    case 'tasks/cancel': {
+      const validated = validateParams(tasksCancelParamsSchema, params);
+      if (!validated.success) {
+        response = createErrorResponse(id, A2A_ERROR_CODES.INVALID_PARAMS, validated.error);
+        break;
+      }
+      response = await handleTasksCancel(c, id, validated.data);
       break;
+    }
 
     default:
       response = createErrorResponse(

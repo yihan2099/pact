@@ -256,6 +256,8 @@ contract ERC8004IdentityRegistry is ERC721, IERC8004IdentityRegistry {
         if (!_exists(agentId)) revert AgentNotFound();
         if (ownerOf(agentId) != msg.sender) revert NotAgentOwner();
         if (block.timestamp > deadline) revert SignatureExpired();
+        // SECURITY: Prevent indefinitely valid signatures (max 7 days from now)
+        if (deadline > block.timestamp + 7 days) revert SignatureExpired();
         if (_walletToAgent[newWallet] != 0) revert WalletAlreadyLinked();
 
         // Verify signature from new wallet

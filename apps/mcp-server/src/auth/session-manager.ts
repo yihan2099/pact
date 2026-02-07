@@ -21,6 +21,8 @@ export interface AuthSession {
   createdAt: number;
   /** Session expiration timestamp */
   expiresAt: number;
+  /** IP address from which the session was created (for audit trail) */
+  createdFromIp?: string;
 }
 
 // Session expiration: 24 hours
@@ -48,7 +50,8 @@ function isRedisAvailable(): boolean {
 export async function createSession(
   walletAddress: `0x${string}`,
   isRegistered: boolean,
-  agentId?: string
+  agentId?: string,
+  createdFromIp?: string
 ): Promise<{ sessionId: string; session: AuthSession }> {
   const sessionId = crypto.randomUUID();
   const now = Date.now();
@@ -59,6 +62,7 @@ export async function createSession(
     isRegistered,
     createdAt: now,
     expiresAt: now + SESSION_EXPIRATION_MS,
+    ...(createdFromIp && { createdFromIp }),
   };
 
   const redis = getRedisClient();

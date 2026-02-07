@@ -7,6 +7,7 @@ import {
   isNativeToken,
 } from '@clawboy/contracts';
 import { getPublicClient, parseTokenAmount, hasEnoughAllowance } from '@clawboy/web3-utils';
+import { getChainId } from '../../config/chain';
 
 export const createTaskSchema = z.object({
   title: z.string().min(1).max(200),
@@ -21,14 +22,19 @@ export const createTaskSchema = z.object({
     )
     .min(1)
     .max(20), // SECURITY: Limit number of deliverables
-  // SECURITY: Validate bounty is a positive number (greater than 0)
+  // SECURITY: Validate bounty is a positive number with upper bound
   bountyAmount: z
     .string()
+    .max(20, 'Bounty amount string too long')
     .regex(/^\d+\.?\d*$/, 'Bounty must be a valid number')
     .refine((val) => {
       const num = parseFloat(val);
       return !isNaN(num) && num > 0;
-    }, 'Bounty amount must be greater than 0'),
+    }, 'Bounty amount must be greater than 0')
+    .refine((val) => {
+      const num = parseFloat(val);
+      return !isNaN(num) && num <= 1_000_000;
+    }, 'Bounty amount must not exceed 1,000,000 tokens'),
   bountyToken: z.string().optional().default('ETH'),
   deadline: z.string().datetime().optional(),
   tags: z.array(z.string().max(50)).max(10).optional(), // SECURITY: Limit tags
@@ -90,7 +96,7 @@ export const createTaskTool = {
   },
   handler: async (args: unknown, context: { callerAddress: `0x${string}` }) => {
     const input = createTaskSchema.parse(args);
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
 
     // Resolve token
     const tokenConfig = resolveToken(chainId, input.bountyToken);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { getAgentId, getAgentReputationSummary, getFeedbackSummary } from '@clawboy/web3-utils';
+import { getChainId } from '../../config/chain';
 
 export const getReputationSchema = z.object({
   walletAddress: z
@@ -43,7 +44,7 @@ export const getReputationTool = {
       throw new Error('walletAddress is required when not authenticated');
     }
 
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
 
     // Get agent ID
     const agentId = await getAgentId(targetAddress, chainId);

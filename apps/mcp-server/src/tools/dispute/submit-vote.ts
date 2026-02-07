@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@clawboy/contracts';
 import { getPublicClient, getAgentVoteWeight } from '@clawboy/web3-utils';
 import type { ServerContext } from '../../server';
+import { getChainId } from '../../config/chain';
 
 export const submitVoteSchema = z.object({
   disputeId: z.string().min(1),
@@ -30,7 +31,7 @@ export const submitVoteTool = {
   },
   handler: async (args: unknown, context: ServerContext) => {
     const input = submitVoteSchema.parse(args);
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
     const addresses = getContractAddresses(chainId);
     const publicClient = getPublicClient(chainId);
 

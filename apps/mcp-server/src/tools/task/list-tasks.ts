@@ -69,6 +69,10 @@ export const listTasksTool = {
   handler: async (args: unknown) => {
     const input = listTasksSchema.parse(args);
     const result = await listTasksHandler(input);
-    return result;
+    return {
+      ...result,
+      limit: input.limit,
+      offset: input.offset,
+    };
   },
 };

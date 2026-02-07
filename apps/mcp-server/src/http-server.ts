@@ -36,28 +36,42 @@ import { allTools } from './tools';
 import { logAccessDenied, logSecurityEvent } from './services/security-logger';
 import { a2aRouter } from './a2a';
 import { sanitizeErrorMessage, isUnknownToolError } from './utils/error-sanitizer';
+import { getChainId } from './config/chain';
 
 const app = new Hono();
 
+// SECURITY: Validate NODE_ENV against allowlist
+const VALID_NODE_ENVS = ['development', 'staging', 'production', 'test'];
+const nodeEnv = process.env.NODE_ENV || 'development';
+if (!VALID_NODE_ENVS.includes(nodeEnv)) {
+  console.error(
+    `FATAL: Invalid NODE_ENV value: "${nodeEnv}". ` +
+      `Must be one of: ${VALID_NODE_ENVS.join(', ')}`
+  );
+  process.exit(1);
+}
+
 // SECURITY: Configure CORS with allowed origins from environment
+// Both production and staging require explicit CORS_ORIGINS
+const requireExplicitCors = nodeEnv === 'production' || nodeEnv === 'staging';
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-  : process.env.NODE_ENV === 'production'
+  : requireExplicitCors
     ? null // FAIL-CLOSED: null means startup will fail
-    : ['*']; // Default to all for development only
+    : ['*']; // Default to all for development/test only
 
-// SECURITY: Fail-closed in production if CORS_ORIGINS not configured
+// SECURITY: Fail-closed in production/staging if CORS_ORIGINS not configured
 if (allowedOrigins === null) {
   console.error(
-    'FATAL: CORS_ORIGINS environment variable is required in production. ' +
+    `FATAL: CORS_ORIGINS environment variable is required in ${nodeEnv}. ` +
       'Set it to a comma-separated list of allowed origins (e.g., "https://pact.dev,https://app.pact.dev"). ' +
-      'Server will not start without proper CORS configuration in production.'
+      `Server will not start without proper CORS configuration in ${nodeEnv}.`
   );
   process.exit(1);
 }
 
 // Validate CORS origins format
-if (process.env.NODE_ENV === 'production' && allowedOrigins) {
+if (requireExplicitCors && allowedOrigins) {
   for (const origin of allowedOrigins) {
     if (origin === '*') {
       console.error('SECURITY WARNING: Wildcard CORS origin not allowed in production');
@@ -134,6 +148,13 @@ app.use('/*', async (c, next) => {
   }
 });
 
+// Request ID correlation middleware
+app.use('/*', async (c, next) => {
+  const requestId = c.req.header('X-Request-Id') || crypto.randomUUID();
+  await next();
+  c.res.headers.set('X-Request-Id', requestId);
+});
+
 // SECURITY: Whether to trust proxy headers for client IP detection
 // Only enable if behind a trusted reverse proxy that overwrites these headers
 const TRUST_PROXY_HEADERS = process.env.TRUST_PROXY_HEADERS === 'true';
@@ -167,6 +188,30 @@ function getClientIp(c: { req: { header: (name: string) => string | undefined } 
   return 'unknown-client';
 }
 
+// SECURITY: Body size limit middleware (1MB max for all API routes)
+const MAX_BODY_SIZE = 1_048_576; // 1MB in bytes
+app.use('/tools/*', async (c, next) => {
+  const contentLength = c.req.header('Content-Length');
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return c.json({ error: 'Payload Too Large', maxSize: '1MB' }, 413);
+  }
+  await next();
+});
+app.use('/a2a', async (c, next) => {
+  const contentLength = c.req.header('Content-Length');
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return c.json({ error: 'Payload Too Large', maxSize: '1MB' }, 413);
+  }
+  await next();
+});
+app.use('/mcp', async (c, next) => {
+  const contentLength = c.req.header('Content-Length');
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return c.json({ error: 'Payload Too Large', maxSize: '1MB' }, 413);
+  }
+  await next();
+});
+
 // SECURITY: Request logging middleware
 app.use('/tools/*', async (c, next) => {
   const start = Date.now();
@@ -180,6 +225,7 @@ app.use('/tools/*', async (c, next) => {
   const status = c.res.status;
 
   // Log request (structured for log aggregation)
+  const requestId = c.res.headers.get('X-Request-Id') || undefined;
   logSecurityEvent({
     type: status >= 400 ? 'access_denied' : 'auth_challenge_requested',
     timestamp: new Date().toISOString(),
@@ -190,6 +236,7 @@ app.use('/tools/*', async (c, next) => {
       method: c.req.method,
       status,
       duration,
+      requestId,
     },
   });
 });
@@ -249,7 +296,7 @@ app.get('/health', async (c) => {
   try {
     const start = Date.now();
     const { getBlockNumber } = await import('@clawboy/web3-utils');
-    const chainId = parseInt(process.env.CHAIN_ID || '84532');
+    const chainId = getChainId();
     const blockNumber = await getBlockNumber(chainId);
     checks.rpc = {
       status: 'ok',

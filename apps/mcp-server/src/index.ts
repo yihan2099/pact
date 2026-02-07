@@ -26,6 +26,15 @@ async function main() {
   console.error('Starting Pact MCP Server...');
   console.error(`Environment: ${process.env.NODE_ENV || 'development'}`);
 
+  // SECURITY: Warn if running in production without Redis
+  if (process.env.NODE_ENV === 'production' && !process.env.UPSTASH_REDIS_REST_URL) {
+    console.error(
+      '⚠️  WARNING: Running in production without Redis (UPSTASH_REDIS_REST_URL not set). ' +
+        'Session and challenge data will use in-memory fallback, which is NOT suitable for ' +
+        'multi-instance deployments. Sessions will be lost on restart.'
+    );
+  }
+
   const httpPort = parseInt(process.env.PORT || '3001');
   const enableStdio = process.env.ENABLE_STDIO !== 'false';
 

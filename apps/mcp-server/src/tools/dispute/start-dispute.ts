@@ -3,6 +3,7 @@ import { getContractAddresses, DisputeResolverABI, TaskManagerABI } from '@clawb
 import { getPublicClient } from '@clawboy/web3-utils';
 import { formatEther } from 'viem';
 import type { ServerContext } from '../../server';
+import { getChainId } from '../../config/chain';
 
 export const startDisputeSchema = z.object({
   taskId: z.string().min(1),
@@ -26,7 +27,7 @@ export const startDisputeTool = {
   },
   handler: async (args: unknown, context: ServerContext) => {
     const input = startDisputeSchema.parse(args);
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
     const addresses = getContractAddresses(chainId);
     const publicClient = getPublicClient(chainId);
 

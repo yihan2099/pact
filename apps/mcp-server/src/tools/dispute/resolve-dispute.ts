@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getContractAddresses, DisputeResolverABI } from '@clawboy/contracts';
 import { getPublicClient } from '@clawboy/web3-utils';
 import { formatEther } from 'viem';
+import { getChainId } from '../../config/chain';
 
 export const resolveDisputeSchema = z.object({
   disputeId: z.string().min(1),
@@ -24,7 +25,7 @@ export const resolveDisputeTool = {
   },
   handler: async (args: unknown) => {
     const input = resolveDisputeSchema.parse(args);
-    const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+    const chainId = getChainId();
     const addresses = getContractAddresses(chainId);
     const publicClient = getPublicClient(chainId);
 

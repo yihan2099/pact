@@ -13,10 +13,15 @@ const CHALLENGE_EXPIRATION_SECONDS = 5 * 60;
 // Maximum active challenges per address (prevents DoS)
 const MAX_CHALLENGES_PER_ADDRESS = 3;
 
+// SECURITY: Hourly challenge rate limit (sliding window)
+const MAX_CHALLENGES_PER_HOUR = 20;
+const HOURLY_WINDOW_SECONDS = 3600;
+
 // Redis key prefixes
 const CHALLENGE_PREFIX = 'challenge:';
 const WALLET_CHALLENGES_PREFIX = 'wallet:';
 const WALLET_CHALLENGES_SUFFIX = ':challenges';
+const HOURLY_RATE_SUFFIX = ':challenge_hourly';
 
 // In-memory fallback storage (used when Redis unavailable)
 const memoryChallenges = new Map<
@@ -24,6 +29,8 @@ const memoryChallenges = new Map<
   { address: string; createdAt: number; expiresAt: number }
 >();
 const memoryWalletChallenges = new Map<string, Set<string>>(); // address -> set of nonces
+// In-memory hourly rate tracking: address -> list of timestamps
+const memoryHourlyRate = new Map<string, number[]>();
 
 /**
  * Check if Redis is available
@@ -174,6 +181,39 @@ async function deleteChallenge(nonce: string, normalizedAddress: string): Promis
 }
 
 /**
+ * SECURITY: Check hourly challenge rate for an address (sliding window)
+ */
+async function checkHourlyChallengeRate(normalizedAddress: string): Promise<number> {
+  const redis = getRedisClient();
+
+  if (redis) {
+    try {
+      const hourlyKey = `${WALLET_CHALLENGES_PREFIX}${normalizedAddress}${HOURLY_RATE_SUFFIX}`;
+      const count = await redis.incr(hourlyKey);
+      // Set TTL on first increment
+      if (count === 1) {
+        await redis.expire(hourlyKey, HOURLY_WINDOW_SECONDS);
+      }
+      return count;
+    } catch (error) {
+      console.warn('Redis error in checkHourlyChallengeRate, falling back to memory:', error);
+    }
+  }
+
+  // Fallback to in-memory storage
+  const now = Date.now();
+  const windowStart = now - HOURLY_WINDOW_SECONDS * 1000;
+  let timestamps = memoryHourlyRate.get(normalizedAddress) || [];
+
+  // Remove expired entries
+  timestamps = timestamps.filter((t) => t > windowStart);
+  timestamps.push(now);
+  memoryHourlyRate.set(normalizedAddress, timestamps);
+
+  return timestamps.length;
+}
+
+/**
  * Generate a new authentication challenge for a wallet address
  * SECURITY: Each challenge is unique by nonce, preventing overwrite attacks
  */
@@ -183,6 +223,14 @@ export async function generateChallenge(address: `0x${string}`): Promise<{
   expiresAt: number;
 }> {
   const normalizedAddress = address.toLowerCase();
+
+  // SECURITY: Check hourly sliding window rate limit
+  const hourlyCount = await checkHourlyChallengeRate(normalizedAddress);
+  if (hourlyCount > MAX_CHALLENGES_PER_HOUR) {
+    throw new Error(
+      'Too many challenge requests. Please wait before requesting more challenges (limit: 20/hour).'
+    );
+  }
 
   // SECURITY: Limit active challenges per address to prevent DoS
   const activeCount = await getActiveChallengeCountForAddress(normalizedAddress);

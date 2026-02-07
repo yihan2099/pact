@@ -6,6 +6,7 @@
  */
 
 import { getSupportedTokens, type TokenConfig } from '@clawboy/contracts';
+import { getChainId } from '../../config/chain';
 
 export interface GetSupportedTokensInput {
   // No input required - uses current chain from environment
@@ -26,7 +27,7 @@ export interface GetSupportedTokensOutput {
  * Handler for get_supported_tokens tool
  */
 export async function getSupportedTokensHandler(): Promise<GetSupportedTokensOutput> {
-  const chainId = parseInt(process.env.CHAIN_ID || '84532', 10);
+  const chainId = getChainId();
   const tokens = getSupportedTokens(chainId);
 
   return {
