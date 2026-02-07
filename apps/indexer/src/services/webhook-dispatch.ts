@@ -6,10 +6,7 @@
  */
 
 import type { IndexerEvent } from '../listener';
-import {
-  getTaskByChainId,
-  getDisputeByChainId,
-} from '@clawboy/database';
+import { getTaskByChainId, getDisputeByChainId } from '@clawboy/database';
 import {
   notifyTaskCreated,
   notifyWorkSubmitted,
@@ -56,11 +53,7 @@ export function dispatchWebhookNotifications(event: IndexerEvent): void {
           };
           const task = await getTaskByChainId(taskId.toString(), event.chainId);
           if (task) {
-            await notifyWorkSubmitted(
-              taskId.toString(),
-              task.creator_address,
-              agent.toLowerCase()
-            );
+            await notifyWorkSubmitted(taskId.toString(), task.creator_address, agent.toLowerCase());
           }
           break;
         }
@@ -72,11 +65,7 @@ export function dispatchWebhookNotifications(event: IndexerEvent): void {
           };
           const task = await getTaskByChainId(taskId.toString(), event.chainId);
           if (task) {
-            await notifyWinnerSelected(
-              taskId.toString(),
-              task.id,
-              winner.toLowerCase()
-            );
+            await notifyWinnerSelected(taskId.toString(), task.id, winner.toLowerCase());
           }
           break;
         }

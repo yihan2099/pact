@@ -4,10 +4,10 @@ Shared ESLint configuration for the Pact monorepo. Uses ESLint 9 flat config wit
 
 ## Exports
 
-| Export path | Description                    |
-| ----------- | ------------------------------ |
-| `.`         | Base config (TS/TSX)           |
-| `./node`    | Node.js-specific config        |
+| Export path | Description             |
+| ----------- | ----------------------- |
+| `.`         | Base config (TS/TSX)    |
+| `./node`    | Node.js-specific config |
 
 ## Usage
 

@@ -50,10 +50,7 @@ async function signPayload(payload: string, secret: string): Promise<string> {
 /**
  * Send a webhook to a single agent (fire-and-forget)
  */
-async function deliverWebhook(
-  agent: AgentWebhookInfo,
-  payload: WebhookPayload
-): Promise<void> {
+async function deliverWebhook(agent: AgentWebhookInfo, payload: WebhookPayload): Promise<void> {
   const payloadJson = JSON.stringify(payload);
 
   const headers: Record<string, string> = {
@@ -117,9 +114,7 @@ async function deliverWebhook(
     }
 
     if (!response.ok) {
-      console.warn(
-        `Webhook delivery to ${agent.address} returned ${response.status}`
-      );
+      console.warn(`Webhook delivery to ${agent.address} returned ${response.status}`);
     }
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -143,16 +138,14 @@ function notifyAgents(agents: AgentWebhookInfo[], payload: WebhookPayload): void
   if (agents.length === 0) return;
 
   // Fire-and-forget: don't await, just log errors
-  Promise.allSettled(agents.map((agent) => deliverWebhook(agent, payload))).then(
-    (results) => {
-      const failures = results.filter((r) => r.status === 'rejected');
-      if (failures.length > 0) {
-        console.warn(
-          `${failures.length}/${agents.length} webhook deliveries failed for ${payload.event}`
-        );
-      }
+  Promise.allSettled(agents.map((agent) => deliverWebhook(agent, payload))).then((results) => {
+    const failures = results.filter((r) => r.status === 'rejected');
+    if (failures.length > 0) {
+      console.warn(
+        `${failures.length}/${agents.length} webhook deliveries failed for ${payload.event}`
+      );
     }
-  );
+  });
 }
 
 // ============ Event-specific notification functions ============

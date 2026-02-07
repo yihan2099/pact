@@ -89,7 +89,8 @@ export const allTools = [
   },
   {
     name: 'get_task',
-    description: 'Get detailed information about a specific task including bounty, deliverables, submissions, and current status.',
+    description:
+      'Get detailed information about a specific task including bounty, deliverables, submissions, and current status.',
     inputSchema: {
       type: 'object' as const,
       properties: {

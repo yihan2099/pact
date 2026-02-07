@@ -14,7 +14,9 @@ export async function handleTaskDisputed(event: IndexerEvent): Promise<void> {
     disputeId: bigint;
   };
 
-  console.log(`Processing TaskDisputed: taskId=${taskId}, disputer=${disputer}, disputeId=${disputeId}`);
+  console.log(
+    `Processing TaskDisputed: taskId=${taskId}, disputer=${disputer}, disputeId=${disputeId}`
+  );
 
   // Find task in database
   const task = await getTaskByChainId(taskId.toString(), event.chainId);

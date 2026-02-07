@@ -4,11 +4,11 @@ Supabase client and query functions for Pact. Provides typed database access for
 
 ## Exports
 
-| Export path  | Description                              |
-| ------------ | ---------------------------------------- |
-| `.`          | Client, schema types, and all queries    |
-| `./client`   | Supabase client factory                  |
-| `./queries`  | Query modules (tasks, agents, disputes, submissions, sync state, events, statistics) |
+| Export path | Description                                                                          |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `.`         | Client, schema types, and all queries                                                |
+| `./client`  | Supabase client factory                                                              |
+| `./queries` | Query modules (tasks, agents, disputes, submissions, sync state, events, statistics) |
 
 ## Environment Variables
 

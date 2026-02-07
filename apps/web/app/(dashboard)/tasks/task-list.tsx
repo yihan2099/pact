@@ -114,9 +114,7 @@ export function TaskList({
               }}
             >
               {opt.label}
-              {currentSort === opt.value && (
-                <ArrowUpDown className="h-3 w-3 ml-0.5" />
-              )}
+              {currentSort === opt.value && <ArrowUpDown className="h-3 w-3 ml-0.5" />}
             </Button>
           ))}
         </div>
@@ -139,10 +137,7 @@ export function TaskList({
               <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full py-4">
                 <CardContent className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <Badge
-                      variant="outline"
-                      className={getStatusColor(task.status)}
-                    >
+                    <Badge variant="outline" className={getStatusColor(task.status)}>
                       {formatStatus(task.status)}
                     </Badge>
                     <span className="text-sm font-semibold text-primary whitespace-nowrap">

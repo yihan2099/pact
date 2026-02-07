@@ -29,17 +29,13 @@ export async function getAgentsWithWebhooks(): Promise<AgentWebhookInfo[]> {
     throw new Error(`Failed to get agents with webhooks: ${error.message}`);
   }
 
-  return (data ?? []).filter(
-    (a): a is AgentWebhookInfo => a.webhook_url !== null
-  );
+  return (data ?? []).filter((a): a is AgentWebhookInfo => a.webhook_url !== null);
 }
 
 /**
  * Get webhook info for a specific agent
  */
-export async function getAgentWebhookInfo(
-  address: string
-): Promise<AgentWebhookInfo | null> {
+export async function getAgentWebhookInfo(address: string): Promise<AgentWebhookInfo | null> {
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
@@ -82,9 +78,7 @@ export async function getAgentsWebhookInfoByAddresses(
     throw new Error(`Failed to get agents webhook info: ${error.message}`);
   }
 
-  return (data ?? []).filter(
-    (a): a is AgentWebhookInfo => a.webhook_url !== null
-  );
+  return (data ?? []).filter((a): a is AgentWebhookInfo => a.webhook_url !== null);
 }
 
 /**
@@ -113,14 +107,16 @@ export async function createWebhookDelivery(
  */
 export async function updateWebhookDelivery(
   id: string,
-  updates: Partial<Pick<WebhookDeliveryRow, 'status' | 'status_code' | 'error_message' | 'attempt' | 'next_retry_at' | 'delivered_at'>>
+  updates: Partial<
+    Pick<
+      WebhookDeliveryRow,
+      'status' | 'status_code' | 'error_message' | 'attempt' | 'next_retry_at' | 'delivered_at'
+    >
+  >
 ): Promise<void> {
   const supabase = getWriteClient();
 
-  const { error } = await supabase
-    .from('webhook_deliveries')
-    .update(updates)
-    .eq('id', id);
+  const { error } = await supabase.from('webhook_deliveries').update(updates).eq('id', id);
 
   if (error) {
     throw new Error(`Failed to update webhook delivery: ${error.message}`);
@@ -130,9 +126,7 @@ export async function updateWebhookDelivery(
 /**
  * Get pending webhook deliveries ready for retry
  */
-export async function getRetryableWebhookDeliveries(
-  limit = 50
-): Promise<WebhookDeliveryRow[]> {
+export async function getRetryableWebhookDeliveries(limit = 50): Promise<WebhookDeliveryRow[]> {
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase

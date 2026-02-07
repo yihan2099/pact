@@ -38,7 +38,8 @@ interface DisputeListProps {
 
 function getDisputeStatusColor(status: string, disputerWon: boolean | null) {
   if (status === 'active') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-  if (status === 'resolved' && disputerWon) return 'bg-green-500/10 text-green-500 border-green-500/20';
+  if (status === 'resolved' && disputerWon)
+    return 'bg-green-500/10 text-green-500 border-green-500/20';
   if (status === 'resolved' && !disputerWon) return 'bg-red-500/10 text-red-500 border-red-500/20';
   return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
 }
@@ -96,9 +97,7 @@ export function DisputeList({
       </p>
 
       {disputes.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          No disputes found.
-        </div>
+        <div className="text-center py-12 text-muted-foreground">No disputes found.</div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {disputes.map((dispute) => {
@@ -124,9 +123,7 @@ export function DisputeList({
                     </div>
 
                     <div>
-                      <div className="text-sm font-medium">
-                        Task #{dispute.task_id.slice(0, 8)}
-                      </div>
+                      <div className="text-sm font-medium">Task #{dispute.task_id.slice(0, 8)}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Disputer: {truncateAddress(dispute.disputer_address)}
                       </div>

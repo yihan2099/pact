@@ -17,11 +17,7 @@ interface DisputesPageProps {
 
 const PAGE_SIZE = 12;
 
-async function listAllDisputes(options: {
-  status?: string;
-  limit: number;
-  offset: number;
-}) {
+async function listAllDisputes(options: { status?: string; limit: number; offset: number }) {
   if (options.status === 'resolved') {
     const supabase = getSupabaseClient();
     const { data, error, count } = await supabase

@@ -4,11 +4,11 @@ TypeScript package providing contract ABIs, addresses, token configurations, and
 
 ## Exports
 
-| Export path   | Description                                         |
-| ------------- | --------------------------------------------------- |
-| `.`           | Everything (ABIs, addresses, types, tokens)         |
-| `./abis`      | Contract ABIs (TaskManager, EscrowVault, etc.)      |
-| `./addresses` | Deployed addresses (Base Sepolia, local Anvil)      |
+| Export path   | Description                                    |
+| ------------- | ---------------------------------------------- |
+| `.`           | Everything (ABIs, addresses, types, tokens)    |
+| `./abis`      | Contract ABIs (TaskManager, EscrowVault, etc.) |
+| `./addresses` | Deployed addresses (Base Sepolia, local Anvil) |
 
 ## Usage
 

@@ -40,9 +40,7 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
     return (
       <Card className="border-muted">
         <CardContent className="py-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            You cannot vote on your own dispute.
-          </p>
+          <p className="text-sm text-muted-foreground">You cannot vote on your own dispute.</p>
         </CardContent>
       </Card>
     );

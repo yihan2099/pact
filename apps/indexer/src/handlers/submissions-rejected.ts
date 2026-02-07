@@ -13,7 +13,9 @@ export async function handleAllSubmissionsRejected(event: IndexerEvent): Promise
     reason: string;
   };
 
-  console.log(`Processing AllSubmissionsRejected: taskId=${taskId}, creator=${creator}, reason=${reason}`);
+  console.log(
+    `Processing AllSubmissionsRejected: taskId=${taskId}, creator=${creator}, reason=${reason}`
+  );
 
   // Find task in database
   const task = await getTaskByChainId(taskId.toString(), event.chainId);

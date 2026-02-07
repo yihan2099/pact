@@ -19,7 +19,9 @@ export async function handleWorkSubmitted(event: IndexerEvent): Promise<void> {
     submissionIndex: bigint;
   };
 
-  console.log(`Processing WorkSubmitted: taskId=${taskId}, agent=${agent}, index=${submissionIndex}`);
+  console.log(
+    `Processing WorkSubmitted: taskId=${taskId}, agent=${agent}, index=${submissionIndex}`
+  );
 
   // Find task in database (filter by chainId for multi-chain support)
   const task = await getTaskByChainId(taskId.toString(), event.chainId);

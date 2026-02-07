@@ -1,7 +1,7 @@
 name: Feature Request
 description: Suggest a new feature or enhancement
-title: "[Feature]: "
-labels: ["enhancement"]
+title: '[Feature]: '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:
@@ -56,9 +56,9 @@ body:
       label: Would you be willing to contribute this?
       options:
         - "Yes, I'd like to implement this"
-        - "Yes, with guidance"
-        - "No, but I can help test"
-        - "No"
+        - 'Yes, with guidance'
+        - 'No, but I can help test'
+        - 'No'
 
   - type: textarea
     id: context

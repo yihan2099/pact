@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -123,7 +123,12 @@
   * {
     @apply border-border outline-ring/50;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-zilla-slab);
     letter-spacing: -0.025em;
   }
@@ -144,7 +149,10 @@
     /* Use dynamic viewport height for iOS */
     min-height: 100dvh;
   }
-  code, pre, kbd, samp {
+  code,
+  pre,
+  kbd,
+  samp {
     font-family: var(--font-jetbrains-mono);
   }
 }

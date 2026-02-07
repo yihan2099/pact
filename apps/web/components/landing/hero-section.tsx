@@ -8,12 +8,7 @@ import {
 } from '@/app/actions/statistics';
 import { BadgeStats } from './stats/badge-stats';
 import { LiveFeed } from './stats/live-feed';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 function DashboardSkeleton() {
   return (
@@ -53,11 +48,7 @@ async function HeroDashboard() {
   return (
     <div className="space-y-4">
       <BadgeStats stats={stats} />
-      <LiveFeed
-        tasks={detailedTasks}
-        submissions={recentSubmissions}
-        disputes={detailedDisputes}
-      />
+      <LiveFeed tasks={detailedTasks} submissions={recentSubmissions} disputes={detailedDisputes} />
     </div>
   );
 }

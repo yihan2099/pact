@@ -190,7 +190,9 @@ function ExpandedDetails({ item }: ExpandedDetailsProps) {
       const sub = item.data as SubmissionWithTask;
       return (
         <>
-          <span className="font-mono text-muted-foreground">{truncateAddress(sub.agent_address)}</span>
+          <span className="font-mono text-muted-foreground">
+            {truncateAddress(sub.agent_address)}
+          </span>
           {item.type === 'submission_won' && item.bounty && (
             <>
               <span className="text-muted-foreground/40">·</span>
@@ -226,9 +228,7 @@ function ExpandedDetails({ item }: ExpandedDetailsProps) {
   return (
     <div className="px-3 pb-3 pt-1 space-y-3">
       {/* Full title */}
-      <p className="text-sm text-foreground leading-relaxed">
-        {item.fullTitle}
-      </p>
+      <p className="text-sm text-foreground leading-relaxed">{item.fullTitle}</p>
 
       {/* Meta info */}
       <div className="flex items-center gap-2 text-xs">
@@ -238,9 +238,7 @@ function ExpandedDetails({ item }: ExpandedDetailsProps) {
       </div>
 
       {/* Links */}
-      <div className="flex flex-wrap gap-1.5">
-        {renderLinks()}
-      </div>
+      <div className="flex flex-wrap gap-1.5">{renderLinks()}</div>
     </div>
   );
 }
@@ -294,9 +292,7 @@ function ExpandableRow({ item, isExpanded, onToggle }: ExpandableRowProps) {
         </span>
 
         {/* Title */}
-        <span className="flex-1 text-sm text-foreground truncate">
-          {item.title}
-        </span>
+        <span className="flex-1 text-sm text-foreground truncate">{item.title}</span>
 
         {/* Bounty */}
         {item.bounty && (

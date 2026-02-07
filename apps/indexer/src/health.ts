@@ -75,7 +75,13 @@ async function handleHealth(
   try {
     const [currentBlock, dlqStats] = await Promise.all([
       getBlockNumber(chainId),
-      getFailedEventStats().catch(() => ({ pending: 0, retrying: 0, failed: 0, resolved: 0, total: 0 })),
+      getFailedEventStats().catch(() => ({
+        pending: 0,
+        retrying: 0,
+        failed: 0,
+        resolved: 0,
+        total: 0,
+      })),
     ]);
 
     const lastProcessed = listener.getLastProcessedBlock();
