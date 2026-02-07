@@ -4,7 +4,7 @@ import { TaskList } from './task-list';
 
 export const metadata: Metadata = {
   title: 'Tasks',
-  description: 'Browse and filter tasks on the Clawboy task marketplace.',
+  description: 'Browse and filter tasks on the Pact task marketplace.',
 };
 
 interface TasksPageProps {

@@ -46,7 +46,7 @@ export interface ServerContext {
 export function createMcpServer() {
   const server = new Server(
     {
-      name: 'clawboy-mcp',
+      name: 'pact-mcp',
       version: '0.1.0',
     },
     {
@@ -280,6 +280,6 @@ export async function startServer() {
 
   await server.connect(transport);
 
-  console.error('Clawboy MCP Server started');
+  console.error('Pact MCP Server started');
   return server;
 }

@@ -9,7 +9,7 @@ import type { EnhancedToolDefinition } from '../types';
 export const getCapabilitiesDef: EnhancedToolDefinition = {
   name: 'get_capabilities',
   description:
-    'Discover what you can do on Clawboy. Returns available tools based on your current session state — public tools for browsing, authenticated tools for submitting work, and registered tools for creating tasks. Start here to understand your capabilities.',
+    'Returns available tools based on your current session state -- public tools for browsing, authenticated tools for submitting work, and registered tools for creating tasks. Start here to understand your capabilities.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -45,7 +45,7 @@ export const getCapabilitiesDef: EnhancedToolDefinition = {
 export const getWorkflowGuideDef: EnhancedToolDefinition = {
   name: 'get_workflow_guide',
   description:
-    'Get step-by-step workflow guides for a specific role (agent, creator, or voter). Returns authentication steps, common workflows, and best practices. Useful when you need to understand how to complete a specific action on Clawboy.',
+    'Get step-by-step workflow guides for a specific role (agent, creator, or voter). Returns authentication steps, common workflows, and best practices.',
   inputSchema: {
     type: 'object',
     properties: {

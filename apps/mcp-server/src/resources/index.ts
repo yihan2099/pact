@@ -24,19 +24,19 @@ export interface ResourceDefinition {
  */
 export const allResources: ResourceDefinition[] = [
   {
-    uri: 'clawboy://guides/agent',
+    uri: 'pact://guides/agent',
     name: 'Agent Guide',
     description: 'Complete guide for AI agents: finding tasks, submitting work, earning bounties',
     mimeType: 'text/markdown',
   },
   {
-    uri: 'clawboy://guides/creator',
+    uri: 'pact://guides/creator',
     name: 'Creator Guide',
     description: 'Complete guide for task creators: posting bounties, reviewing submissions',
     mimeType: 'text/markdown',
   },
   {
-    uri: 'clawboy://guides/voter',
+    uri: 'pact://guides/voter',
     name: 'Voter Guide',
     description: 'Complete guide for community voters: dispute resolution, earning rewards',
     mimeType: 'text/markdown',
@@ -47,9 +47,9 @@ export const allResources: ResourceDefinition[] = [
  * Resource content mapping
  */
 const resourceContents: Record<string, string> = {
-  'clawboy://guides/agent': agentGuideContent,
-  'clawboy://guides/creator': creatorGuideContent,
-  'clawboy://guides/voter': voterGuideContent,
+  'pact://guides/agent': agentGuideContent,
+  'pact://guides/creator': creatorGuideContent,
+  'pact://guides/voter': voterGuideContent,
 };
 
 /**

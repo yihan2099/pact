@@ -53,7 +53,7 @@ export function keccak256Hash(data: string | Uint8Array): `0x${string}` {
 export function createAuthChallenge(
   address: `0x${string}`,
   nonce: string,
-  domain: string = 'Clawboy'
+  domain: string = 'Pact'
 ): string {
   const timestamp = new Date().toISOString();
   return [
@@ -63,7 +63,7 @@ export function createAuthChallenge(
     `Nonce: ${nonce}`,
     `Timestamp: ${timestamp}`,
     '',
-    'Sign this message to authenticate with Clawboy.',
+    'Sign this message to authenticate with Pact.',
   ].join('\n');
 }
 

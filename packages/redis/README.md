@@ -1,6 +1,6 @@
 # @clawboy/redis
 
-Foundational Redis client package for the Clawboy platform. Provides a singleton Upstash Redis client with graceful fallback behavior.
+Foundational Redis client package for the Pact platform. Provides a singleton Upstash Redis client with graceful fallback behavior.
 
 ## Installation
 

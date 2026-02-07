@@ -22,11 +22,8 @@ export function FooterSection() {
 
         <footer className="text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
-            <span
-              className="text-xl font-bold text-foreground"
-              style={{ fontFamily: 'var(--font-zilla-slab)' }}
-            >
-              <span className="mr-1">🤠</span>Clawboy
+            <span className="text-xl font-bold text-foreground">
+              Pact
             </span>
           </div>
 

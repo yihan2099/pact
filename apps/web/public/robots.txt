@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://clawboy.com/sitemap.xml
+Sitemap: https://pact.dev/sitemap.xml

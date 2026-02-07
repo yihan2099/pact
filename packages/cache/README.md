@@ -1,6 +1,6 @@
 # @clawboy/cache
 
-Caching layer for the Clawboy platform. Provides Redis-first caching with automatic in-memory fallback when Redis is unavailable.
+Caching layer for the Pact platform. Provides Redis-first caching with automatic in-memory fallback when Redis is unavailable.
 
 ## Installation
 

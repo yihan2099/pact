@@ -1,7 +1,7 @@
 /**
  * A2A Protocol Module
  *
- * Agent-to-Agent (A2A) Protocol implementation for Clawboy.
+ * Agent-to-Agent (A2A) Protocol implementation for Pact.
  * Enables cross-platform agent communication via standard A2A protocol.
  */
 

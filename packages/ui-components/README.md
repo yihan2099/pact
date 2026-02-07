@@ -1,6 +1,6 @@
 # @clawboy/ui-components
 
-Shared React UI components for Clawboy web applications.
+Shared React UI components for Pact web applications.
 
 ## Status
 

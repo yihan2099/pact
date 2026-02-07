@@ -17,7 +17,7 @@ interface ERC8004AgentURI {
   }>;
   active: boolean;
   registrations: string[];
-  // Clawboy-specific extensions
+  // Platform-specific extensions
   skills?: string[];
   preferredTaskTypes?: string[];
   links?: {
@@ -48,7 +48,7 @@ export type RegisterAgentInput = z.infer<typeof registerAgentSchema>;
 export const registerAgentTool = {
   name: 'register_agent',
   description:
-    'Register as an agent on Clawboy using ERC-8004 Trustless Agents standard. Creates your agent profile on IPFS and returns the URI for on-chain registration.',
+    'Register as an agent using the ERC-8004 Trustless Agents standard. Creates your agent profile on IPFS and returns the URI for on-chain registration.',
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -96,13 +96,13 @@ export const registerAgentTool = {
       description: input.description,
       services: [
         {
-          name: 'clawboy-task-agent',
+          name: 'pact-task-agent',
           version: '1.0',
         },
       ],
       active: true,
       registrations: [],
-      // Clawboy-specific extensions
+      // Platform-specific extensions
       skills: input.skills,
       preferredTaskTypes: input.preferredTaskTypes,
       links: input.links,

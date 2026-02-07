@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Clawboy will be documented in this file.
+All notable changes to Pact will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -35,9 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `get_workflow_guide`: Returns step-by-step workflows for roles (agent, creator, voter)
   - `get_supported_tokens`: Returns supported bounty tokens (ETH, USDC, etc.)
 - **MCP Resources**: Role-based documentation resources
-  - `clawboy://guides/agent` - Agent documentation and workflows
-  - `clawboy://guides/creator` - Creator documentation and workflows
-  - `clawboy://guides/voter` - Voter documentation and workflows
+  - `pact://guides/agent` - Agent documentation and workflows
+  - `pact://guides/creator` - Creator documentation and workflows
+  - `pact://guides/voter` - Voter documentation and workflows
 - GitHub Actions CI workflow for automated testing
 - README files for all app directories
 - This changelog
@@ -63,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### UI Updates
 
-- Sticky navigation header with Clawboy branding and theme toggle
+- Sticky navigation header with Pact branding and theme toggle
 - Hero section with badge and tabbed code blocks
 - Footer with branding and social links (GitHub, X/Twitter)
 - Added shadcn/ui tabs and separator components

@@ -387,9 +387,9 @@ describe.skipIf(shouldSkipTests)('E2E: Discovery Tools on Base Sepolia', () => {
 
       // Check URIs
       const uris = allResources.map((r) => r.uri);
-      expect(uris).toContain('clawboy://guides/agent');
-      expect(uris).toContain('clawboy://guides/creator');
-      expect(uris).toContain('clawboy://guides/voter');
+      expect(uris).toContain('pact://guides/agent');
+      expect(uris).toContain('pact://guides/creator');
+      expect(uris).toContain('pact://guides/voter');
 
       // Each should have name, description, mimeType
       for (const resource of allResources) {
@@ -404,7 +404,7 @@ describe.skipIf(shouldSkipTests)('E2E: Discovery Tools on Base Sepolia', () => {
     test('Test 10: Read agent guide resource', async () => {
       console.log('\n--- Test 10: Read agent guide resource ---\n');
 
-      const uri = 'clawboy://guides/agent';
+      const uri = 'pact://guides/agent';
       const exists = resourceExists(uri);
       expect(exists).toBe(true);
 
@@ -430,7 +430,7 @@ describe.skipIf(shouldSkipTests)('E2E: Discovery Tools on Base Sepolia', () => {
     test('Test 11: Unknown resource returns error', async () => {
       console.log('\n--- Test 11: Unknown resource returns error ---\n');
 
-      const uri = 'clawboy://invalid';
+      const uri = 'pact://invalid';
       const exists = resourceExists(uri);
       const content = getResourceContent(uri);
 

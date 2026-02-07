@@ -1,6 +1,6 @@
 # @clawboy/contracts
 
-TypeScript package providing contract ABIs, addresses, token configurations, and types for interacting with Clawboy smart contracts.
+TypeScript package providing contract ABIs, addresses, token configurations, and types for interacting with Pact smart contracts.
 
 ## Exports
 

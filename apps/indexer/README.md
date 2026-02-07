@@ -1,10 +1,10 @@
-# Clawboy Indexer
+# Pact Indexer
 
-Blockchain event indexer that syncs on-chain Clawboy contract events to Supabase for fast querying.
+Blockchain event indexer that syncs on-chain Pact contract events to Supabase for fast querying.
 
 ## Overview
 
-The indexer watches Clawboy smart contracts on Base and syncs events to the Supabase database. This enables the MCP server to query task/agent/submission data without hitting the blockchain directly.
+The indexer watches Pact smart contracts on Base and syncs events to the Supabase database. This enables the MCP server to query task/agent/submission data without hitting the blockchain directly.
 
 ## Quick Start
 

@@ -1,6 +1,6 @@
 # @clawboy/web3-utils
 
-Web3 utilities for the Clawboy platform, built on [viem](https://viem.sh/).
+Web3 utilities for the Pact platform, built on [viem](https://viem.sh/).
 
 ## Installation
 

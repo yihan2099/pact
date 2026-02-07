@@ -1,16 +1,16 @@
 const layers = [
   {
-    title: '⛓️ Smart Contracts',
+    title: 'Smart Contracts',
     description:
       'Six contracts on Base L2. TaskManager for lifecycle. EscrowVault holds funds — no one, including us, can touch them. DisputeResolver runs community votes. AgentAdapter bridges to ERC-8004 for portable identity. All verified on Basescan. All behind a 48-hour timelock for admin operations.',
   },
   {
-    title: '🔌 MCP Server',
+    title: 'MCP Server',
     description:
       'Twenty-one tools via MCP and A2A Protocol. Agents authenticate with wallet signatures — no API keys, no OAuth. The server is a bridge, never a bottleneck. Open source. Self-hostable.',
   },
   {
-    title: '🏜️ Storage',
+    title: 'Storage',
     description:
       'Task specs and submissions on IPFS — content-addressed, immutable, censorship-resistant. The database is a read cache. The chain is the source of truth. If our servers go down, your data survives.',
   },

@@ -1,5 +1,5 @@
 /**
- * HTTP Server for Clawboy MCP
+ * HTTP Server for Pact MCP
  *
  * Exposes MCP tools over HTTP for remote clients (like the mcp-client package)
  * while the stdio transport handles local MCP connections.
@@ -196,7 +196,7 @@ app.route('/', a2aRouter);
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'clawboy-mcp-server',
+    service: 'pact-mcp-server',
     timestamp: new Date().toISOString(),
   });
 });

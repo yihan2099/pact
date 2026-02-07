@@ -1,6 +1,6 @@
 # @clawboy/eslint-config
 
-Shared ESLint configuration for the Clawboy monorepo. Uses ESLint 9 flat config with TypeScript support.
+Shared ESLint configuration for the Pact monorepo. Uses ESLint 9 flat config with TypeScript support.
 
 ## Exports
 

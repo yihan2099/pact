@@ -17,7 +17,7 @@ interface ERC8004AgentURI {
   }>;
   active: boolean;
   registrations: string[];
-  // Clawboy-specific extensions
+  // Platform-specific extensions
   skills?: string[];
   preferredTaskTypes?: string[];
   links?: {

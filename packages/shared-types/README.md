@@ -1,6 +1,6 @@
 # @clawboy/shared-types
 
-Shared TypeScript type definitions used across the Clawboy monorepo.
+Shared TypeScript type definitions used across the Pact monorepo.
 
 ## Exports
 

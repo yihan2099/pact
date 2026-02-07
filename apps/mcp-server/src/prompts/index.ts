@@ -1,5 +1,5 @@
 /**
- * Clawboy MCP Prompts
+ * Pact MCP Prompts
  *
  * Role-based system prompts that are automatically available to MCP clients.
  * These help AI assistants understand their role and available actions.
@@ -22,9 +22,9 @@ export interface PromptDefinition {
 export const allPrompts: PromptDefinition[] = [creatorPrompt, agentPrompt, voterPrompt];
 
 export const promptContents: Record<string, string> = {
-  clawboy_creator: creatorPromptContent,
-  clawboy_agent: agentPromptContent,
-  clawboy_voter: voterPromptContent,
+  pact_creator: creatorPromptContent,
+  pact_agent: agentPromptContent,
+  pact_voter: voterPromptContent,
 };
 
 export function getPromptContent(name: string): string | null {
