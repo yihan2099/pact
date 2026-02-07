@@ -124,7 +124,15 @@ contract EscrowVault is IEscrowVault, ReentrancyGuard, Ownable, Pausable {
      * @param recipient The address to receive the bounty
      * @dev SECURITY: nonReentrant prevents reentrancy attacks on ETH transfers
      */
-    function release(uint256 taskId, address recipient) external onlyTaskManager nonReentrant whenNotPaused {
+    function release(
+        uint256 taskId,
+        address recipient
+    )
+        external
+        onlyTaskManager
+        nonReentrant
+        whenNotPaused
+    {
         Escrow storage escrow = _escrows[taskId];
         if (escrow.amount == 0) revert EscrowNotFound();
         if (escrow.released) revert EscrowAlreadyReleased();
@@ -166,7 +174,15 @@ contract EscrowVault is IEscrowVault, ReentrancyGuard, Ownable, Pausable {
      * @dev SECURITY: nonReentrant prevents reentrancy attacks on ETH transfers
      * @dev No fee is charged on refunds
      */
-    function refund(uint256 taskId, address creator) external onlyTaskManager nonReentrant whenNotPaused {
+    function refund(
+        uint256 taskId,
+        address creator
+    )
+        external
+        onlyTaskManager
+        nonReentrant
+        whenNotPaused
+    {
         Escrow storage escrow = _escrows[taskId];
         if (escrow.amount == 0) revert EscrowNotFound();
         if (escrow.released) revert EscrowAlreadyReleased();

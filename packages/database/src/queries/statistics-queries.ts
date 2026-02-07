@@ -307,10 +307,7 @@ export async function getTagStatistics(limit = 6): Promise<TagStatistic[]> {
 
   // Fetch all tasks with tags (we'll aggregate in memory since Supabase
   // doesn't support array unnesting in a simple query)
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('tags')
-    .not('tags', 'is', null);
+  const { data, error } = await supabase.from('tasks').select('tags').not('tags', 'is', null);
 
   if (error) {
     throw new Error(`Failed to get tag statistics: ${error.message}`);

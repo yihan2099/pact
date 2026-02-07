@@ -58,7 +58,13 @@ export function TaskActions({
   }
 
   const error = selectError || rejectError || finalizeError;
-  const isAnyPending = isSelecting || isRejecting || isFinalizing || isSelectConfirming || isRejectConfirming || isFinalizeConfirming;
+  const isAnyPending =
+    isSelecting ||
+    isRejecting ||
+    isFinalizing ||
+    isSelectConfirming ||
+    isRejectConfirming ||
+    isFinalizeConfirming;
 
   return (
     <Card className="border-primary/20">
@@ -74,9 +80,7 @@ export function TaskActions({
 
         {status === 'open' && submissions.length > 0 && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Select a winner from the submissions:
-            </p>
+            <p className="text-sm text-muted-foreground">Select a winner from the submissions:</p>
             <div className="flex flex-wrap gap-2">
               {submissions.map((sub) => (
                 <Button

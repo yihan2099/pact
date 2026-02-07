@@ -4,12 +4,12 @@ Rate limiting utilities using Upstash Redis. Provides pre-configured limiters fo
 
 ## Exports
 
-| Export path          | Description                        |
-| -------------------- | ---------------------------------- |
-| `.`                  | Client, configs, middleware        |
-| `./middleware/hono`  | Hono rate limit middleware         |
-| `./config/mcp`       | MCP server rate limit config       |
-| `./config/web`       | Web app rate limit config          |
+| Export path         | Description                  |
+| ------------------- | ---------------------------- |
+| `.`                 | Client, configs, middleware  |
+| `./middleware/hono` | Hono rate limit middleware   |
+| `./config/mcp`      | MCP server rate limit config |
+| `./config/web`      | Web app rate limit config    |
 
 ## Environment Variables
 

@@ -43,9 +43,7 @@ export function ConnectButton() {
                   <span className="hidden sm:inline text-xs text-muted-foreground">
                     {chain.name}
                   </span>
-                  <span className="font-mono text-xs">
-                    {account.displayName}
-                  </span>
+                  <span className="font-mono text-xs">{account.displayName}</span>
                 </Button>
               );
             })()}

@@ -58,14 +58,9 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
               <Badge variant="outline" className={getStatusColor(task.status)}>
                 {formatStatus(task.status)}
               </Badge>
-              <span className="text-xs text-muted-foreground">
-                Task #{task.chain_task_id}
-              </span>
+              <span className="text-xs text-muted-foreground">Task #{task.chain_task_id}</span>
             </div>
-            <h1
-              className="text-2xl font-bold"
-              style={{ fontFamily: 'var(--font-zilla-slab)' }}
-            >
+            <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-zilla-slab)' }}>
               {task.title || `Task #${task.chain_task_id}`}
             </h1>
           </div>
@@ -77,9 +72,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
           </div>
         </div>
 
-        {task.description && (
-          <p className="text-sm text-muted-foreground">{task.description}</p>
-        )}
+        {task.description && <p className="text-sm text-muted-foreground">{task.description}</p>}
 
         {task.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
@@ -174,9 +167,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
       {/* Submissions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
-            Submissions ({submissions.length})
-          </CardTitle>
+          <CardTitle className="text-lg">Submissions ({submissions.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {submissions.length === 0 ? (

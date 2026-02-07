@@ -82,7 +82,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
     event StakesWithdrawn(address indexed recipient, uint256 amount);
 
     // Voter reputation batch processing event
-    event VoterReputationBatchProcessed(uint256 indexed disputeId, uint256 processed, uint256 remaining);
+    event VoterReputationBatchProcessed(
+        uint256 indexed disputeId, uint256 processed, uint256 remaining
+    );
 
     // Emergency bypass event
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed selector);
@@ -158,7 +160,12 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
      * @param taskId The task ID to dispute
      * @return disputeId The created dispute ID
      */
-    function startDispute(uint256 taskId) external payable whenNotPaused returns (uint256 disputeId) {
+    function startDispute(uint256 taskId)
+        external
+        payable
+        whenNotPaused
+        returns (uint256 disputeId)
+    {
         ITaskManager.Task memory task = taskManager.getTask(taskId);
 
         // Verify task is in review (within challenge window)

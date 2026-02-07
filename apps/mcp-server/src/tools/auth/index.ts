@@ -55,7 +55,8 @@ export const authToolDefs = [
   },
   {
     name: 'auth_session',
-    description: 'Check your current session status or invalidate it to log out. Sessions expire after 24 hours.',
+    description:
+      'Check your current session status or invalidate it to log out. Sessions expire after 24 hours.',
     inputSchema: {
       type: 'object' as const,
       properties: {

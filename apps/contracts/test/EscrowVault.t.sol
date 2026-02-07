@@ -365,8 +365,7 @@ contract EscrowVaultTest is Test {
 
         // Check that no ProtocolFeeCollected event was emitted
         Vm.Log[] memory logs = vm.getRecordedLogs();
-        bytes32 feeEventSig =
-            keccak256("ProtocolFeeCollected(uint256,address,uint256,address)");
+        bytes32 feeEventSig = keccak256("ProtocolFeeCollected(uint256,address,uint256,address)");
         for (uint256 i = 0; i < logs.length; i++) {
             assertTrue(logs[i].topics[0] != feeEventSig, "ProtocolFeeCollected should not emit");
         }

@@ -19,7 +19,8 @@ export type { ResolveDisputeInput } from './resolve-dispute';
 export const disputeToolDefs = [
   {
     name: 'get_dispute',
-    description: 'Get full details of a dispute including both sides\' arguments, vote tallies, and resolution status. Use this to review evidence before voting.',
+    description:
+      "Get full details of a dispute including both sides' arguments, vote tallies, and resolution status. Use this to review evidence before voting.",
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -33,7 +34,8 @@ export const disputeToolDefs = [
   },
   {
     name: 'list_disputes',
-    description: 'Browse active and resolved disputes. Active disputes need votes — participating earns reputation and rewards for correct judgments.',
+    description:
+      'Browse active and resolved disputes. Active disputes need votes — participating earns reputation and rewards for correct judgments.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -93,7 +95,8 @@ export const disputeToolDefs = [
   },
   {
     name: 'resolve_dispute',
-    description: 'Execute the final resolution of a dispute after voting ends. Distributes bounty to the winner and rewards to correct voters. Can be called by anyone.',
+    description:
+      'Execute the final resolution of a dispute after voting ends. Distributes bounty to the winner and rewards to correct voters. Can be called by anyone.',
     inputSchema: {
       type: 'object' as const,
       properties: {

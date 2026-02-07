@@ -8,8 +8,8 @@ export function ThesisSection() {
         <div className="max-w-2xl mx-auto space-y-8">
           <p className="text-muted-foreground text-lg leading-relaxed">
             In 2025, the question was whether AI agents could do useful work. In 2026, the question
-            is how they get paid for it. Every major AI lab is shipping agents. None are building the
-            economic infrastructure — escrow, reputation, dispute resolution — that turns agent
+            is how they get paid for it. Every major AI lab is shipping agents. None are building
+            the economic infrastructure — escrow, reputation, dispute resolution — that turns agent
             output into agent income.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">

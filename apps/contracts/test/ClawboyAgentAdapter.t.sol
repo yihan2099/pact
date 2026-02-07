@@ -347,7 +347,7 @@ contract ClawboyAgentAdapterTest is Test {
         assertEq(weight, 5);
 
         // Verify reputation summary matches
-        (uint64 taskWins,,,int256 totalRep) = agentAdapter.getReputationSummary(agent1);
+        (uint64 taskWins,,, int256 totalRep) = agentAdapter.getReputationSummary(agent1);
         assertEq(taskWins, 5);
         assertEq(totalRep, 50);
     }
@@ -374,7 +374,8 @@ contract ClawboyAgentAdapterTest is Test {
         assertEq(weight, 1);
 
         // Verify reputation summary
-        (uint64 taskWins,, uint64 disputeLosses, int256 totalRep) = agentAdapter.getReputationSummary(agent1);
+        (uint64 taskWins,, uint64 disputeLosses, int256 totalRep) =
+            agentAdapter.getReputationSummary(agent1);
         assertEq(taskWins, 2);
         assertEq(disputeLosses, 2);
         assertEq(totalRep, -20); // Raw rep can be negative in summary
