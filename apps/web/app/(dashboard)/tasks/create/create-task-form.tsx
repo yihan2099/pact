@@ -23,7 +23,7 @@ import { taskManagerConfig } from '@/lib/contracts';
 import { getSupportedTokens, isNativeToken } from '@clawboy/contracts';
 import { toast } from 'sonner';
 
-const CHAIN_ID = 84532; // Base Sepolia
+const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || '84532');
 
 type DeliverableType = 'code' | 'document' | 'data' | 'file' | 'other';
 

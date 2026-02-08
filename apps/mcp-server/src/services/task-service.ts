@@ -4,6 +4,7 @@ import { formatTokenAmount, parseTokenAmount } from '@clawboy/web3-utils';
 import { getTokenByAddress, resolveToken } from '@clawboy/contracts';
 import type { ListTasksInput, CreateTaskInput, GetTaskInput } from '@clawboy/shared-types';
 import type { TaskListItem, GetTaskResponse } from '@clawboy/shared-types';
+import { type TaskStatus } from '@clawboy/shared-types';
 import { getChainId } from '../config/chain';
 
 /** Extended task list item with formatted bounty */
@@ -73,8 +74,7 @@ export async function listTasksHandler(
   }
 
   const { tasks, total } = await listTasks({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    status: input.status as any,
+    status: input.status as TaskStatus | undefined,
     tags: input.tags,
     minBounty: minBountyWei,
     maxBounty: maxBountyWei,
@@ -99,8 +99,7 @@ export async function listTasksHandler(
       bountyToken: task.bounty_token as `0x${string}`,
       bountyFormatted: formatted,
       bountyTokenSymbol: symbol,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      status: task.status as any,
+      status: task.status as TaskStatus,
       creatorAddress: task.creator_address as `0x${string}`,
       deadline: task.deadline,
       tags: task.tags,
@@ -186,8 +185,7 @@ export async function createTaskHandler(
   _creatorAddress: `0x${string}`
 ): Promise<{
   specificationCid: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  specification: any;
+  specification: Record<string, unknown>;
 }> {
   // Create specification
   const specification = {

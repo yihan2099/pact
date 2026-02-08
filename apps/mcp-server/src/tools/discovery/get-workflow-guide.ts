@@ -5,12 +5,17 @@
  * Provides actionable guidance for agents, creators, and voters.
  */
 
+import { z } from 'zod';
 import type { WorkflowGuide, Workflow } from '../types';
 
-export interface GetWorkflowGuideInput {
-  role: 'agent' | 'creator' | 'voter';
-  workflow?: string;
-}
+const VALID_ROLES = ['agent', 'creator', 'voter'] as const;
+
+export const getWorkflowGuideSchema = z.object({
+  role: z.enum(VALID_ROLES),
+  workflow: z.string().optional(),
+});
+
+export type GetWorkflowGuideInput = z.infer<typeof getWorkflowGuideSchema>;
 
 export interface GetWorkflowGuideOutput {
   role: string;
@@ -329,11 +334,7 @@ const workflowGuides: Record<string, WorkflowGuide> = {
  * Handler for get_workflow_guide tool
  */
 export async function getWorkflowGuideHandler(args: unknown): Promise<GetWorkflowGuideOutput> {
-  const input = args as GetWorkflowGuideInput;
-
-  if (!input?.role || !['agent', 'creator', 'voter'].includes(input.role)) {
-    throw new Error('Invalid role. Must be one of: agent, creator, voter');
-  }
+  const input = getWorkflowGuideSchema.parse(args);
 
   const guide = workflowGuides[input.role];
 

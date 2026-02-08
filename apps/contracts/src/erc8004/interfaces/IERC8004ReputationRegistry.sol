@@ -166,4 +166,34 @@ interface IERC8004ReputationRegistry {
         external
         view
         returns (uint64 count);
+
+    /**
+     * @notice Get a paginated summary of an agent's reputation
+     * @param agentId The agent ID
+     * @param tag1 Filter by primary tag (empty for all)
+     * @param tag2 Filter by secondary tag (empty for all)
+     * @param startClientIndex Index of the first client to process
+     * @param maxClients Maximum number of clients to process in this call
+     * @return count Number of matching feedback entries
+     * @return summaryValue Sum of feedback values
+     * @return summaryValueDecimals Decimal places for the summary value
+     * @return processedClients Number of clients actually processed
+     * @return hasMore True if more clients remain to be processed
+     */
+    function getPaginatedSummary(
+        uint256 agentId,
+        string calldata tag1,
+        string calldata tag2,
+        uint256 startClientIndex,
+        uint256 maxClients
+    )
+        external
+        view
+        returns (
+            uint64 count,
+            int128 summaryValue,
+            uint8 summaryValueDecimals,
+            uint256 processedClients,
+            bool hasMore
+        );
 }

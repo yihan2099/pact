@@ -193,9 +193,7 @@ describe('Discovery Tools', () => {
     });
 
     test('should throw error for invalid role', async () => {
-      await expect(getWorkflowGuideHandler({ role: 'invalid' as 'agent' })).rejects.toThrow(
-        'Invalid role'
-      );
+      await expect(getWorkflowGuideHandler({ role: 'invalid' as 'agent' })).rejects.toThrow();
     });
 
     test('should throw error for unknown workflow', async () => {

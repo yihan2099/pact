@@ -76,6 +76,13 @@ export const EscrowVaultABI = [
       { name: 'newOwner', type: 'address', indexed: true },
     ],
   },
+  {
+    type: 'event',
+    name: 'TimelockSet',
+    inputs: [
+      { name: 'newTimelock', type: 'address', indexed: true },
+    ],
+  },
 
   // Read functions
   {

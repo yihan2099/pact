@@ -123,6 +123,13 @@ export const DisputeResolverABI = [
   },
   {
     type: 'event',
+    name: 'TimelockSet',
+    inputs: [
+      { name: 'newTimelock', type: 'address', indexed: true },
+    ],
+  },
+  {
+    type: 'event',
     name: 'Paused',
     inputs: [{ name: 'account', type: 'address', indexed: false }],
   },
@@ -259,7 +266,7 @@ export const DisputeResolverABI = [
   },
   {
     type: 'function',
-    name: 'MAJORITY_THRESHOLD',
+    name: 'MAJORITY_THRESHOLD_BPS',
     inputs: [],
     outputs: [{ name: '', type: 'uint256' }],
     stateMutability: 'view',

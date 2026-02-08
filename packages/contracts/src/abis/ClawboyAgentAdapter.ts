@@ -58,6 +58,13 @@ export const ClawboyAgentAdapterABI = [
       { name: 'delta', type: 'int256', indexed: false },
     ],
   },
+  {
+    type: 'event',
+    name: 'TimelockSet',
+    inputs: [
+      { name: 'newTimelock', type: 'address', indexed: true },
+    ],
+  },
 
   // Read functions
   {

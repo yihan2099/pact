@@ -103,6 +103,9 @@ contract TaskManager is ITaskManager, Pausable {
     event ChallengeWindowUpdated(uint256 oldWindow, uint256 newWindow);
     event SelectionDeadlineUpdated(uint256 oldDeadline, uint256 newDeadline);
 
+    // Timelock configuration event
+    event TimelockSet(address indexed newTimelock);
+
     /**
      * @notice Initiate ownership transfer (two-step process)
      * @param newOwner The address to transfer ownership to
@@ -148,6 +151,7 @@ contract TaskManager is ITaskManager, Pausable {
     function setTimelock(address _timelock) external onlyOwner {
         if (_timelock == address(0)) revert ZeroAddress();
         timelock = _timelock;
+        emit TimelockSet(_timelock);
     }
 
     /**

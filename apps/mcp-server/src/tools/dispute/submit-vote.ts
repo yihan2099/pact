@@ -43,27 +43,23 @@ export const submitVoteTool = {
       args: [BigInt(input.disputeId)],
     });
 
-    // viem returns hybrid object - use numeric indices for reliability
-    const r = disputeData as unknown as {
-      [key: number]: unknown;
-      id?: bigint;
-      taskId?: bigint;
-      disputer?: `0x${string}`;
-      votingDeadline?: bigint;
-      status?: number;
-      votesForDisputer?: bigint;
-      votesAgainstDisputer?: bigint;
-    };
+    // viem returns a hybrid struct/tuple - cast through unknown to validate fields
+    const r = disputeData as unknown as readonly unknown[];
+    if (!r || r.length < 9) {
+      throw new Error('Unexpected contract response format for getDispute');
+    }
+    const id = r[0] as bigint;
+    const taskId = r[1] as bigint;
+    const disputer = r[2] as `0x${string}`;
+    const votingDeadline = r[4] as bigint;
+    const status = r[5] as number;
+    const votesForDisputer = r[7] as bigint;
+    const votesAgainstDisputer = r[8] as bigint;
+    if (typeof status !== 'number' || typeof id !== 'bigint') {
+      throw new Error('Unexpected field types in getDispute response');
+    }
 
-    const dispute = {
-      id: (r[0] as bigint) ?? r.id ?? 0n,
-      taskId: (r[1] as bigint) ?? r.taskId ?? 0n,
-      disputer: (r[2] as `0x${string}`) ?? r.disputer ?? ('0x0' as `0x${string}`),
-      votingDeadline: (r[4] as bigint) ?? r.votingDeadline ?? 0n,
-      status: (r[5] as number) ?? r.status ?? 0,
-      votesForDisputer: (r[7] as bigint) ?? r.votesForDisputer ?? 0n,
-      votesAgainstDisputer: (r[8] as bigint) ?? r.votesAgainstDisputer ?? 0n,
-    };
+    const dispute = { id, taskId, disputer, votingDeadline, status, votesForDisputer, votesAgainstDisputer };
 
     if (dispute.id === 0n) {
       throw new Error(`Dispute not found: ${input.disputeId}`);
@@ -93,14 +89,13 @@ export const submitVoteTool = {
       args: [dispute.taskId],
     });
 
-    // viem returns hybrid object - use numeric indices for reliability
-    // Task ABI: [id, creator, status, bountyAmount, ...]
-    const taskR = taskData as unknown as {
-      [key: number]: unknown;
-      creator?: `0x${string}`;
-    };
+    // viem returns a hybrid struct/tuple - cast through unknown to validate fields
+    const taskR = taskData as unknown as readonly unknown[];
+    if (!taskR || taskR.length < 2) {
+      throw new Error('Unexpected contract response format for getTask');
+    }
     const task = {
-      creator: (taskR[1] as `0x${string}`) ?? taskR.creator ?? ('0x0' as `0x${string}`),
+      creator: taskR[1] as `0x${string}`,
     };
 
     if (context.callerAddress.toLowerCase() === task.creator.toLowerCase()) {

@@ -35,7 +35,8 @@ import { getChallengeHandler, verifySignatureHandler, getSessionHandler } from '
 import { allTools } from './tools';
 import { logAccessDenied, logSecurityEvent } from './services/security-logger';
 import { a2aRouter } from './a2a';
-import { sanitizeErrorMessage, isUnknownToolError } from './utils/error-sanitizer';
+import { isUnknownToolError } from './utils/error-sanitizer';
+import { toHttpError, ERROR_CODES } from './utils/api-error';
 import { getChainId } from './config/chain';
 
 const app = new Hono();
@@ -470,6 +471,7 @@ app.post('/tools/:toolName', async (c) => {
       return c.json(
         {
           error: 'Access denied',
+          code: ERROR_CODES.ACCESS_DENIED,
           reason: accessCheck.reason,
         },
         403
@@ -489,10 +491,10 @@ app.post('/tools/:toolName', async (c) => {
     // Return 404 for unknown tools, 500 for other errors (sanitized)
     if (isUnknownToolError(error)) {
       const message = error instanceof Error ? error.message : 'Unknown tool';
-      return c.json({ error: message }, 404);
+      return c.json({ error: message, code: ERROR_CODES.UNKNOWN_TOOL }, 404);
     }
 
-    return c.json({ error: sanitizeErrorMessage(error) }, 500);
+    return c.json(toHttpError(error), 500);
   }
 });
 

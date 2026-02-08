@@ -39,20 +39,19 @@ export const startDisputeTool = {
       args: [BigInt(input.taskId)],
     });
 
-    // viem returns hybrid object - use numeric indices for reliability
-    // Task ABI: [id, creator, status, bountyAmount, bountyToken, specificationCid, ...]
-    const r = taskData as unknown as {
-      [key: number]: unknown;
-      creator?: `0x${string}`;
-      bountyAmount?: bigint;
-      status?: number;
-    };
+    // viem returns a hybrid struct/tuple - cast through unknown to validate fields
+    const r = taskData as unknown as readonly unknown[];
+    if (!r || r.length < 4) {
+      throw new Error('Unexpected contract response format for getTask');
+    }
+    const creator = r[1] as `0x${string}`;
+    const status = r[2] as number;
+    const bountyAmount = r[3] as bigint;
+    if (typeof status !== 'number' || typeof bountyAmount !== 'bigint') {
+      throw new Error('Unexpected field types in getTask response');
+    }
 
-    const task = {
-      creator: (r[1] as `0x${string}`) ?? r.creator ?? ('0x0' as `0x${string}`),
-      bountyAmount: (r[3] as bigint) ?? r.bountyAmount ?? 0n,
-      status: (r[2] as number) ?? r.status ?? 0,
-    };
+    const task = { creator, bountyAmount, status };
 
     // TaskStatus.InReview = 1
     if (task.status !== 1) {

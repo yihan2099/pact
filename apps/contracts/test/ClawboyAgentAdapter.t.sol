@@ -400,4 +400,22 @@ contract ClawboyAgentAdapterTest is Test {
     function test_GetAgentId_Zero() public view {
         assertEq(agentAdapter.getAgentId(randomUser), 0);
     }
+
+    function test_GetVoteWeight_ZeroReputation() public {
+        // Register agent with no wins or losses
+        vm.prank(agent1);
+        agentAdapter.register("ipfs://agent1-profile-cid");
+
+        // Verify reputation is zero
+        (uint64 taskWins, uint64 disputeWins, uint64 disputeLosses, int256 totalRep) =
+            agentAdapter.getReputationSummary(agent1);
+        assertEq(taskWins, 0);
+        assertEq(disputeWins, 0);
+        assertEq(disputeLosses, 0);
+        assertEq(totalRep, 0);
+
+        // With 0 reputation: log2(0 + 1) = log2(1) = 0, minimum weight for registered = 1
+        uint256 weight = agentAdapter.getVoteWeight(agent1);
+        assertEq(weight, 1, "Zero reputation should yield minimum weight of 1 for registered agent");
+    }
 }

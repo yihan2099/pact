@@ -131,7 +131,11 @@ contract EscrowVault is IEscrowVault, ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @notice Release bounty to the recipient (agent), deducting protocol fee
+     * @notice Release bounty to the recipient (agent), deducting protocol fee.
+     *         Fee is calculated as: feeAmount = (totalAmount * protocolFeeBps) / 10_000.
+     *         Net payout = totalAmount - feeAmount. Fee is sent to protocolTreasury.
+     *         protocolFeeBps is capped at MAX_FEE_BPS (1000 = 10%), and Solidity 0.8
+     *         overflow checks prevent any arithmetic overflow.
      * @param taskId The task ID
      * @param recipient The address to receive the bounty
      * @dev SECURITY: nonReentrant prevents reentrancy attacks on ETH transfers
@@ -220,6 +224,7 @@ contract EscrowVault is IEscrowVault, ReentrancyGuard, Ownable, Pausable {
     function setTimelock(address _timelock) external onlyOwner {
         if (_timelock == address(0)) revert ZeroAddress();
         timelockController = _timelock;
+        emit TimelockSet(_timelock);
     }
 
     /**

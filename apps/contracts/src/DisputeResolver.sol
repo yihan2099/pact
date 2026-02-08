@@ -17,9 +17,16 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
     // Constants
     uint256 public constant MIN_DISPUTE_STAKE = 0.01 ether;
     uint256 public constant DISPUTE_STAKE_PERCENT = 1; // 1% of bounty
-    uint256 public constant MAJORITY_THRESHOLD = 60; // 60% weighted majority
+    uint256 public constant MAJORITY_THRESHOLD_BPS = 6000; // 60% in basis points (10000 = 100%)
     uint256 public constant MAX_VOTERS_PER_DISPUTE = 500; // Prevent gas exhaustion in resolution
     uint256 public constant VOTER_REP_BATCH_SIZE = 50; // Max voters processed per batch call
+    /// @dev VOTE_CORRECT_DELTA and VOTE_INCORRECT_DELTA are passed to
+    ///      ClawboyAgentAdapter.updateVoterReputation(), which only uses the *sign*
+    ///      of the delta (positive → reward, negative → penalty). The actual reputation
+    ///      values written on-chain are VOTE_CORRECT_VALUE / VOTE_INCORRECT_VALUE
+    ///      defined in ClawboyAgentAdapter. Keep both pairs in sync if you change them.
+    int256 constant VOTE_CORRECT_DELTA = 3; // Reputation reward for voting with majority
+    int256 constant VOTE_INCORRECT_DELTA = -2; // Reputation penalty for voting against majority
 
     // Configurable time constant with bounded setter
     uint256 public votingPeriod = 48 hours;
@@ -91,6 +98,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
 
     // Time configuration event
     event VotingPeriodUpdated(uint256 oldPeriod, uint256 newPeriod);
+
+    // Timelock configuration event
+    event TimelockSet(address indexed newTimelock);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert OnlyOwner();
@@ -263,9 +273,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
             // No votes - default to creator wins (status quo)
             disputerWon = false;
         } else {
-            // Check if disputer got 60%+ of votes
-            uint256 disputerPercent = (dispute.votesForDisputer * 100) / totalVotes;
-            disputerWon = disputerPercent >= MAJORITY_THRESHOLD;
+            // Check if disputer got 60%+ of votes (basis points for precision)
+            uint256 disputerBps = (dispute.votesForDisputer * 10_000) / totalVotes;
+            disputerWon = disputerBps >= MAJORITY_THRESHOLD_BPS;
         }
 
         dispute.status = DisputeStatus.Resolved;
@@ -287,7 +297,13 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
     }
 
     /**
-     * @dev Process dispute outcome - handle stakes and reputation
+     * @dev Process dispute outcome - handle stakes and reputation.
+     *      If disputer wins: stake is returned and reputation is updated via TaskManager.
+     *      If disputer loses: stake is slashed (tracked in totalSlashedStakes) and a
+     *      dispute loss is recorded against the disputer's reputation.
+     *      In both cases, voter reputation is updated in batches via _updateVoterReputation().
+     * @param dispute The dispute storage reference
+     * @param disputerWon Whether the disputer won the vote
      */
     function _processDisputeOutcome(Dispute storage dispute, bool disputerWon) private {
         if (disputerWon) {
@@ -327,9 +343,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
             bool votedWithMajority = (vote.supportsDisputer == disputerWon);
 
             if (votedWithMajority) {
-                agentAdapter.updateVoterReputation(voters[i], 3); // +3 for voting with majority
+                agentAdapter.updateVoterReputation(voters[i], VOTE_CORRECT_DELTA);
             } else {
-                agentAdapter.updateVoterReputation(voters[i], -2); // -2 for voting against majority
+                agentAdapter.updateVoterReputation(voters[i], VOTE_INCORRECT_DELTA);
             }
         }
 
@@ -367,9 +383,9 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
             bool votedWithMajority = (vote.supportsDisputer == disputerWon);
 
             if (votedWithMajority) {
-                agentAdapter.updateVoterReputation(voters[i], 3);
+                agentAdapter.updateVoterReputation(voters[i], VOTE_CORRECT_DELTA);
             } else {
-                agentAdapter.updateVoterReputation(voters[i], -2);
+                agentAdapter.updateVoterReputation(voters[i], VOTE_INCORRECT_DELTA);
             }
         }
 
@@ -526,6 +542,7 @@ contract DisputeResolver is IDisputeResolver, ReentrancyGuard, Pausable {
     function setTimelock(address _timelock) external onlyOwner {
         if (_timelock == address(0)) revert ZeroAddress();
         timelock = _timelock;
+        emit TimelockSet(_timelock);
     }
 
     /**

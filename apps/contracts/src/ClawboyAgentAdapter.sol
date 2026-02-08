@@ -73,6 +73,9 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
     // Emergency bypass event
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed selector);
 
+    // Timelock configuration event
+    event TimelockSet(address indexed newTimelock);
+
     constructor(address _identityRegistry, address _reputationRegistry) {
         identityRegistry = IERC8004IdentityRegistry(_identityRegistry);
         reputationRegistry = IERC8004ReputationRegistry(_reputationRegistry);
@@ -122,6 +125,7 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
     function setTimelock(address _timelock) external onlyOwner {
         if (_timelock == address(0)) revert ZeroAddress();
         timelock = _timelock;
+        emit TimelockSet(_timelock);
     }
 
     /**
@@ -250,11 +254,18 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
     }
 
     /**
-     * @notice Update voter reputation
+     * @notice Update voter reputation after a dispute is resolved
+     * @param voter The voter's wallet address
+     * @param delta Positive for correct votes, negative for incorrect votes
+     * @dev Silently skips voters with agentId == 0. This is intentional: while
+     *      DisputeResolver.submitVote() requires registration to vote, an agent
+     *      could deregister between voting and dispute resolution. In that case,
+     *      their reputation update is safely skipped rather than reverting the
+     *      entire batch.
      */
     function updateVoterReputation(address voter, int256 delta) external onlyAuthorized {
         uint256 agentId = identityRegistry.getAgentIdByWallet(voter);
-        if (agentId == 0) return; // Silently skip non-registered voters
+        if (agentId == 0) return;
 
         string memory tag2 = delta > 0 ? TAG_CORRECT : TAG_INCORRECT;
         int128 value = delta > 0 ? VOTE_CORRECT_VALUE : VOTE_INCORRECT_VALUE;
@@ -338,8 +349,12 @@ contract ClawboyAgentAdapter is IClawboyAgentAdapter {
     }
 
     /**
-     * @dev Calculate floor(log2(x)) for x > 0
-     * Returns 0 for x = 0 or x = 1
+     * @dev Calculate floor(log2(x)) using bit-shifting.
+     *      Returns 0 for x = 0 or x = 1. Used by getVoteWeight() to produce
+     *      a logarithmic vote weight from reputation, ensuring diminishing
+     *      returns as reputation grows.
+     * @param x The value to compute log2 of
+     * @return The floor of log2(x)
      */
     function _log2(uint256 x) private pure returns (uint256) {
         if (x <= 1) return 0;

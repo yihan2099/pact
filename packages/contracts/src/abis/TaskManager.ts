@@ -149,6 +149,13 @@ export const TaskManagerABI = [
   },
   {
     type: 'event',
+    name: 'TimelockSet',
+    inputs: [
+      { name: 'newTimelock', type: 'address', indexed: true },
+    ],
+  },
+  {
+    type: 'event',
     name: 'Paused',
     inputs: [{ name: 'account', type: 'address', indexed: false }],
   },

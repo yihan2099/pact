@@ -32,6 +32,7 @@ import { getSession } from './auth/session-manager';
 import { checkAccessWithRegistrationRefresh } from './auth/access-control';
 import { allPrompts, getPromptContent } from './prompts';
 import { allResources, getResourceContent, resourceExists } from './resources';
+import { toMcpError } from './utils/api-error';
 
 export interface ServerContext {
   callerAddress: `0x${string}`;
@@ -258,9 +259,7 @@ export function createMcpServer() {
         content: [
           {
             type: 'text',
-            text: JSON.stringify({
-              error: error instanceof Error ? error.message : 'Unknown error',
-            }),
+            text: JSON.stringify(toMcpError(error)),
           },
         ],
         isError: true,

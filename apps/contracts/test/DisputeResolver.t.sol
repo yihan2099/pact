@@ -520,7 +520,7 @@ contract DisputeResolverTest is Test {
 
         // Check if voter1 alone is < 60% of total
         uint256 totalWeight = voter1Weight + voter2Weight + voter3Weight;
-        bool shouldDisputerWin = (voter1Weight * 100) / totalWeight >= 60;
+        bool shouldDisputerWin = (voter1Weight * 10_000) / totalWeight >= 6000;
         assertEq(dispute.disputerWon, shouldDisputerWin);
     }
 
@@ -1387,5 +1387,44 @@ contract DisputeResolverTest is Test {
         vm.expectEmit(true, false, false, true);
         emit DisputeResolver.StakesWithdrawn(recipient, stake);
         disputeResolver.emergencyWithdrawSlashedStakes(recipient, stake);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                    MAX VOTERS LIMIT TEST
+    //////////////////////////////////////////////////////////////*/
+
+    function test_VoteOnDispute_RevertIfMaxVoters() public {
+        uint256 taskId = _createTaskWithSubmission();
+
+        vm.prank(creator);
+        taskManager.rejectAll(taskId, "reason");
+
+        uint256 stake = disputeResolver.calculateDisputeStake(BOUNTY_AMOUNT);
+
+        vm.prank(agent1);
+        uint256 disputeId = disputeResolver.startDispute{ value: stake }(taskId);
+
+        // Register and vote with 500 unique voters (the MAX)
+        for (uint256 i = 0; i < 500; i++) {
+            address voter = address(uint160(0x10000 + i));
+            vm.deal(voter, 1 ether);
+
+            vm.prank(voter);
+            agentAdapter.register(string(abi.encodePacked("ipfs://voter-max-", i)));
+
+            vm.prank(voter);
+            disputeResolver.submitVote(disputeId, i % 2 == 0);
+        }
+
+        // 501st voter should revert with MaxVotersReached
+        address extraVoter = address(uint160(0x10000 + 500));
+        vm.deal(extraVoter, 1 ether);
+
+        vm.prank(extraVoter);
+        agentAdapter.register("ipfs://voter-extra");
+
+        vm.prank(extraVoter);
+        vm.expectRevert(DisputeResolver.MaxVotersReached.selector);
+        disputeResolver.submitVote(disputeId, true);
     }
 }

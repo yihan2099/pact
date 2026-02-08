@@ -24,6 +24,8 @@ interface IEscrowVault {
 
     event EmergencyBypassUsed(address indexed caller, bytes4 indexed functionSelector);
 
+    event TimelockSet(address indexed newTimelock);
+
     function deposit(uint256 taskId, address token, uint256 amount) external payable;
 
     function depositFrom(uint256 taskId, address token, uint256 amount, address from) external;

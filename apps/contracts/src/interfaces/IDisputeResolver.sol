@@ -82,7 +82,7 @@ interface IDisputeResolver {
 
     function DISPUTE_STAKE_PERCENT() external view returns (uint256);
 
-    function MAJORITY_THRESHOLD() external view returns (uint256);
+    function MAJORITY_THRESHOLD_BPS() external view returns (uint256);
 
     // Configurable time constant
     function votingPeriod() external view returns (uint256);
