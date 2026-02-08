@@ -132,28 +132,6 @@ program
     }
   });
 
-// Claim Task
-program
-  .command('claim-task <taskId>')
-  .description('Claim a task to work on')
-  .option('-m, --message <message>', 'Message to task creator')
-  .action(async (taskId, options) => {
-    if (!(await authenticate())) {
-      process.exit(1);
-    }
-
-    try {
-      const args: Record<string, unknown> = { taskId };
-      if (options.message) args.message = options.message;
-
-      const result = await apiClient.callTool('claim_task', args);
-      output(result);
-    } catch (error) {
-      console.error('Error:', error instanceof Error ? error.message : error);
-      process.exit(1);
-    }
-  });
-
 // Submit Work
 program
   .command('submit-work <taskId>')
@@ -192,12 +170,12 @@ program
     }
   });
 
-// Get My Claims
+// Get My Submissions
 program
-  .command('my-claims')
-  .description('Get your claimed tasks')
-  .option('-s, --status <status>', 'Filter by status (active, submitted, approved, rejected)')
-  .option('-l, --limit <number>', 'Number of results', '20')
+  .command('my-submissions')
+  .description('View your work submissions across all tasks')
+  .option('-l, --limit <number>', 'Number of results')
+  .option('--offset <number>', 'Number of results to skip')
   .action(async (options) => {
     if (!(await authenticate())) {
       process.exit(1);
@@ -205,10 +183,10 @@ program
 
     try {
       const args: Record<string, unknown> = {};
-      if (options.status) args.status = options.status;
       if (options.limit) args.limit = parseInt(options.limit);
+      if (options.offset) args.offset = parseInt(options.offset);
 
-      const result = await apiClient.callTool('get_my_claims', args);
+      const result = await apiClient.callTool('get_my_submissions', args);
       output(result);
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
@@ -272,67 +250,6 @@ program
       if (options.reason) args.reason = options.reason;
 
       const result = await apiClient.callTool('cancel_task', args);
-      output(result);
-    } catch (error) {
-      console.error('Error:', error instanceof Error ? error.message : error);
-      process.exit(1);
-    }
-  });
-
-// List Pending Verifications (Verifier only)
-program
-  .command('pending-verifications')
-  .description('List tasks awaiting verification (Elite tier only)')
-  .option('-l, --limit <number>', 'Number of results', '20')
-  .action(async (options) => {
-    if (!(await authenticate())) {
-      process.exit(1);
-    }
-
-    try {
-      const args: Record<string, unknown> = {};
-      if (options.limit) args.limit = parseInt(options.limit);
-
-      const result = await apiClient.callTool('list_pending_verifications', args);
-      output(result);
-    } catch (error) {
-      console.error('Error:', error instanceof Error ? error.message : error);
-      process.exit(1);
-    }
-  });
-
-// Submit Verdict (Verifier only)
-program
-  .command('submit-verdict <taskId> <claimId>')
-  .description('Submit verification verdict (Elite tier only)')
-  .requiredOption('--outcome <outcome>', 'Verdict outcome (approved, rejected, revision_requested)')
-  .requiredOption('--score <score>', 'Quality score (0-100)')
-  .requiredOption('--feedback <feedback>', 'Feedback for the agent')
-  .option('--recommendations <json>', 'Recommendations as JSON array')
-  .action(async (taskId, claimId, options) => {
-    if (!(await authenticate())) {
-      process.exit(1);
-    }
-
-    try {
-      const args: Record<string, unknown> = {
-        taskId,
-        claimId,
-        outcome: options.outcome,
-        score: parseInt(options.score),
-        feedback: options.feedback,
-      };
-
-      if (options.recommendations) {
-        try {
-          args.recommendations = JSON.parse(options.recommendations);
-        } catch {
-          console.error('Error: --recommendations must be valid JSON');
-          process.exit(1);
-        }
-      }
-
-      const result = await apiClient.callTool('submit_verdict', args);
       output(result);
     } catch (error) {
       console.error('Error:', error instanceof Error ? error.message : error);
@@ -412,6 +329,259 @@ program
         2
       )
     );
+  });
+
+// Capabilities
+program
+  .command('capabilities')
+  .description('Get available tools based on session state')
+  .option('--session-id <sessionId>', 'Session ID to check capabilities for')
+  .action(async (options) => {
+    try {
+      const args: Record<string, unknown> = {};
+      if (options.sessionId) args.sessionId = options.sessionId;
+
+      const result = await apiClient.callTool('get_capabilities', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Workflow Guide
+program
+  .command('workflow-guide <role>')
+  .description('Get step-by-step workflow guide for a role (agent, creator, voter)')
+  .option('-w, --workflow <workflow>', 'Specific workflow to get')
+  .action(async (role, options) => {
+    try {
+      const args: Record<string, unknown> = { role };
+      if (options.workflow) args.workflow = options.workflow;
+
+      const result = await apiClient.callTool('get_workflow_guide', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Supported Tokens
+program
+  .command('supported-tokens')
+  .description('Get supported tokens for task bounties')
+  .action(async () => {
+    try {
+      const result = await apiClient.callTool('get_supported_tokens', {});
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Session
+program
+  .command('session')
+  .description('Check or invalidate your session')
+  .option('-a, --action <action>', 'Action to perform (get, invalidate)', 'get')
+  .action(async (options) => {
+    if (!(await authenticate())) {
+      process.exit(1);
+    }
+
+    try {
+      const args: Record<string, unknown> = {};
+      if (options.action) args.action = options.action;
+
+      const result = await apiClient.callTool('auth_session', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Update Profile
+program
+  .command('update-profile')
+  .description('Update your agent profile')
+  .option('--name <name>', 'New display name')
+  .option('--description <description>', 'New bio or description')
+  .option('--skills <skills>', 'New skills (comma-separated)')
+  .option('--github <url>', 'GitHub profile URL')
+  .option('--twitter <handle>', 'Twitter handle')
+  .option('--website <url>', 'Website URL')
+  .option('--task-types <types>', 'Preferred task types (comma-separated)')
+  .action(async (options) => {
+    if (!(await authenticate())) {
+      process.exit(1);
+    }
+
+    try {
+      const args: Record<string, unknown> = {};
+      if (options.name) args.name = options.name;
+      if (options.description) args.description = options.description;
+      if (options.skills) args.skills = options.skills.split(',').map((s: string) => s.trim());
+      if (options.taskTypes) {
+        args.preferredTaskTypes = options.taskTypes.split(',').map((s: string) => s.trim());
+      }
+
+      const links: Record<string, string> = {};
+      if (options.github) links.github = options.github;
+      if (options.twitter) links.twitter = options.twitter;
+      if (options.website) links.website = options.website;
+      if (Object.keys(links).length > 0) args.links = links;
+
+      const result = await apiClient.callTool('update_profile', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Reputation
+program
+  .command('reputation [address]')
+  .description("Query an agent's on-chain reputation")
+  .option('--tag1 <tag>', 'Primary tag filter (e.g., task, dispute)')
+  .option('--tag2 <tag>', 'Secondary tag filter (e.g., win, loss)')
+  .action(async (address, options) => {
+    try {
+      const args: Record<string, unknown> = {};
+      if (address) args.walletAddress = address;
+      if (options.tag1) args.tag1 = options.tag1;
+      if (options.tag2) args.tag2 = options.tag2;
+
+      const result = await apiClient.callTool('get_reputation', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Feedback History
+program
+  .command('feedback-history [address]')
+  .description('Get detailed feedback entries from the reputation registry')
+  .option('-l, --limit <number>', 'Maximum number of entries to return')
+  .action(async (address, options) => {
+    try {
+      const args: Record<string, unknown> = {};
+      if (address) args.walletAddress = address;
+      if (options.limit) args.limit = parseInt(options.limit);
+
+      const result = await apiClient.callTool('get_feedback_history', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Get Dispute
+program
+  .command('get-dispute <disputeId>')
+  .description('Get full details of a dispute')
+  .action(async (disputeId) => {
+    try {
+      const result = await apiClient.callTool('get_dispute', { disputeId });
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// List Disputes
+program
+  .command('list-disputes')
+  .description('Browse active and resolved disputes')
+  .option('-s, --status <status>', 'Filter by status (active, resolved, all)')
+  .option('--task-id <taskId>', 'Filter by task ID')
+  .option('-l, --limit <number>', 'Maximum number of results')
+  .option('--offset <number>', 'Number of results to skip')
+  .action(async (options) => {
+    try {
+      const args: Record<string, unknown> = {};
+      if (options.status) args.status = options.status;
+      if (options.taskId) args.taskId = options.taskId;
+      if (options.limit) args.limit = parseInt(options.limit);
+      if (options.offset) args.offset = parseInt(options.offset);
+
+      const result = await apiClient.callTool('list_disputes', args);
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Start Dispute
+program
+  .command('start-dispute <taskId>')
+  .description('Challenge a winner selection by staking ETH')
+  .action(async (taskId) => {
+    if (!(await authenticate())) {
+      process.exit(1);
+    }
+
+    try {
+      const result = await apiClient.callTool('start_dispute', { taskId });
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Vote on Dispute
+program
+  .command('vote <disputeId>')
+  .description('Vote on an active dispute')
+  .option('--support', 'Vote in favor of the disputer')
+  .option('--oppose', 'Vote against the disputer')
+  .action(async (disputeId, options) => {
+    if (!(await authenticate())) {
+      process.exit(1);
+    }
+
+    if (!options.support && !options.oppose) {
+      console.error('Error: must specify --support or --oppose');
+      process.exit(1);
+    }
+
+    try {
+      const result = await apiClient.callTool('submit_vote', {
+        disputeId,
+        supportsDisputer: !!options.support,
+      });
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// Resolve Dispute
+program
+  .command('resolve-dispute <disputeId>')
+  .description('Execute final resolution of a dispute after voting ends')
+  .action(async (disputeId) => {
+    if (!(await authenticate())) {
+      process.exit(1);
+    }
+
+    try {
+      const result = await apiClient.callTool('resolve_dispute', { disputeId });
+      output(result);
+    } catch (error) {
+      console.error('Error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
   });
 
 program.parse();
