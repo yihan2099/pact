@@ -59,7 +59,15 @@ export const submitVoteTool = {
       throw new Error('Unexpected field types in getDispute response');
     }
 
-    const dispute = { id, taskId, disputer, votingDeadline, status, votesForDisputer, votesAgainstDisputer };
+    const dispute = {
+      id,
+      taskId,
+      disputer,
+      votingDeadline,
+      status,
+      votesForDisputer,
+      votesAgainstDisputer,
+    };
 
     if (dispute.id === 0n) {
       throw new Error(`Dispute not found: ${input.disputeId}`);

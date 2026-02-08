@@ -66,16 +66,12 @@ describe('Error Sanitizer', () => {
     });
 
     test('invalid database connection string sanitized (H4 regression)', () => {
-      const result = sanitizeErrorMessage(
-        new Error('Invalid database connection string format')
-      );
+      const result = sanitizeErrorMessage(new Error('Invalid database connection string format'));
       expect(result).toBe('An internal error occurred. Please try again later.');
     });
 
     test('TypeError sanitized', () => {
-      const result = sanitizeErrorMessage(
-        new Error("Cannot read property 'x' of undefined")
-      );
+      const result = sanitizeErrorMessage(new Error("Cannot read property 'x' of undefined"));
       expect(result).toBe('An internal error occurred. Please try again later.');
     });
   });

@@ -17,10 +17,7 @@ import {
   handleTasksList,
   handleTasksCancel,
 } from './handlers';
-import type {
-  A2AJsonRpcRequest,
-  A2AJsonRpcResponse,
-} from './types';
+import type { A2AJsonRpcRequest, A2AJsonRpcResponse } from './types';
 import { A2A_ERROR_CODES, createErrorResponse } from './types';
 import { logSecurityEvent } from '../services/security-logger';
 import {
