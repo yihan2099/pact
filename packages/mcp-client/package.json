@@ -33,6 +33,7 @@
     "@clawboy/contracts": "workspace:*",
     "@clawboy/eslint-config": "workspace:*",
     "@clawboy/shared-types": "workspace:*",
+    "@types/bun": "latest",
     "@types/node": "^25.2.0",
     "eslint": "^9",
     "tsup": "^8.0.0",
