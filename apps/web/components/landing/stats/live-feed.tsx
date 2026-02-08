@@ -226,12 +226,19 @@ function ExpandedDetails({ item }: ExpandedDetailsProps) {
   };
 
   return (
-    <div className="px-3 pb-3 pt-1 space-y-3">
+    <div className="px-2 sm:px-3 pb-3 pt-1 space-y-3">
       {/* Full title */}
       <p className="text-sm text-foreground leading-relaxed">{item.fullTitle}</p>
 
+      {/* Bounty (shown here on mobile since it's hidden in the row) */}
+      {item.bounty && (
+        <div className="sm:hidden text-xs">
+          <span className="text-foreground font-medium">{formatBounty(item.bounty)}</span>
+        </div>
+      )}
+
       {/* Meta info */}
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="text-muted-foreground/60">{formatTimeAgo(item.timestamp)}</span>
         <span className="text-muted-foreground/40">·</span>
         {renderMeta()}
@@ -277,32 +284,32 @@ function ExpandableRow({ item, isExpanded, onToggle }: ExpandableRowProps) {
       {/* Row header */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 py-2.5 px-3 text-left cursor-pointer"
+        className="w-full flex items-center gap-2 sm:gap-3 py-2.5 px-2 sm:px-3 text-left cursor-pointer min-w-0"
       >
         {/* Chevron */}
         <ChevronRight
-          className={`size-4 text-muted-foreground/60 shrink-0 transition-transform duration-200 ${
+          className={`size-3.5 sm:size-4 text-muted-foreground/60 shrink-0 transition-transform duration-200 ${
             isExpanded ? 'rotate-90' : ''
           }`}
         />
 
         {/* Event label */}
-        <span className={`text-xs font-medium w-14 shrink-0 ${getEventColor(item.type)}`}>
+        <span className={`text-[10px] sm:text-xs font-medium w-12 sm:w-14 shrink-0 ${getEventColor(item.type)}`}>
           {getEventLabel(item.type)}
         </span>
 
         {/* Title */}
-        <span className="flex-1 text-sm text-foreground truncate">{item.title}</span>
+        <span className="flex-1 text-xs sm:text-sm text-foreground truncate min-w-0">{item.title}</span>
 
-        {/* Bounty */}
+        {/* Bounty - hidden on small screens, visible in expanded details */}
         {item.bounty && (
-          <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
+          <span className="hidden sm:inline text-xs text-muted-foreground shrink-0 tabular-nums">
             {formatBounty(item.bounty)}
           </span>
         )}
 
         {/* Time */}
-        <span className="text-xs text-muted-foreground/60 shrink-0 w-8 text-right tabular-nums">
+        <span className="text-[10px] sm:text-xs text-muted-foreground/60 shrink-0 w-7 sm:w-8 text-right tabular-nums">
           {formatTimeCompact(item.timestamp)}
         </span>
       </button>

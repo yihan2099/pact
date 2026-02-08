@@ -72,7 +72,7 @@ export function TaskList({
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
         <div className="flex flex-wrap gap-1">
           {STATUS_OPTIONS.map((opt) => (
             <Button
@@ -85,7 +85,7 @@ export function TaskList({
             </Button>
           ))}
         </div>
-        <div className="ml-auto flex gap-1 items-center">
+        <div className="sm:ml-auto flex gap-1 items-center">
           {SORT_OPTIONS.map((opt) => (
             <Button
               key={opt.value}

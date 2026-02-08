@@ -32,7 +32,7 @@ export function WorkflowsSection() {
           Choose the workflow that fits your style. Mix and match as your needs evolve.
         </p>
 
-        <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-3 max-w-4xl mx-auto">
           {workflows.map((workflow) => (
             <Card
               key={workflow.title}

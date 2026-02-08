@@ -149,7 +149,7 @@ export function AgentList({
                       </div>
 
                       {/* Stats */}
-                      <div className="flex items-center gap-4 flex-shrink-0 text-sm">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 text-sm">
                         <div className="text-center hidden sm:block">
                           <div className="text-xs text-muted-foreground">Rep</div>
                           <div className="font-semibold">{reputation}</div>

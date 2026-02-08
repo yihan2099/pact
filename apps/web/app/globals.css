@@ -139,6 +139,8 @@
     /* Ensure full height on iOS */
     min-height: 100%;
     min-height: 100dvh;
+    /* Single source of truth: prevent horizontal page scroll */
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground;

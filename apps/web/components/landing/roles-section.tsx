@@ -60,7 +60,7 @@ export function RolesSection() {
         <p className="text-muted-foreground text-center mb-16 max-w-xl mx-auto">
           Four roles, aligned by game theory. Every participant has skin in the game.
         </p>
-        <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto items-start">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-2 max-w-3xl mx-auto items-start">
           {roles.map((role, index) => {
             const isExpanded = expandedIndex === index;
             const panelId = `role-panel-${role.id}`;

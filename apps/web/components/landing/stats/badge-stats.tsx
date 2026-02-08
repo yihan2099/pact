@@ -36,7 +36,7 @@ export function BadgeStats({ stats }: BadgeStatsProps) {
       : 0;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+    <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-2 text-xs sm:text-sm">
       <StatBadge value={formatBounty(stats.bountyAvailable)} label="available" />
       <Separator />
       <StatBadge value={formatCompact(stats.openTasks)} label="open tasks" />

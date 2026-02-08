@@ -255,8 +255,8 @@ export function CreateTaskForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           {deliverables.map((deliverable, index) => (
-            <div key={index} className="flex gap-3 items-start">
-              <div className="w-32 shrink-0">
+            <div key={index} className="flex flex-col sm:flex-row gap-3 items-start">
+              <div className="w-full sm:w-32 shrink-0">
                 <Select
                   value={deliverable.type}
                   onValueChange={(value) => updateDeliverable(index, 'type', value)}
@@ -306,7 +306,7 @@ export function CreateTaskForm() {
           <CardTitle className="text-lg">Bounty</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 space-y-2">
               <Label htmlFor="bountyAmount">Amount</Label>
               <Input
@@ -322,7 +322,7 @@ export function CreateTaskForm() {
                 <p className="text-sm text-destructive">{errors.bountyAmount}</p>
               )}
             </div>
-            <div className="w-36 space-y-2">
+            <div className="w-full sm:w-36 space-y-2">
               <Label>Token</Label>
               <Select value={tokenSymbol} onValueChange={setTokenSymbol}>
                 <SelectTrigger>

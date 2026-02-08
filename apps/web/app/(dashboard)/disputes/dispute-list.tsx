@@ -80,7 +80,7 @@ export function DisputeList({
           <p className="text-sm text-muted-foreground">No disputes have been filed yet.</p>
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {disputes.map((dispute) => {
             const votesFor = parseInt(dispute.votes_for_disputer || '0');
             const votesAgainst = parseInt(dispute.votes_against_disputer || '0');

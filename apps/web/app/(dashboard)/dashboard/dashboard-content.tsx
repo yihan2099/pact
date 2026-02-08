@@ -208,10 +208,10 @@ export function DashboardContent() {
 
       {/* Tabs */}
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="created">My Created Tasks ({createdTotal})</TabsTrigger>
-          <TabsTrigger value="submissions">My Submissions ({submissionsTotal})</TabsTrigger>
-          <TabsTrigger value="won">Won Tasks ({wonTotal})</TabsTrigger>
+        <TabsList className="w-full sm:w-auto flex">
+          <TabsTrigger value="created" className="flex-1 sm:flex-initial text-xs sm:text-sm">Created ({createdTotal})</TabsTrigger>
+          <TabsTrigger value="submissions" className="flex-1 sm:flex-initial text-xs sm:text-sm">Submissions ({submissionsTotal})</TabsTrigger>
+          <TabsTrigger value="won" className="flex-1 sm:flex-initial text-xs sm:text-sm">Won ({wonTotal})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="created" className="mt-4">
@@ -234,7 +234,7 @@ export function DashboardContent() {
                 <Link key={task.id} href={`/tasks/${task.chain_task_id}`}>
                   <Card className="card-hover hover:border-primary/30 cursor-pointer py-3 mb-2">
                     <CardContent>
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <Badge variant="outline" className={getStatusColor(task.status)}>
                             {formatStatus(task.status)}
@@ -276,7 +276,7 @@ export function DashboardContent() {
               {submissions.map((sub) => (
                 <Card key={sub.id} className="card-hover hover:border-primary/30 py-3 mb-2">
                   <CardContent>
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                       <div className="flex items-center gap-2 min-w-0">
                         <Link
                           href={`/tasks/${sub.task_id}`}
@@ -331,7 +331,7 @@ export function DashboardContent() {
                 <Link key={task.id} href={`/tasks/${task.chain_task_id}`}>
                   <Card className="card-hover hover:border-primary/30 cursor-pointer py-3 mb-2">
                     <CardContent>
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
                             Won

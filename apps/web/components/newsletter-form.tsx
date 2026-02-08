@@ -34,7 +34,7 @@ export function NewsletterForm() {
             required
             disabled={isPending}
             aria-describedby={state?.message && !state.success ? emailErrorId : undefined}
-            className="h-12 px-5 rounded-full bg-card backdrop-blur-sm border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 min-w-[280px]"
+            className="h-12 px-5 rounded-full bg-card backdrop-blur-sm border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 w-full sm:min-w-[280px]"
           />
         </div>
         <button

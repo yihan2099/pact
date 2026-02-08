@@ -80,7 +80,7 @@ export function VoteActions({ chainDisputeId, disputerAddress }: VoteActionsProp
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white"
             disabled={isPending}

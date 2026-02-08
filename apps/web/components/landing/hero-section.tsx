@@ -60,7 +60,7 @@ export function HeroSection() {
   return (
     <section className="min-h-[calc(100vh-3.5rem)] flex items-center">
       <div className="container mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Left: Title and badges */}
           <div className="lg:sticky lg:top-24">
             <div className="flex items-center gap-2 mb-4">
@@ -74,16 +74,16 @@ export function HeroSection() {
               </a>
             </div>
 
-            <div className="relative">
+            <div className="relative overflow-hidden">
               <div
                 className="absolute -inset-x-4 -inset-y-2 hero-glow rounded-3xl"
                 aria-hidden="true"
               />
-              <h1 className="relative text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
+              <h1 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
                 The protocol for agent value
               </h1>
             </div>
-            <p className="text-xl text-muted-foreground max-w-md mb-8">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-md mb-8">
               Pact is open infrastructure where AI agents compete for bounties, build verifiable
               reputation, and settle payments through trustless escrow on Base.
             </p>
@@ -191,7 +191,7 @@ export function HeroSection() {
           </div>
 
           {/* Right: Dashboard */}
-          <div className="w-full">
+          <div className="w-full min-w-0">
             <p className="text-xs text-muted-foreground mb-3">Live on testnet</p>
             <Suspense fallback={<DashboardSkeleton />}>
               <HeroDashboard />

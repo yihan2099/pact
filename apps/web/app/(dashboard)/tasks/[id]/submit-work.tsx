@@ -178,7 +178,7 @@ export function SubmitWork({ chainTaskId, status }: SubmitWorkProps) {
                   </Button>
                 )}
               </div>
-              <div className="grid gap-2 sm:grid-cols-[140px_1fr]">
+              <div className="grid gap-2 grid-cols-1 sm:grid-cols-[140px_1fr]">
                 <select
                   value={d.type}
                   onChange={(e) => updateDeliverable(index, 'type', e.target.value)}

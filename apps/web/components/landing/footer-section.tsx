@@ -24,9 +24,9 @@ export function FooterSection() {
 
         {/* Multi-column footer */}
         <footer className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             {/* Brand */}
-            <div className="col-span-2 md:col-span-1">
+            <div className="sm:col-span-2 md:col-span-1">
               <span
                 className="text-xl font-bold text-foreground"
                 style={{ fontFamily: 'var(--font-zilla-slab)' }}

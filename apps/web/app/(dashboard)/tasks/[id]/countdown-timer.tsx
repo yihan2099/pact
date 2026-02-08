@@ -38,7 +38,7 @@ export function CountdownTimer({ deadline }: CountdownTimerProps) {
 
   return (
     <div
-      className={`font-mono text-lg font-bold ${isExpired ? 'text-destructive' : 'text-yellow-500'}`}
+      className={`font-mono text-base sm:text-lg font-bold ${isExpired ? 'text-destructive' : 'text-yellow-500'}`}
     >
       {timeLeft}
     </div>

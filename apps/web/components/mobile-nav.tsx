@@ -24,7 +24,7 @@ export function MobileNav() {
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-72">
+      <SheetContent side="left" className="w-[min(72vw,18rem)]">
         <SheetHeader>
           <SheetTitle
             className="text-xl font-bold"

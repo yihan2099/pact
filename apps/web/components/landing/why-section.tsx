@@ -33,14 +33,14 @@ export function WhySection() {
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
           Why Pact
         </h2>
-        <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5 max-w-6xl mx-auto">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 max-w-6xl mx-auto">
           {reasons.map((reason) => (
             <div
               key={reason.title}
               className="p-6 rounded-xl bg-card backdrop-blur-sm border border-border hover:bg-accent transition-colors"
             >
               <h3 className="text-lg font-semibold text-foreground">{reason.title}</h3>
-              <p className="mt-2 text-muted-foreground">{reason.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{reason.description}</p>
             </div>
           ))}
         </div>

@@ -75,7 +75,7 @@ export function GettingStartedSection() {
         </p>
 
         {/* Steps 1 & 2: Wallet and Tokens */}
-        <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto mb-12">
+        <div className="grid gap-4 md:gap-6 md:grid-cols-2 max-w-2xl mx-auto mb-12">
           {steps.map((item) => (
             <Card key={item.step} className="p-6 relative overflow-hidden">
               <div className="absolute top-3 right-3 text-6xl font-bold text-muted-foreground/10">
@@ -115,16 +115,16 @@ export function GettingStartedSection() {
               </p>
 
               <Tabs defaultValue="mcp" className="w-full">
-                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-4">
-                  <TabsTrigger value="mcp">MCP Config</TabsTrigger>
-                  <TabsTrigger value="openclaw">OpenClaw</TabsTrigger>
-                  <TabsTrigger value="remote">Remote</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 mb-4">
+                  <TabsTrigger value="mcp" className="text-xs sm:text-sm">MCP Config</TabsTrigger>
+                  <TabsTrigger value="openclaw" className="text-xs sm:text-sm">OpenClaw</TabsTrigger>
+                  <TabsTrigger value="remote" className="text-xs sm:text-sm">Remote</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="mcp">
                   <div className="rounded-lg border border-border overflow-hidden">
-                    <div className="px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">
+                    <div className="px-3 sm:px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground truncate min-w-0">
                         Add to claude_desktop_config.json
                       </p>
                       <Button
@@ -141,7 +141,7 @@ export function GettingStartedSection() {
                         )}
                       </Button>
                     </div>
-                    <pre className="p-4 text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
+                    <pre className="p-3 sm:p-4 text-xs sm:text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
                       {mcpConfig}
                     </pre>
                   </div>
@@ -153,8 +153,8 @@ export function GettingStartedSection() {
 
                 <TabsContent value="openclaw">
                   <div className="rounded-lg border border-border overflow-hidden">
-                    <div className="px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">Install OpenClaw skill</p>
+                    <div className="px-3 sm:px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground truncate min-w-0">Install OpenClaw skill</p>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -169,7 +169,7 @@ export function GettingStartedSection() {
                         )}
                       </Button>
                     </div>
-                    <pre className="p-4 text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
+                    <pre className="p-3 sm:p-4 text-xs sm:text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
                       {openclawInstall}
                     </pre>
                   </div>
@@ -180,8 +180,8 @@ export function GettingStartedSection() {
 
                 <TabsContent value="remote">
                   <div className="rounded-lg border border-border overflow-hidden">
-                    <div className="px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">MCP remote connector URL</p>
+                    <div className="px-3 sm:px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground truncate min-w-0">MCP remote connector URL</p>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -196,7 +196,7 @@ export function GettingStartedSection() {
                         )}
                       </Button>
                     </div>
-                    <pre className="p-4 text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
+                    <pre className="p-3 sm:p-4 text-xs sm:text-sm font-mono text-muted-foreground overflow-x-auto text-left bg-muted/20">
                       {remoteConnectorUrl}
                     </pre>
                   </div>
