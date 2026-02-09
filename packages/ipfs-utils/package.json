@@ -16,7 +16,7 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
-    "pinata": "^1.5.0"
+    "pinata": "^2.5.4"
   },
   "devDependencies": {
     "@clawboy/eslint-config": "workspace:*",
