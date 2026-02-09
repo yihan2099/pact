@@ -84,7 +84,7 @@ contract InvariantHandler is Test {
         vm.prank(agent);
         try taskManager.submitWork(taskId, "sub-cid") {
             ghost_taskSubmissionCount[taskId]++;
-        } catch {}
+        } catch { }
     }
 
     function selectWinner(uint256 taskIdx, uint256 agentIdx) external {
@@ -106,7 +106,7 @@ contract InvariantHandler is Test {
         vm.prank(creator);
         try taskManager.selectWinner(taskId, winner) {
             ghost_taskHasWinner[taskId] = true;
-        } catch {}
+        } catch { }
     }
 
     function finalizeTask(uint256 taskIdx) external {
@@ -131,7 +131,7 @@ contract InvariantHandler is Test {
             } else if (task.status == ITaskManager.TaskStatus.Refunded) {
                 ghost_totalRefunded += task.bountyAmount;
             }
-        } catch {}
+        } catch { }
     }
 
     function cancelTask(uint256 taskIdx) external {
@@ -151,7 +151,7 @@ contract InvariantHandler is Test {
         try taskManager.cancelTask(taskId) {
             ITaskManager.Task memory task = taskManager.getTask(taskId);
             ghost_totalRefunded += task.bountyAmount;
-        } catch {}
+        } catch { }
     }
 
     function getCreatedTaskCount() external view returns (uint256) {
@@ -175,7 +175,8 @@ contract InvariantsTest is Test {
     function setUp() public {
         identityRegistry = new ERC8004IdentityRegistry();
         reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
@@ -203,12 +204,7 @@ contract InvariantsTest is Test {
         vm.deal(creator, 1000 ether);
 
         handler = new InvariantHandler(
-            taskManager,
-            escrowVault,
-            agentAdapter,
-            disputeResolver,
-            creator,
-            agents
+            taskManager, escrowVault, agentAdapter, disputeResolver, creator, agents
         );
 
         // Target the handler for invariant testing
@@ -241,7 +237,7 @@ contract InvariantsTest is Test {
                 // Task status must be a valid enum value (0-5)
                 uint256 status = uint256(task.status);
                 assertLe(status, 5);
-            } catch {}
+            } catch { }
         }
     }
 
@@ -261,7 +257,7 @@ contract InvariantsTest is Test {
                     // Open tasks should not have a winner
                     assertEq(task.selectedWinner, address(0));
                 }
-            } catch {}
+            } catch { }
         }
     }
 
@@ -291,7 +287,7 @@ contract InvariantsTest is Test {
 
                 assertEq(dispute.votesForDisputer, computedFor);
                 assertEq(dispute.votesAgainstDisputer, computedAgainst);
-            } catch {}
+            } catch { }
         }
     }
 
@@ -319,7 +315,7 @@ contract InvariantsTest is Test {
                 // Every dispute must reference a valid task
                 assertTrue(dispute.taskId > 0);
                 assertTrue(dispute.taskId <= taskManager.taskCount());
-            } catch {}
+            } catch { }
         }
     }
 
@@ -343,11 +339,10 @@ contract InvariantsTest is Test {
             try taskManager.getTask(i) returns (ITaskManager.Task memory task) {
                 if (task.status == ITaskManager.TaskStatus.Completed) {
                     assertTrue(
-                        task.selectedWinner != address(0),
-                        "Completed task must have a winner"
+                        task.selectedWinner != address(0), "Completed task must have a winner"
                     );
                 }
-            } catch {}
+            } catch { }
         }
     }
 
@@ -366,12 +361,8 @@ contract InvariantsTest is Test {
             try taskManager.getTask(i) returns (ITaskManager.Task memory task) {
                 uint256 maxFee = (task.bountyAmount * escrowVault.MAX_FEE_BPS()) / 10_000;
                 // Fee can never exceed maxFee by design
-                assertLe(
-                    (task.bountyAmount * feeBps) / 10_000,
-                    maxFee,
-                    "Fee exceeds max allowed"
-                );
-            } catch {}
+                assertLe((task.bountyAmount * feeBps) / 10_000, maxFee, "Fee exceeds max allowed");
+            } catch { }
         }
     }
 
@@ -385,12 +376,10 @@ contract InvariantsTest is Test {
             try taskManager.getTask(i) returns (ITaskManager.Task memory task) {
                 if (task.status == ITaskManager.TaskStatus.Cancelled) {
                     assertEq(
-                        task.selectedWinner,
-                        address(0),
-                        "Cancelled task should have no winner"
+                        task.selectedWinner, address(0), "Cancelled task should have no winner"
                     );
                 }
-            } catch {}
+            } catch { }
         }
     }
 
@@ -410,7 +399,7 @@ contract InvariantsTest is Test {
                     (, uint256 balance) = escrowVault.getBalance(i);
                     assertEq(balance, 0, "Terminal task should have zero escrow");
                 }
-            } catch {}
+            } catch { }
         }
     }
 }

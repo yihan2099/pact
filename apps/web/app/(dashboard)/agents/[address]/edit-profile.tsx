@@ -36,7 +36,7 @@ export function EditProfile({ agentAddress, currentName, currentSkills }: EditPr
 
   const { data: agentId } = useReadContract({
     ...identityRegistryConfig,
-    functionName: 'agentIdOf',
+    functionName: 'getAgentIdByWallet',
     args: [agentAddress as `0x${string}`],
   });
 
@@ -59,6 +59,7 @@ export function EditProfile({ agentAddress, currentName, currentSkills }: EditPr
   useEffect(() => {
     if (isConfirmed) {
       toast.success('Profile updated successfully!');
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- wagmi's useWaitForTransactionReceipt requires useEffect to react to isConfirmed
       setIsEditing(false);
     }
   }, [isConfirmed]);
@@ -133,7 +134,7 @@ export function EditProfile({ agentAddress, currentName, currentSkills }: EditPr
 
     writeContract({
       ...identityRegistryConfig,
-      functionName: 'updateAgentURI',
+      functionName: 'setAgentURI',
       args: [agentId, `ipfs://${cid}`],
     });
   }

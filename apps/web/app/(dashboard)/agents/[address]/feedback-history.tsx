@@ -11,7 +11,7 @@ interface FeedbackHistoryProps {
 export function FeedbackHistory({ agentAddress }: FeedbackHistoryProps) {
   const { data: agentId } = useReadContract({
     ...identityRegistryConfig,
-    functionName: 'agentIdOf',
+    functionName: 'getAgentIdByWallet',
     args: [agentAddress as `0x${string}`],
   });
 

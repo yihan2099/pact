@@ -13,7 +13,7 @@ import { IDisputeResolver } from "../src/interfaces/IDisputeResolver.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20Cross is ERC20 {
-    constructor() ERC20("Mock Token", "MOCK") {}
+    constructor() ERC20("Mock Token", "MOCK") { }
 
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
@@ -43,7 +43,8 @@ contract CrossContractTest is Test {
     function setUp() public {
         identityRegistry = new ERC8004IdentityRegistry();
         reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
@@ -138,9 +139,7 @@ contract CrossContractTest is Test {
         token.approve(address(escrowVault), BOUNTY_AMOUNT);
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask(
-            "spec-cid", address(token), BOUNTY_AMOUNT, 0
-        );
+        uint256 taskId = taskManager.createTask("spec-cid", address(token), BOUNTY_AMOUNT, 0);
 
         assertEq(token.balanceOf(address(escrowVault)), BOUNTY_AMOUNT);
 
@@ -380,7 +379,7 @@ contract CrossContractTest is Test {
         taskManager.finalizeTask(taskId);
 
         // Check reputation updated
-        (uint64 tw2,,,int256 rep) = agentAdapter.getReputationSummary(newAgent);
+        (uint64 tw2,,, int256 rep) = agentAdapter.getReputationSummary(newAgent);
         assertEq(tw2, 1);
         assertEq(rep, 10); // TASK_WIN_VALUE = 10
 

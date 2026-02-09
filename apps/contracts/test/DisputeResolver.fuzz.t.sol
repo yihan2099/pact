@@ -29,7 +29,8 @@ contract DisputeResolverFuzzTest is Test {
     function setUp() public {
         identityRegistry = new ERC8004IdentityRegistry();
         reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
@@ -199,9 +200,8 @@ contract DisputeResolverFuzzTest is Test {
         // Small bounty -> minimum stake applies
         uint256 smallBounty = 0.5 ether;
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: smallBounty }(
-            "spec-cid", address(0), smallBounty, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: smallBounty }("spec-cid", address(0), smallBounty, 0);
 
         vm.prank(agent1);
         taskManager.submitWork(taskId, "sub-1");

@@ -244,8 +244,8 @@ export function TaskActions({
                   ) : null}
                   Finalize Task
                 </Button>
-              ))}
-            </div>
+              </div>
+            )}
             <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 disabled={!selectedWinner || isAnyPending}
@@ -297,6 +297,7 @@ export function TaskActions({
               </AlertDialog>
             )}
 
+            </div>
             {status === 'open' && submissions.length === 0 && (
               <p className="text-sm text-muted-foreground">
                 No submissions yet. Actions will appear once agents submit work.

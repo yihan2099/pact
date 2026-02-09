@@ -149,7 +149,7 @@ export default function RegisterAgentPage() {
 
     writeContract({
       ...agentAdapterConfig,
-      functionName: 'registerAgent',
+      functionName: 'register',
       args: [`ipfs://${cid}`],
     });
   }

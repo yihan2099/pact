@@ -45,12 +45,10 @@ contract ERC8004IdentityRegistryTest is Test {
         IERC8004IdentityRegistry.MetadataEntry[] memory metadata =
             new IERC8004IdentityRegistry.MetadataEntry[](2);
         metadata[0] = IERC8004IdentityRegistry.MetadataEntry({
-            metadataKey: "name",
-            metadataValue: abi.encode("Agent One")
+            metadataKey: "name", metadataValue: abi.encode("Agent One")
         });
         metadata[1] = IERC8004IdentityRegistry.MetadataEntry({
-            metadataKey: "version",
-            metadataValue: abi.encode("1.0")
+            metadataKey: "version", metadataValue: abi.encode("1.0")
         });
 
         vm.prank(user1);
@@ -156,8 +154,9 @@ contract ERC8004IdentityRegistryTest is Test {
         registry.unsetAgentWallet(agentId);
 
         uint256 deadline = block.timestamp + 1 hours;
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(newWalletPk, ethSignedMessage);
@@ -184,8 +183,9 @@ contract ERC8004IdentityRegistryTest is Test {
 
         // Use wrong private key to sign
         uint256 wrongPk = 0xCAFE;
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(wrongPk, ethSignedMessage);
         bytes memory signature = abi.encodePacked(r, s, v);
@@ -207,8 +207,9 @@ contract ERC8004IdentityRegistryTest is Test {
 
         // Deadline already passed
         uint256 deadline = block.timestamp - 1;
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(newWalletPk, ethSignedMessage);
         bytes memory signature = abi.encodePacked(r, s, v);
@@ -230,8 +231,9 @@ contract ERC8004IdentityRegistryTest is Test {
 
         // Deadline > 7 days from now
         uint256 deadline = block.timestamp + 8 days;
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(newWalletPk, ethSignedMessage);
         bytes memory signature = abi.encodePacked(r, s, v);
@@ -267,8 +269,9 @@ contract ERC8004IdentityRegistryTest is Test {
         // newWallet is now auto-linked to agent3
 
         // Now try to link newWallet to agent1 — should fail
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agent1Id, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agent1Id, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(newWalletPk, ethSignedMessage);
         bytes memory signature = abi.encodePacked(r, s, v);
@@ -287,8 +290,9 @@ contract ERC8004IdentityRegistryTest is Test {
         address newWallet = vm.addr(newWalletPk);
 
         uint256 deadline = block.timestamp + 1 hours;
-        bytes32 message =
-            keccak256(abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry)));
+        bytes32 message = keccak256(
+            abi.encodePacked("Link wallet to agent:", agentId, deadline, address(registry))
+        );
         bytes32 ethSignedMessage = _toEthSignedMessageHash(message);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(newWalletPk, ethSignedMessage);
         bytes memory signature = abi.encodePacked(r, s, v);

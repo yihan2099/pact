@@ -4,7 +4,9 @@ pragma solidity ^0.8.24;
 import { Test, console } from "forge-std/Test.sol";
 import { ERC8004IdentityRegistry } from "../src/erc8004/ERC8004IdentityRegistry.sol";
 import { ERC8004ReputationRegistry } from "../src/erc8004/ERC8004ReputationRegistry.sol";
-import { IERC8004ReputationRegistry } from "../src/erc8004/interfaces/IERC8004ReputationRegistry.sol";
+import {
+    IERC8004ReputationRegistry
+} from "../src/erc8004/interfaces/IERC8004ReputationRegistry.sol";
 
 contract ERC8004ReputationRegistryTest is Test {
     ERC8004IdentityRegistry public identityRegistry;

@@ -7,7 +7,7 @@ import { IEscrowVault } from "../src/interfaces/IEscrowVault.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20EscrowFuzz is ERC20 {
-    constructor() ERC20("Mock Token", "MOCK") {}
+    constructor() ERC20("Mock Token", "MOCK") { }
 
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
@@ -146,8 +146,7 @@ contract EscrowVaultFuzzTest is Test {
 
         // Verify no value lost
         assertEq(
-            (recipient.balance - recipientBefore) + (treasury.balance - treasuryBefore),
-            amount
+            (recipient.balance - recipientBefore) + (treasury.balance - treasuryBefore), amount
         );
         assertEq(recipient.balance, recipientBefore + expectedNet);
     }

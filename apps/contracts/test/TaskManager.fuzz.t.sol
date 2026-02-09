@@ -12,7 +12,7 @@ import { ITaskManager } from "../src/interfaces/ITaskManager.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20Fuzz is ERC20 {
-    constructor() ERC20("Mock Token", "MOCK") {}
+    constructor() ERC20("Mock Token", "MOCK") { }
 
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
@@ -37,7 +37,8 @@ contract TaskManagerFuzzTest is Test {
     function setUp() public {
         identityRegistry = new ERC8004IdentityRegistry();
         reputationRegistry = new ERC8004ReputationRegistry(address(identityRegistry));
-        agentAdapter = new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
+        agentAdapter =
+            new ClawboyAgentAdapter(address(identityRegistry), address(reputationRegistry));
 
         address predictedTaskManager =
             vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 1);
@@ -94,9 +95,8 @@ contract TaskManagerFuzzTest is Test {
         uint256 deadline = block.timestamp + futureOffset;
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, deadline
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, deadline);
 
         ITaskManager.Task memory task = taskManager.getTask(taskId);
         assertEq(task.deadline, deadline);
@@ -110,9 +110,8 @@ contract TaskManagerFuzzTest is Test {
         numSubmitters = uint8(bound(numSubmitters, 1, 20));
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
 
         for (uint256 i = 0; i < numSubmitters; i++) {
             address agent = address(uint160(0x1000 + i));
@@ -160,9 +159,7 @@ contract TaskManagerFuzzTest is Test {
         string memory cid = string(cidBytes);
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            cid, address(0), 1 ether, 0
-        );
+        uint256 taskId = taskManager.createTask{ value: 1 ether }(cid, address(0), 1 ether, 0);
 
         ITaskManager.Task memory task = taskManager.getTask(taskId);
         assertEq(keccak256(bytes(task.specificationCid)), keccak256(bytes(cid)));
@@ -200,9 +197,8 @@ contract TaskManagerFuzzTest is Test {
         winnerIdx = uint8(bound(winnerIdx, 0, numAgents - 1));
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
 
         address[] memory agents = new address[](numAgents);
         for (uint256 i = 0; i < numAgents; i++) {
@@ -258,9 +254,8 @@ contract TaskManagerFuzzTest is Test {
             address c = address(uint160(0x3000 + i));
             vm.deal(c, 2 ether);
             vm.prank(c);
-            uint256 taskId = taskManager.createTask{ value: 1 ether }(
-                "spec-cid", address(0), 1 ether, 0
-            );
+            uint256 taskId =
+                taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
             assertEq(taskId, i + 1);
         }
 
@@ -277,9 +272,8 @@ contract TaskManagerFuzzTest is Test {
         uint256 deadline = block.timestamp + futureOffset;
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, deadline
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, deadline);
 
         vm.warp(deadline + 1);
 
@@ -294,9 +288,8 @@ contract TaskManagerFuzzTest is Test {
 
     function test_DuplicateSubmissionReverts() public {
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
 
         vm.prank(agent1);
         taskManager.submitWork(taskId, "sub-1");
@@ -318,9 +311,7 @@ contract TaskManagerFuzzTest is Test {
         token.approve(address(escrowVault), bountyAmount);
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask(
-            "spec-cid", address(token), bountyAmount, 0
-        );
+        uint256 taskId = taskManager.createTask("spec-cid", address(token), bountyAmount, 0);
 
         ITaskManager.Task memory task = taskManager.getTask(taskId);
         assertEq(task.bountyAmount, bountyAmount);
@@ -336,9 +327,8 @@ contract TaskManagerFuzzTest is Test {
         warpOffset = bound(warpOffset, 0, 48 hours - 1);
 
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
 
         vm.prank(agent1);
         taskManager.submitWork(taskId, "sub-cid");
@@ -360,9 +350,8 @@ contract TaskManagerFuzzTest is Test {
 
     function test_FinalizeExactlyAtChallengeDeadline() public {
         vm.prank(creator);
-        uint256 taskId = taskManager.createTask{ value: 1 ether }(
-            "spec-cid", address(0), 1 ether, 0
-        );
+        uint256 taskId =
+            taskManager.createTask{ value: 1 ether }("spec-cid", address(0), 1 ether, 0);
 
         vm.prank(agent1);
         taskManager.submitWork(taskId, "sub-cid");
