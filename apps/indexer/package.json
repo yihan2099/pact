@@ -20,7 +20,7 @@
     "@pactprotocol/shared-types": "workspace:*",
     "@pactprotocol/web3-utils": "workspace:*",
     "@sentry/bun": "^10.38.0",
-    "viem": "^2.21.0"
+    "viem": "^2.52.0"
   },
   "devDependencies": {
     "@pactprotocol/eslint-config": "workspace:*",

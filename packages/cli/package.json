@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@pactprotocol/mcp-client": "workspace:*",
-    "commander": "^14.0.3",
-    "viem": "^2.21.0"
+    "commander": "^15.0.0",
+    "viem": "^2.52.0"
   },
   "devDependencies": {
     "@pactprotocol/eslint-config": "workspace:*",
