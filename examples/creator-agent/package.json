@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "@pactprotocol/mcp-client": "workspace:*",
-    "viem": "2.21.0"
+    "viem": "2.52.0"
   }
 }

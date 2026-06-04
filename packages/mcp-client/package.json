@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "viem": "^2.21.0"
+    "viem": "^2.52.0"
   },
   "devDependencies": {
     "@pactprotocol/contracts": "workspace:*",

@@ -25,8 +25,8 @@
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@sentry/bun": "^10.38.0",
     "hono": "^4.0.0",
-    "viem": "^2.21.0",
-    "zod": "^3.24.0"
+    "viem": "^2.52.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@pactprotocol/eslint-config": "workspace:*",
